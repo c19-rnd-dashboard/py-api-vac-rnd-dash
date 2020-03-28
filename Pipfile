@@ -10,6 +10,7 @@ pandas = "*"
 python-decouple = "*"
 pylint = "*"
 black = "*"
+gunicorn = "*"
 
 [dev-packages]
 black = "*"
