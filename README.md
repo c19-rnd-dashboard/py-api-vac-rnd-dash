@@ -3,8 +3,9 @@
 
 ## Endpoint
 
-Production: `https://c19-vac-rnd-dash-api.herokuapp.com/` 
-Staging: `https://c19-vac-rnd-dash-staging-api.herokuapp.com/`
+Production: https://c19-vac-rnd-dash-api.herokuapp.com/
+
+Staging: https://c19-vac-rnd-dash-staging-api.herokuapp.com/
 
 
 ## Mock Routes
