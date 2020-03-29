@@ -4,7 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+alembic = "*"
 flask = "*"
+flask-caching = "*"
 flask-cors = "*"
 pandas = "*"
 python-decouple = "*"
