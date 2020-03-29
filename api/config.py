@@ -17,3 +17,7 @@ class Config:
 
 class DevelopmentConfig(Config):
     pass
+
+# Setup requirements for local environment
+def local_setup():
+    raise NotImplemented
