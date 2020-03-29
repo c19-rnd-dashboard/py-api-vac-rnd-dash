@@ -153,7 +153,7 @@ Result:
 Run unittests with:
 
 ```bash
->> python -m unittests -discover
+>> python -m unittests discover
 ```
 
 

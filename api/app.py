@@ -34,13 +34,16 @@ def create_app(test_config=None):
         CACHE_TYPE=config('CACHE_TYPE', 'simple'),  # Configure caching
         CACHE_DEFAULT_TIMEOUT=config('CACHE_DEFAULT_TIMEOUT', 300), # Long cache times probably ok for ML api
     )
+
     # Enable CORS header support
     CORS(app)
 
     # Enable caching
     cache = Cache(app)
 
-    # Register routes
+    ##############
+    ### Routes ###
+    ##############
     app.register_blueprint(mock_routes)
 
     #############
@@ -54,5 +57,9 @@ def create_app(test_config=None):
     # logging.basicConfig(filename=app.config['LOGFILE'], level=logging.INFO)  # File logging
     logging.getLogger('flask_cors').level = logging.INFO
     app_logger = logging.getLogger(__name__)
+
+    # Register database functions.  Will allow db.close() to run on teardown
+    from api import db
+    db.init_app(app)
 
     return app
