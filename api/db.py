@@ -8,7 +8,7 @@ Database
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from contextlib import contextmanager
-from models import *
+from api.models import *
 
 import click
 from flask import current_app, g
@@ -59,6 +59,7 @@ def close_db(e=None):
 def init_db():
     db = get_db()
     Base.metadata.create_all(db)
+
 
 @click.command('init-db')
 @with_appcontext

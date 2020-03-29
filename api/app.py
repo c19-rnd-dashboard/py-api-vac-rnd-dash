@@ -59,7 +59,7 @@ def create_app(test_config=None):
     app_logger = logging.getLogger(__name__)
 
     # Register database functions.  Will allow db.close() to run on teardown
-    import db
+    from api import db
     db.init_app(app)
 
     return app
