@@ -25,11 +25,13 @@ class LocalServerTest(LiveServerTestCase):
         return app
 
     def test_server_is_up_and_running(self):
+        # Flask-Testing yields a lot of this functionality
         response = requests.get(self.get_server_url())
         print(response.status_code)
         self.assertEqual(response.status_code, 200)
 
     def test_mock_urls(self):
+        # Example appending self.url to mock endpoints (no endpoint discovery here)
         MOCK_URLS = [f'{self.get_server_url()}/mock{i}' for i in [1, 2]]
         for url in MOCK_URLS:
             print('Searching {}'.format(url))
@@ -38,6 +40,7 @@ class LocalServerTest(LiveServerTestCase):
 
 
 class DeployedServerTest(unittest.TestCase):
+    """ Tests for Deployed Server """
     pass
 
 
