@@ -8,7 +8,11 @@ with open(PACKAGE_ROOT / "VERSION") as version_file:
 
 
 class Config:
-    pass
+    CRED_PATH = PACKAGE_ROOT + "credentials.json"
+    # If modifying these scopes, delete the file token.pickle.
+    SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+    SPREADSHEET_ID = "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
+    RANGE_NAME = "Class Data!A2:E"
 
 
 class DevelopmentConfig(Config):
