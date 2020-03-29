@@ -18,6 +18,7 @@ dependencies:
     - docutils==0.15.2
     - flask-caching
     - flask-cors
+    - flask-testing
     - gunicorn
     - httplib2==0.14.0
     - idna==2.8
