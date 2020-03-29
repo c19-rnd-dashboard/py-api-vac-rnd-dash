@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 flask = "*"
+flask-caching = "*"
 flask-cors = "*"
 pandas = "*"
 python-decouple = "*"
