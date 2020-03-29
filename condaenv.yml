@@ -12,6 +12,7 @@ dependencies:
   - flask
   - pandas
   - numpy
+  - pip
   - pip:
     - chardet==3.0.4
     - docutils==0.15.2
