@@ -16,6 +16,7 @@ dependencies:
   - pip:
     - chardet==3.0.4
     - docutils==0.15.2
+    - flask-caching
     - flask-cors
     - gunicorn
     - httplib2==0.14.0

@@ -3,9 +3,8 @@ from flask import Flask, json, jsonify, request
 from api.routes.mock_routes import mock_routes
 from flask_cors import CORS
 from flask_caching import Cache
-
-# Custom errors
-from errors import InvalidUsage
+from decouple import config
+import os
 
 # Logging
 import logging
@@ -14,7 +13,7 @@ import logging
 ###Setup###
 ###########
 # Local Environment Testing Only.
-#   Un-comment to build enviorment script in instance folder.
+#   Un-comment to build environment script in config.py
 # from instance import setup
 # setup.setup_env()
 
