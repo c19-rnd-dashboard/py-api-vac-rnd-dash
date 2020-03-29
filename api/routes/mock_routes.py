@@ -3,8 +3,14 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta, time
 from random import randint
+from api.config import __version__
 
 mock_routes = Blueprint("mock_routes", __name__)
+
+
+@mock_routes.route("/")
+def home_route():
+    return f"COVID19 Vaccine R&D Dashboard Version: {__version__}"
 
 
 @mock_routes.route("/mock1")

@@ -1,3 +1,6 @@
+# Ignore GSheets API Credentials
+credentials.json
+
 # VSCode
 .vscode
 
