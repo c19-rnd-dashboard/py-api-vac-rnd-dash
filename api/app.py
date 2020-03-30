@@ -54,7 +54,7 @@ def create_app(test_config=None):
     # To enable different services, see README.md
     gunicorn_logger = logging.getLogger('gunicorn.error')
     app.logger.handlers = gunicorn_logger.handlers
-    # logging.basicConfig(filename=app.config['LOGFILE'], level=logging.INFO)  # File logging
+    logging.basicConfig(filename=app.config['LOGFILE'], level=logging.INFO)  # File logging. Remove in PROD
     logging.getLogger('flask_cors').level = logging.INFO
     app_logger = logging.getLogger(__name__)
 
