@@ -150,9 +150,12 @@ Result:
 
 ## Tests
 
-Run unittests with:
+
+Run unittests from application root folder (.../py-api-vac-rnd-dash/) with:
 
 ```bash
+(Requirement Local) >> mkdir .../py-api-vac-rnd-dash/api/instance/logs
+(Requirement Local) >> touch .../py-api-vac-rnd-dash/api/instance/logs/debg.log
 >> python -m unittests discover
 ```
 
