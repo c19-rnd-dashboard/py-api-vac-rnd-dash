@@ -18,10 +18,83 @@ from sqlalchemy import \
 from sqlalchemy.orm import relationship
 
 
-###################
-### Data Models ###
-###################
+#######################
+### New Data Models ###
+#######################
 
+
+class ProductRaw(Base):
+    __tablename__ = "productraw"
+
+    product_id = Column(Integer, primary_key=True)
+    preferred_name = Column(String)
+    chemical_name = Column(String)
+    brand_name = Column(String)
+    repurposed = Column(Boolean)
+    notes = Column(Text)
+    disease = Column(String)
+    application = Column(Text)
+    data_reference = Column(String)
+    data_source = Column(String)
+    type = Column(String)
+    sponsors = Column(Text)
+
+
+class TrialRaw(Base):
+    __tablename__ = 'trialraw'
+
+    trial_id = Column(String, primary_key=True)
+    title = Column(String)
+    registry = Column(String)
+    registration_date = Column(DateTime)
+    enrollment_date = Column(DateTime)
+    start_date = Column(DateTime)
+    recruitment_status = Column(String)
+    title = Column(String)
+    intervention_type = Column(String)
+    trial_id = Column(String) # was in schema ref but don't know if needed
+    intervention_notes = Column(Text)
+    sponsors = Column(Text)
+    countries = Column(Text)
+    data_reference = Column(String)
+    data_source = Column(String)
+    results_link = Column(String)
+
+
+class Milestone(Base):
+    __tablename__ = 'milestone'
+
+    milestone_id = Column(Integer, primary_key=True)
+    name = Column(String)
+    category = Column(String)
+
+
+class ProductMilestone(ProductRaw):
+    __tablename__ = 'productmilestone'
+
+    link_id = Column(Integer, primary_key=True) 
+    milestone_id = Column(Integer, ForeignKey('milestone.milestone_id'))
+    product_id = Column(Integer, ForeignKey('productraw.product_id'))
+    date_start = Column(DateTime)
+    date_complete = Column(DateTime)
+    status = Column(String)
+
+
+class TrialMilestone(TrialRaw):
+    __tablename__ = 'trialmilestone'
+
+    link_id = Column(Integer, primary_key=True) 
+    milestone_id = Column(Integer, ForeignKey('milestone.milestone_id'))
+    trial_id = Column(String, ForeignKey('trialraw.trial_id'))
+    date_start = Column(DateTime)
+    date_complete = Column(DateTime)
+    status = Column(String)
+
+#######################
+### Adv Data Models ###
+#######################
+
+"""
 class Product(Base):
     __tablename__ = "product"
 
@@ -187,3 +260,4 @@ class TrialMilestone(Trial):
     link_id = Column(Integer, primary_key=True) 
     milestone_id = Column(Integer, ForeignKey('milestone.milestone_id'))
     trial_id = Column(String, ForeignKey('trial.trial_id'))
+"""
