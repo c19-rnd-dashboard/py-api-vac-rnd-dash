@@ -45,7 +45,6 @@ class ProductRaw(Base):
     other_partners = Column(Text)
     num_sites = Column(Integer)
     site_locations = Column(Text)
-    disease = Column(String)
 
 
 class TrialRaw(Base):
@@ -58,7 +57,6 @@ class TrialRaw(Base):
     enrollment_date = Column(DateTime)
     start_date = Column(DateTime)
     recruitment_status = Column(String)
-    title = Column(String)
     intervention_type = Column(String)
     intervention_notes = Column(Text)
     sponsors = Column(Text)
