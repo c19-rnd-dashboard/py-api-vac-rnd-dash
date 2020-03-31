@@ -5,8 +5,12 @@ Load local and remote data into database.
 """
 import pandas as pd
 from time import time
+from functools import partial
+
 from .loader import load
 from .writer import write_trial, write_product
+from .transform import filter_columns
+from api.models import *
 
 import logging
 
@@ -147,6 +151,11 @@ def trial_cleaner(data: pd.DataFrame):
 
     return df
 
+
+def make_column_filter(model):
+    return partial(filter_columns, model=model)
+
+
 ##################
 ### Trial Data ###
 ##################
@@ -157,6 +166,7 @@ def assign_trial_transforms(**kwargs):
     transform_list = [
         null_transform,
         trial_cleaner,
+        make_column_filter(TrialRaw)
         # Add transforms here or
         # use transform_list.append(new_transform) for dynamic construction
     ]
@@ -171,6 +181,7 @@ def assign_product_transforms(**kwargs):
     """Assemble trial data transforms for clean write"""
     transform_list = [
         null_transform,
+        make_column_filter(ProductRaw)
         # Add transforms here or
         # use transform_list.append(new_transform) for dynamic construction
     ]
