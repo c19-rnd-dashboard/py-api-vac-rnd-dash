@@ -129,7 +129,7 @@ def is_file(file_or_buffer):
         validate_url(file_or_buffer) and infer_filetype(file_or_buffer) is not None
     ]
 
-    logmsg = f"Tests run: {'-'.join([str(x) for x in tests])}"
+    logmsg = f"IsFile tests: run: {'-'.join([str(x) for x in tests])}"
     loadlogger.info(logmsg)
     # print(logmsg)  # DEBUG
 

@@ -6,6 +6,7 @@ Load local and remote data into database.
 import pandas as pd
 from time import time
 from .loader import load
+from .writer import write_trial
 
 import logging
 
@@ -47,7 +48,7 @@ def run_ingest(source, category:str):
     job = Ingest(source=source, category=category)
     try:
         job.transform_data()
-        ingestlogger.info(f'Transformation completed at: {time()}')
+        ingestlogger.info(f'Transformation completed in: {time() - job.start_time}')
     except Exception as e:
         ingestlogger.error(f'Transformation failed. \n {e.message} \n {e.args}')
 
