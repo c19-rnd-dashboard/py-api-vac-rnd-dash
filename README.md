@@ -150,7 +150,7 @@ Result:
 
 ## Tests
 
-Run unittests with:
+Run unittests from application root folder (.../py-api-vac-rnd-dash/) with:
 
 ```bash
 >> python -m unittests discover
