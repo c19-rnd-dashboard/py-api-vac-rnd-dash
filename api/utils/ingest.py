@@ -6,7 +6,7 @@ Load local and remote data into database.
 import pandas as pd
 from time import time
 from .loader import load
-from .writer import write_trial
+from .writer import write_trial, write_product
 
 import logging
 
@@ -26,6 +26,7 @@ class Ingest():
         self.start_time = time()
         self.data = load(source)
         self.assign_transformations()
+        self.assign_writer()
 
     def assign_transformations(self):
         if self.category == 'trial':
@@ -35,22 +36,58 @@ class Ingest():
         else:
             raise ValueError('Invalid Category Type')
 
+    def assign_writer(self):
+        if self.category == 'trial':
+            self._writer = write_trial
+        elif self.category == 'product': 
+            self._writer = write_product
+        else:
+            raise ValueError('Invalid Category Type')
+
     def transform_data(self):
         self._transformed_data = self.data.copy()
         for transform in self._transforms:
             self._transformed_data = transform(self._transformed_data)
+
+    def write_data(self):
+        if self._transformed_data is not None:
+            self._writer(self._transformed_data)
+        else:
+            error_msg = 'Attempting to write Nonetype.  Transform data first.'
+            ingestlogger.error(error_msg)
+            raise ValueError(error_msg)
 
 
 ### Control Function ###
 
 def run_ingest(source, category:str):
     ingestlogger.info(f'Starting ingest of source: {source} category: {category}')
-    job = Ingest(source=source, category=category)
+    
+    try:  # will start load automatically
+        job = Ingest(source=source, category=category)
+        process_time = time() - job.start_time
+        ingestlogger.info(f'Load completed in: {process_time}')
+    except Exception as e:
+        ingestlogger.error(f'Load failed. \n {e}')
+        return 'error'  # return statement for unittest
+    # Transform Data & Log
     try:
         job.transform_data()
-        ingestlogger.info(f'Transformation completed in: {time() - job.start_time}')
+        ingestlogger.info(f'Transformation completed in: {(time() - job.start_time) - process_time}')
+        process_time = time() - job.start_time
     except Exception as e:
-        ingestlogger.error(f'Transformation failed. \n {e.message} \n {e.args}')
+        ingestlogger.error(f'Transformation failed. \n {e}')
+        return 'error' # return statement for unittest
+    # Write Data & Log
+    try:
+        job.write_data()
+        ingestlogger.info(f'Data write completed in: {(time() - job.start_time) - process_time}')
+        process_time = time() - job.start_time
+    except Exception as e:
+        ingestlogger.error(f'Write failed. \n {e}')
+        return 'error' # return statement for unittest
+
+    ingestlogger.info(f'Ingest completed in {time() - job.start_time}')
 
 
 

@@ -14,7 +14,9 @@ class IngestTest(unittest.TestCase):
 
     def test_trial_ingest(self):
         category = 'trial'
-        run_ingest(source=self.test_url, category=category)
+        error = run_ingest(source=self.test_url, category=category)
+        self.assertIsNone(error)
+
 
 if __name__ == "__main__":
     unittest.main()

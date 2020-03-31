@@ -1,1 +1,1 @@
-from .writers import write_trial
+from .writers import write_trial, write_product
