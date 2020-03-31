@@ -36,8 +36,16 @@ class ProductRaw(Base):
     application = Column(Text)
     data_reference = Column(String)
     data_source = Column(String)
-    type = Column(String)
+    product_type = Column(String)
     sponsors = Column(Text)
+    intervention_type = Column(String)
+    indication = Column(String)
+    molecule_type = Column(String)
+    therapeutic_approach = Column(String)
+    other_partners = Column(Text)
+    num_sites = Column(Integer)
+    site_locations = Column(Text)
+    disease = Column(String)
 
 
 class TrialRaw(Base):
@@ -52,7 +60,6 @@ class TrialRaw(Base):
     recruitment_status = Column(String)
     title = Column(String)
     intervention_type = Column(String)
-    trial_id = Column(String) # was in schema ref but don't know if needed
     intervention_notes = Column(Text)
     sponsors = Column(Text)
     countries = Column(Text)
