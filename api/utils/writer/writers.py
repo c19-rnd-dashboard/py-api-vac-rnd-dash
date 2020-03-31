@@ -19,7 +19,8 @@ def write_trial(data: pd.DataFrame):
     """
     with get_session() as session:
         for i in range(data.shape[0]):
-            curr_trial = TrialRaw(data.iloc[i].to_dict())
+            curr_data = data.iloc[i].to_dict()
+            curr_trial = TrialRaw(**curr_data)
             session.add(curr_trial)
         session.commit()
 
@@ -30,6 +31,7 @@ def write_product(data: pd.DataFrame):
     """
     with get_session() as session:
         for i in range(data.shape[0]):
-            curr_product = ProductRaw(data.iloc[i].to_dict())
+            curr_data = data.iloc[i].to_dict()
+            curr_product = ProductRaw(**curr_data)
             session.add(curr_product)
         session.commit()
