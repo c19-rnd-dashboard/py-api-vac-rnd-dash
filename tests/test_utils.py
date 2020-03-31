@@ -4,11 +4,17 @@ Basic Unittests for application utilities
     Load, Parse -> Ingest Pipeline
 """
 
+from flask_testing import LiveServerTestCase
 import unittest
 from api.utils import run_ingest
 
-class IngestTest(unittest.TestCase):
-    """ Tests for Deployed Server """
+from api import create_app
+
+class IngestTest(LiveServerTestCase):
+    def create_app(self):
+        app = create_app()
+        return app
+
     def setUp(self):
         self.test_url = 'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-03-25.csv'
 
