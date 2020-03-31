@@ -48,6 +48,6 @@ class LocalDatabaseTest(LiveServerTestCase):
         with get_session() as session:
             # Note:  There is no commit operation occuring here, so this data won't be written to the database
             session.execute(_data_sql)
-            test_result = session.execute('SELECT * FROM product p;').fetchone()
+            test_result = session.execute('SELECT * FROM productraw p;').fetchone()
             self.assertNotEqual(test_result, None)
 

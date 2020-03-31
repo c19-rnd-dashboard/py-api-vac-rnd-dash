@@ -18,10 +18,90 @@ from sqlalchemy import \
 from sqlalchemy.orm import relationship
 
 
-###################
-### Data Models ###
-###################
+#######################
+### New Data Models ###
+#######################
 
+
+class ProductRaw(Base):
+    __tablename__ = "productraw"
+
+    product_id = Column(Integer, primary_key=True)
+    preferred_name = Column(String)
+    chemical_name = Column(String)
+    brand_name = Column(String)
+    repurposed = Column(Boolean)
+    notes = Column(Text)
+    disease = Column(String)
+    application = Column(Text)
+    data_reference = Column(String)
+    data_source = Column(String)
+    product_type = Column(String)
+    sponsors = Column(Text)
+    intervention_type = Column(String)
+    indication = Column(String)
+    molecule_type = Column(String)
+    therapeutic_approach = Column(String)
+    other_partners = Column(Text)
+    num_sites = Column(Integer)
+    site_locations = Column(Text)
+    disease = Column(String)
+
+
+class TrialRaw(Base):
+    __tablename__ = 'trialraw'
+
+    trial_id = Column(String, primary_key=True)
+    title = Column(String)
+    registry = Column(String)
+    registration_date = Column(DateTime)
+    enrollment_date = Column(DateTime)
+    start_date = Column(DateTime)
+    recruitment_status = Column(String)
+    title = Column(String)
+    intervention_type = Column(String)
+    intervention_notes = Column(Text)
+    sponsors = Column(Text)
+    countries = Column(Text)
+    data_reference = Column(String)
+    data_source = Column(String)
+    results_link = Column(String)
+
+
+class Milestone(Base):
+    __tablename__ = 'milestone'
+
+    milestone_id = Column(Integer, primary_key=True)
+    name = Column(String)
+    category = Column(String)
+
+
+class ProductMilestone(ProductRaw):
+    __tablename__ = 'productmilestone'
+
+    link_id = Column(Integer, primary_key=True) 
+    milestone_id = Column(Integer, ForeignKey('milestone.milestone_id'))
+    product_id = Column(Integer, ForeignKey('productraw.product_id'))
+    date_start = Column(DateTime)
+    date_complete = Column(DateTime)
+    status = Column(String)
+
+
+class TrialMilestone(TrialRaw):
+    __tablename__ = 'trialmilestone'
+
+    link_id = Column(Integer, primary_key=True) 
+    milestone_id = Column(Integer, ForeignKey('milestone.milestone_id'))
+    trial_id = Column(String, ForeignKey('trialraw.trial_id'))
+    date_start = Column(DateTime)
+    date_complete = Column(DateTime)
+    status = Column(String)
+
+#######################
+### Adv Data Models ###
+#######################
+
+"""
 class Product(Base):
     __tablename__ = "product"
 
@@ -48,14 +128,24 @@ class Source(Base):
     __tablename__ = 'source'
 
     source_id = Column(Integer, primary_key=True)
+    name = Column(String)
     link = Column(String)
 
 
 class ProductSource(Product):
     __tablename__ = 'productsource'
 
+    link_id = Column(Integer, primary_key=True) 
     source_id = Column(Integer, ForeignKey('source.source_id'))
     product_id = Column(Integer, ForeignKey('product.product_id'))
+
+
+class TrialSource(Trial):
+    __tablename__ = 'trialsource'
+
+    link_id = Column(Integer, primary_key=True) 
+    source_id = Column(Integer, ForeignKey('source.source_id'))
+    trial_id = Column(String, ForeignKey('trial.trial_id'))
 
 
 class Intervention(Base):
@@ -69,17 +159,19 @@ class Intervention(Base):
 class ProductIntervention(Product):
     __tablename__ = 'productintervention'
 
+    link_id = Column(Integer, primary_key=True) 
     intervention_id = Column(Integer, ForeignKey('intervention.intervention_id'))
     product_id = Column(Integer, ForeignKey('product.product_id'))
-    notes = Column(Text)
+    description = Column(Text)
 
 
 class TrialIntervention(Trial):
     __tablename__ = 'trialintervention'
 
+    link_id = Column(Integer, primary_key=True) 
     intervention_id = Column(Integer, ForeignKey('intervention.intervention_id'))
     trial_id = Column(String, ForeignKey('trial.trial_id'))
-    notes = Column(Text)
+    description = Column(Text)
 
 
 class Sponsor(Base):
@@ -94,6 +186,7 @@ class Sponsor(Base):
 class ProductSponsor(Product):
     __tablename__ = 'productsponsor'
 
+    link_id = Column(Integer, primary_key=True) 
     sponsor_id = Column(Integer, ForeignKey('sponsor.sponsor_id'))
     product_id = Column(Integer, ForeignKey('product.product_id'))
 
@@ -101,6 +194,7 @@ class ProductSponsor(Product):
 class TrialSponsor(Trial):
     __tablename__ = 'trialsponsor'
 
+    link_id = Column(Integer, primary_key=True) 
     sponsor_id = Column(Integer, ForeignKey('sponsor.sponsor_id'))
     trial_id = Column(String, ForeignKey('trial.trial_id'))
 
@@ -116,6 +210,7 @@ class Funding(Base):
 class ProductFunding(Product):
     __tablename__ = 'productfunding'
 
+    link_id = Column(Integer, primary_key=True) 
     funding_id = Column(Integer, ForeignKey('funding.funding_id'))
     product_id = Column(Integer, ForeignKey('product.product_id'))
 
@@ -123,6 +218,7 @@ class ProductFunding(Product):
 class TrialFunding(Trial):
     __tablename__ = 'trialfunding'
 
+    link_id = Column(Integer, primary_key=True) 
     funding_id = Column(Integer, ForeignKey('funding.funding_id'))
     trial_id = Column(String, ForeignKey('trial.trial_id'))
 
@@ -136,6 +232,7 @@ class Country(Base):
 class ProductCountry(Product):
     __tablename__ = 'productcountry'
 
+    link_id = Column(Integer, primary_key=True) 
     country_name = Column(String, ForeignKey('country.country_name'))
     product_id = Column(Integer, ForeignKey('product.product_id'))
 
@@ -143,6 +240,7 @@ class ProductCountry(Product):
 class TrialCountry(Trial):
     __tablename__ = 'trialcountry'
 
+    link_id = Column(Integer, primary_key=True) 
     country_name = Column(String, ForeignKey('country.country_name'))
     trial_id = Column(String, ForeignKey('trial.trial_id'))
 
@@ -158,6 +256,7 @@ class Milestone(Base):
 class ProductMilestone(Product):
     __tablename__ = 'productmilestone'
 
+    link_id = Column(Integer, primary_key=True) 
     milestone_id = Column(Integer, ForeignKey('milestone.milestone_id'))
     product_id = Column(Integer, ForeignKey('product.product_id'))
 
@@ -165,5 +264,7 @@ class ProductMilestone(Product):
 class TrialMilestone(Trial):
     __tablename__ = 'trialmilestone'
 
+    link_id = Column(Integer, primary_key=True) 
     milestone_id = Column(Integer, ForeignKey('milestone.milestone_id'))
     trial_id = Column(String, ForeignKey('trial.trial_id'))
+"""
