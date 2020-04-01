@@ -58,9 +58,9 @@ class TrialRaw(Base):
     trial_id = Column(String, primary_key=True, nullable=False, default=id_default)
     title = Column(String)
     registry = Column(String)
-    registration_date = Column(String)
-    enrollment_date = Column(String)
-    start_date = Column(String)
+    registration_date = Column(DateTime)
+    enrollment_date = Column(DateTime)
+    start_date = Column(DateTime)
     recruitment_status = Column(String)
     intervention_type = Column(String)
     intervention_notes = Column(Text)
@@ -69,6 +69,24 @@ class TrialRaw(Base):
     data_reference = Column(String)
     data_source = Column(String)
     results_link = Column(String)
+
+    def to_json(self):
+        return {
+            "trial_id": self.trial_id,
+            "title": self.title,
+            "registry": self.registry,
+            "registration_date": self.registration_date,
+            "enrollment_date": self.enrollment_date,
+            "start_date": self.start_date,
+            "recruitment_status": self.recruitment_status,
+            "intervention_type": self.intervention_type,
+            "intervention_notes": self.intervention_notes,
+            "sponsors": self.sponsors,
+            "countries": self.countries,
+            "data_reference": self.data_reference,
+            "data_source": self.data_source,
+            "results_link": self.results_link
+        }
 
 
 class Milestone(Base):
