@@ -16,12 +16,17 @@ class IngestTest(LiveServerTestCase):
         return app
 
     def setUp(self):
-        self.test_url = 'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-03-25.csv'
+        self.test_trial_url = 'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-03-25.csv'
+        self.test_product_url = 'https://raw.githubusercontent.com/c19-rnd-dashboard/py-api-vac-rnd-dash/master/data/vaccines/vaccineworkfile1_clean.csv'
 
     def test_trial_ingest(self):
         category = 'trial'
-        error = run_ingest(source=self.test_url, category=category)
+        error = run_ingest(source=self.test_trial_url, category=category)
         self.assertIsNone(error)
+
+    def test_product_ingest(self):
+        category = 'product'
+        error = run_ingest(source=self.test_product_url, category=category)
 
 
 if __name__ == "__main__":
