@@ -9,7 +9,7 @@ from functools import partial
 
 from .loader import load
 from .writer import write_trial, write_product
-from .transform import filter_columns
+from .transform import filter_columns, cast_dates
 from api.models import *
 
 import logging
@@ -166,7 +166,8 @@ def assign_trial_transforms(**kwargs):
     transform_list = [
         null_transform,
         trial_cleaner,
-        make_column_filter(TrialRaw)
+        make_column_filter(TrialRaw),
+        cast_dates,
         # Add transforms here or
         # use transform_list.append(new_transform) for dynamic construction
     ]
@@ -181,7 +182,8 @@ def assign_product_transforms(**kwargs):
     """Assemble trial data transforms for clean write"""
     transform_list = [
         null_transform,
-        make_column_filter(ProductRaw)
+        make_column_filter(ProductRaw),
+        cast_dates,
         # Add transforms here or
         # use transform_list.append(new_transform) for dynamic construction
     ]
