@@ -1,6 +1,7 @@
 """Main application and routing logic for Vaccine R&D Dash API."""
 from flask import Flask, json, jsonify, request
 from api.routes.mock_routes import mock_routes
+from api.routes.admin_routes import admin_routes
 from flask_cors import CORS
 from flask_caching import Cache
 from decouple import config
@@ -19,7 +20,9 @@ import logging
 
 
 # Set database name
-local_db_name = 'test.sqlite3'  # Change this or override with config.py file in instance/
+# Change this or override with config.py file in instance/
+local_db_name = 'test.sqlite3'
+
 
 def create_app(test_config=None):
     """
@@ -27,12 +30,17 @@ def create_app(test_config=None):
     """
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        DEBUG=config('DEBUG', default=False),  # Make sure to change debug to False in production env
+        # Make sure to change debug to False in production env
+        DEBUG=config('DEBUG', default=False),
         SECRET_KEY=config('SECRET_KEY', default='dev'),  # CHANGE THIS!!!!
-        DATABASE_URI=config('DATABASE_URI', 'sqlite:///' + os.path.join(os.getcwd(), local_db_name)),  # For in-memory db: default='sqlite:///:memory:'),
-        LOGFILE=config('LOGFILE', os.path.join(app.instance_path, 'logs/debug.log')),
+        # For in-memory db: default='sqlite:///:memory:'),
+        DATABASE_URI=config('DATABASE_URI', 'sqlite:///' + \
+                            os.path.join(os.getcwd(), local_db_name)),
+        LOGFILE=config('LOGFILE', os.path.join(
+            app.instance_path, 'logs/debug.log')),
         CACHE_TYPE=config('CACHE_TYPE', 'simple'),  # Configure caching
-        CACHE_DEFAULT_TIMEOUT=config('CACHE_DEFAULT_TIMEOUT', 300), # Long cache times probably ok for ML api
+        # Long cache times probably ok for ML api
+        CACHE_DEFAULT_TIMEOUT=config('CACHE_DEFAULT_TIMEOUT', 300),
     )
 
     # Enable CORS header support
@@ -45,6 +53,7 @@ def create_app(test_config=None):
     ### Routes ###
     ##############
     app.register_blueprint(mock_routes)
+    app.register_blueprint(admin_routes)
 
     #############
     ###Logging###
@@ -54,7 +63,8 @@ def create_app(test_config=None):
     # To enable different services, see README.md
     gunicorn_logger = logging.getLogger('gunicorn.error')
     app.logger.handlers = gunicorn_logger.handlers
-    logging.basicConfig(filename=app.config['LOGFILE'], level=logging.INFO)  # File logging. Remove in PROD
+    # File logging. Remove in PROD
+    logging.basicConfig(filename=app.config['LOGFILE'], level=logging.INFO)
     logging.getLogger('flask_cors').level = logging.INFO
     app_logger = logging.getLogger(__name__)
 

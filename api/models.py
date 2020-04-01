@@ -26,7 +26,7 @@ from sqlalchemy.orm import relationship
 class ProductRaw(Base):
     __tablename__ = "productraw"
 
-    product_id = Column(Integer, primary_key=True)
+    product_id = Column(Integer, primary_key=True, autoincrement=True)
     preferred_name = Column(String)
     chemical_name = Column(String)
     brand_name = Column(String)
@@ -45,20 +45,23 @@ class ProductRaw(Base):
     other_partners = Column(Text)
     num_sites = Column(Integer)
     site_locations = Column(Text)
-    disease = Column(String)
 
 
 class TrialRaw(Base):
     __tablename__ = 'trialraw'
 
-    trial_id = Column(String, primary_key=True)
+    def id_default(context):
+        new_id = hash(context.get_current_parameters()['title'])
+        # print(new_id)  # DEBUG
+        return new_id
+
+    trial_id = Column(String, primary_key=True, nullable=False, default=id_default)
     title = Column(String)
     registry = Column(String)
     registration_date = Column(DateTime)
     enrollment_date = Column(DateTime)
     start_date = Column(DateTime)
     recruitment_status = Column(String)
-    title = Column(String)
     intervention_type = Column(String)
     intervention_notes = Column(Text)
     sponsors = Column(Text)
@@ -66,6 +69,24 @@ class TrialRaw(Base):
     data_reference = Column(String)
     data_source = Column(String)
     results_link = Column(String)
+
+    def to_json(self):
+        return {
+            "trial_id": self.trial_id,
+            "title": self.title,
+            "registry": self.registry,
+            "registration_date": self.registration_date,
+            "enrollment_date": self.enrollment_date,
+            "start_date": self.start_date,
+            "recruitment_status": self.recruitment_status,
+            "intervention_type": self.intervention_type,
+            "intervention_notes": self.intervention_notes,
+            "sponsors": self.sponsors,
+            "countries": self.countries,
+            "data_reference": self.data_reference,
+            "data_source": self.data_source,
+            "results_link": self.results_link
+        }
 
 
 class Milestone(Base):
