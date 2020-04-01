@@ -9,7 +9,7 @@ from functools import partial
 
 from .loader import load
 from .writer import write_trial, write_product
-from .transform import filter_columns
+from .transform import filter_columns, cast_dates
 from api.models import *
 
 import logging
@@ -108,7 +108,7 @@ def null_transform(data: pd.DataFrame):
 
 def trial_cleaner(data: pd.DataFrame):
     df = data
-    ingestlogger.info('hello, how are you?')
+    ingestlogger.info('Starting trial_cleaner.')
 
     def lower(x):
         """
@@ -134,13 +134,15 @@ def trial_cleaner(data: pd.DataFrame):
         return ','.join([clean_list_item(item) for item in temp_list])
 
     def rename_cols(X):
-        X = X.rename(columns={'normed_spon_names': 'sponsors',
-                              'source_register': 'registry',
-                              'date_registration': 'registration_date',
-                              'date_enrollement': 'enrollment_date',
-                              'public_title': 'title',
-                              'results_url_link': 'results_link',
-                              'web_address': 'data_source'})
+        X = X.rename(columns={
+            'normed_spon_names': 'sponsors',
+            'source_register': 'registry',
+            'date_registration': 'registration_date',
+            'date_enrollement': 'enrollment_date',
+            'public_title': 'title',
+            'results_url_link': 'results_link',
+            'web_address': 'data_source',
+            'trialid': 'trial_id',})
         return X
 
     # Apply function
@@ -166,7 +168,8 @@ def assign_trial_transforms(**kwargs):
     transform_list = [
         null_transform,
         trial_cleaner,
-        make_column_filter(TrialRaw)
+        make_column_filter(TrialRaw),
+        cast_dates,
         # Add transforms here or
         # use transform_list.append(new_transform) for dynamic construction
     ]
@@ -181,7 +184,8 @@ def assign_product_transforms(**kwargs):
     """Assemble trial data transforms for clean write"""
     transform_list = [
         null_transform,
-        make_column_filter(ProductRaw)
+        make_column_filter(ProductRaw),
+        cast_dates,
         # Add transforms here or
         # use transform_list.append(new_transform) for dynamic construction
     ]

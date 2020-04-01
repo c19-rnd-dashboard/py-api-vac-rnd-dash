@@ -26,7 +26,7 @@ from sqlalchemy.orm import relationship
 class ProductRaw(Base):
     __tablename__ = "productraw"
 
-    product_id = Column(Integer, primary_key=True)
+    product_id = Column(Integer, primary_key=True, autoincrement=True)
     preferred_name = Column(String)
     chemical_name = Column(String)
     brand_name = Column(String)
@@ -50,12 +50,17 @@ class ProductRaw(Base):
 class TrialRaw(Base):
     __tablename__ = 'trialraw'
 
-    trial_id = Column(String, primary_key=True)
+    def id_default(context):
+        new_id = hash(context.get_current_parameters()['title'])
+        # print(new_id)  # DEBUG
+        return new_id
+
+    trial_id = Column(String, primary_key=True, nullable=False, default=id_default)
     title = Column(String)
     registry = Column(String)
-    registration_date = Column(DateTime)
-    enrollment_date = Column(DateTime)
-    start_date = Column(DateTime)
+    registration_date = Column(String)
+    enrollment_date = Column(String)
+    start_date = Column(String)
     recruitment_status = Column(String)
     intervention_type = Column(String)
     intervention_notes = Column(Text)
