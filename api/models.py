@@ -46,6 +46,29 @@ class ProductRaw(Base):
     num_sites = Column(Integer)
     site_locations = Column(Text)
 
+    def to_json(self):
+        return {
+            "product_id": self.product_id,
+            "preferred_name": self.preferred_name,
+            "chemical_name": self.chemical_name,
+            "brand_name": self.brand_name,
+            "repurposed": self.repurposed,
+            "notes": self.notes,
+            "disease": self.disease,
+            "application": self.application,
+            "data_reference": self.data_reference,
+            "data_source": self.data_source,
+            "product_type": self.product_type,
+            "sponsors": self.sponsors,
+            "intervention_type": self.intervention_type,
+            "indication": self.indication,
+            "molecule_type": self.molecule_type,
+            "therapeutic_approach": self.therapeutic_approach,
+            "other_partners": self.other_partners,
+            "num_sites": self.num_sites,
+            "site_locations": self.site_locations
+        }
+
 
 class TrialRaw(Base):
     __tablename__ = 'trialraw'
