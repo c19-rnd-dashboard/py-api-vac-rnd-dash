@@ -30,7 +30,7 @@ class ProductRaw(Base):
     preferred_name = Column(String)
     chemical_name = Column(String)
     brand_name = Column(String)
-    repurposed = Column(Boolean)
+    repurposed = Column(String)
     notes = Column(Text)
     disease = Column(String)
     application = Column(Text)

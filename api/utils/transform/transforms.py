@@ -6,6 +6,7 @@ Contains custom source transforms
 
 from sqlalchemy import inspect
 import pandas as pd
+import numpy as np
 from datetime import datetime
 from api.models import *
 
@@ -60,4 +61,20 @@ def cast_dates(data:pd.DataFrame):
     date_columns = [column for column in temp_data.columns if 'date' in column]
     for col in date_columns:
         temp_data[col].apply(convert_to_datetime)
+    return temp_data
+
+
+######################################
+### Product Source Transformations ###
+######################################
+
+def clean_product_raw(data:pd.DataFrame):
+    name_check = data.preferred_name
+    # Teste Names
+    def test_for_good_name(x):
+        return ((x is not None) and (len(x) > 2) and (x != np.nan))
+    name_check = [test_for_good_name(name) for name in name_check]
+    # Build Drop Index for row removal
+    drop_ind = [index for index, val in enumerate(name_check) if not val]
+    temp_data = data.drop(index=drop_ind)
     return temp_data
