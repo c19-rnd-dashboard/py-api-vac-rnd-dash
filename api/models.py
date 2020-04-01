@@ -51,7 +51,7 @@ class TrialRaw(Base):
     __tablename__ = 'trialraw'
 
     def id_default(context):
-        return hash(context.get_current_parameters(title))
+        return hash(context.get_current_parameters()['title'])
 
     trial_id = Column(String, primary_key=True, nullable=False, default=id_default)
     title = Column(String)
