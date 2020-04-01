@@ -27,6 +27,7 @@ class IngestTest(LiveServerTestCase):
     def test_product_ingest(self):
         category = 'product'
         error = run_ingest(source=self.test_product_url, category=category)
+        self.assertIsNone(error)
 
 
 if __name__ == "__main__":

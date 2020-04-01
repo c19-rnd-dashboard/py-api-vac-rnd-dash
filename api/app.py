@@ -2,6 +2,7 @@
 from flask import Flask, json, jsonify, request
 from api.routes.mock_routes import mock_routes
 from api.routes.admin_routes import admin_routes
+from api.routes.covid_dash import covid_dash
 from flask_cors import CORS
 from flask_caching import Cache
 from decouple import config
@@ -41,6 +42,7 @@ def create_app(test_config=None):
         CACHE_TYPE=config('CACHE_TYPE', 'simple'),  # Configure caching
         # Long cache times probably ok for ML api
         CACHE_DEFAULT_TIMEOUT=config('CACHE_DEFAULT_TIMEOUT', 300),
+        TESTING=config('TESTING', default=True)
     )
 
     # Enable CORS header support
@@ -54,6 +56,7 @@ def create_app(test_config=None):
     ##############
     app.register_blueprint(mock_routes)
     app.register_blueprint(admin_routes)
+    app.register_blueprint(covid_dash)
 
     #############
     ###Logging###
@@ -63,8 +66,11 @@ def create_app(test_config=None):
     # To enable different services, see README.md
     gunicorn_logger = logging.getLogger('gunicorn.error')
     app.logger.handlers = gunicorn_logger.handlers
+
     # File logging. Remove in PROD
-    logging.basicConfig(filename=app.config['LOGFILE'], level=logging.INFO)
+    if app.config['TESTING'] == True:
+        logging.basicConfig(filename=app.config['LOGFILE'], level=logging.INFO)
+    
     logging.getLogger('flask_cors').level = logging.INFO
     app_logger = logging.getLogger(__name__)
 
