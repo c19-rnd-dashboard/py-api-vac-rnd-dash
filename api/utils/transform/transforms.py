@@ -29,23 +29,7 @@ def convert_to_datetime(time_string):
     try: 
         return parse(time_string)
     except:
-        raise
-    # old implementation throwing error
-    # tlogg.debug('Converting {} to datetime'.format(time_string))
-    # try:
-    #     assert type(time_string) == str
-    #     return datetime.fromisoformat(time_string)
-    # except ValueError:
-    #     tlogg.error('Value Error: Invalid isoformat string')
-    #     tlogg.debug('Trying YYYY-MM-DD')
-    #     return datetime.fromisoformat('1969-01-01')
-    # except AssertionError as e:
-    #     tlogg.error('AssertionError: DateTime not a string.')
-    #     raise e
-    #     # query_logger.debug('Attempting translation')
-    #     # return datetime.fromtimestamp(time_string / 1e3)
-    # except:
-    #     raise
+        return None
 
 
 ##############################
@@ -65,5 +49,5 @@ def cast_dates(data:pd.DataFrame):
     temp_data = data.copy()
     date_columns = [column for column in temp_data.columns if 'date' in column]
     for col in date_columns:
-        temp_data[col].apply(convert_to_datetime)
+        temp_data[col] = temp_data[col].apply(convert_to_datetime)
     return temp_data
