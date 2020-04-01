@@ -50,4 +50,5 @@ class LocalDatabaseTest(LiveServerTestCase):
             session.execute(_data_sql)
             test_result = session.execute('SELECT * FROM productraw p;').fetchone()
             self.assertNotEqual(test_result, None)
+            # session.commit()  # DEBUG: see if write can be committed by session
 

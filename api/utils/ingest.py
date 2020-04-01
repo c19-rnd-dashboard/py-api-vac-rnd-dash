@@ -9,7 +9,7 @@ from functools import partial
 
 from .loader import load
 from .writer import write_trial, write_product
-from .transform import filter_columns, cast_dates
+from .transform import filter_columns, cast_dates, clean_product_raw
 from api.models import *
 
 import logging
@@ -185,6 +185,7 @@ def assign_product_transforms(**kwargs):
     transform_list = [
         null_transform,
         make_column_filter(ProductRaw),
+        clean_product_raw,
         cast_dates,
         # Add transforms here or
         # use transform_list.append(new_transform) for dynamic construction
