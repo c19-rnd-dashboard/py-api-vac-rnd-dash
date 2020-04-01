@@ -108,7 +108,7 @@ def null_transform(data: pd.DataFrame):
 
 def trial_cleaner(data: pd.DataFrame):
     df = data
-    ingestlogger.info('hello, how are you?')
+    ingestlogger.info('Starting trial_cleaner.')
 
     def lower(x):
         """
@@ -134,13 +134,15 @@ def trial_cleaner(data: pd.DataFrame):
         return ','.join([clean_list_item(item) for item in temp_list])
 
     def rename_cols(X):
-        X = X.rename(columns={'normed_spon_names': 'sponsors',
-                              'source_register': 'registry',
-                              'date_registration': 'registration_date',
-                              'date_enrollement': 'enrollment_date',
-                              'public_title': 'title',
-                              'results_url_link': 'results_link',
-                              'web_address': 'data_source'})
+        X = X.rename(columns={
+            'normed_spon_names': 'sponsors',
+            'source_register': 'registry',
+            'date_registration': 'registration_date',
+            'date_enrollement': 'enrollment_date',
+            'public_title': 'title',
+            'results_url_link': 'results_link',
+            'web_address': 'data_source',
+            'trialid': 'trial_id',})
         return X
 
     # Apply function
