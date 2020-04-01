@@ -2,6 +2,7 @@
 from flask import Flask, json, jsonify, request
 from api.routes.mock_routes import mock_routes
 from api.routes.admin_routes import admin_routes
+from api.routes.covid_dash import covid_dash
 from flask_cors import CORS
 from flask_caching import Cache
 from decouple import config
@@ -55,6 +56,7 @@ def create_app(test_config=None):
     ##############
     app.register_blueprint(mock_routes)
     app.register_blueprint(admin_routes)
+    app.register_blueprint(covid_dash)
 
     #############
     ###Logging###
