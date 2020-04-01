@@ -17,3 +17,10 @@ def treatments():
     with get_session() as session:
         meds = session.query(TrialRaw).filter(TrialRaw.intervention_type != 'traditional medicine (drug)' and TrialRaw.intervention_type != 'diagnosis').all()
     return jsonify([med.to_json() for med in meds])
+
+
+@covid_dash.route('/products')
+def products():
+    with get_session() as session:
+        prods = session.query(ProductRaw).all()
+    return jsonify([prod.to_json() for prod in prods])
