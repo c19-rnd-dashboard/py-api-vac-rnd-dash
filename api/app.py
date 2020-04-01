@@ -41,6 +41,7 @@ def create_app(test_config=None):
         CACHE_TYPE=config('CACHE_TYPE', 'simple'),  # Configure caching
         # Long cache times probably ok for ML api
         CACHE_DEFAULT_TIMEOUT=config('CACHE_DEFAULT_TIMEOUT', 300),
+        TESTING=config('TESTING', default=True)
     )
 
     # Enable CORS header support
@@ -63,8 +64,11 @@ def create_app(test_config=None):
     # To enable different services, see README.md
     gunicorn_logger = logging.getLogger('gunicorn.error')
     app.logger.handlers = gunicorn_logger.handlers
+
     # File logging. Remove in PROD
-    logging.basicConfig(filename=app.config['LOGFILE'], level=logging.INFO)
+    if app.config['TESTING'] == True:
+        logging.basicConfig(filename=app.config['LOGFILE'], level=logging.INFO)
+    
     logging.getLogger('flask_cors').level = logging.INFO
     app_logger = logging.getLogger(__name__)
 
