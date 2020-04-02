@@ -184,8 +184,8 @@ def assign_product_transforms(**kwargs):
     """Assemble trial data transforms for clean write"""
     transform_list = [
         null_transform,
-        make_column_filter(ProductRaw),
         clean_product_raw,
+        make_column_filter(ProductRaw),
         cast_dates,
         # Add transforms here or
         # use transform_list.append(new_transform) for dynamic construction
