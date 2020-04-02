@@ -68,3 +68,4 @@ def clean_product_raw(data:pd.DataFrame):
     # Build Drop Index for row removal
     drop_ind = [index for index, val in enumerate(name_check) if not val]
     temp_data = data.drop(index=drop_ind)
+    return temp_data
