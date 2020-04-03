@@ -1,3 +1,7 @@
+# Ignoring pipfile.lock
+Pipefile.lock
+
+
 # Ignore GSheets API Credentials
 credentials.json
 *.env
