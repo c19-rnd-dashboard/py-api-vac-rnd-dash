@@ -8,11 +8,6 @@ from api.config import __version__
 mock_routes = Blueprint("mock_routes", __name__)
 
 
-@mock_routes.route("/")
-def home_route():
-    return f"COVID19 Vaccine R&D Dashboard Version: {__version__}"
-
-
 @mock_routes.route("/mock1")
 def get_mock_data():
     data = [
