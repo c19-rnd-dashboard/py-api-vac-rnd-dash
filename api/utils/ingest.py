@@ -15,6 +15,7 @@ from .transform import (
     clean_product_raw,
     clean_null,
     trial_cleaner,
+    infer_trial_products
 )
 from api.models import *
 
@@ -181,6 +182,7 @@ def assign_trial_transforms(**kwargs):
     transform_list = [
         null_transform,
         trial_cleaner,
+        infer_trial_products,
         make_column_filter(TrialRaw),
         cast_dates,
         clean_null,

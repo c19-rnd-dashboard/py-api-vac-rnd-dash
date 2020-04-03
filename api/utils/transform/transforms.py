@@ -12,6 +12,7 @@ from api.models import *
 from api.db import get_session
 from dateutil.parser import parse
 from fuzzywuzzy import fuzz
+from functools import partial
 import logging
 
 tlogg = logging.getLogger(__name__)
@@ -19,7 +20,6 @@ tlogg = logging.getLogger(__name__)
 ########################
 ### Helper Functions ###
 ########################
-
 
 def get_columns(model):
     """ Get all column names from SQL Alchemy Model """
@@ -40,13 +40,6 @@ def get_product_names():
     with get_session() as session:
         prod_names = session.query(ProductRaw.preferred_name).all()
     return [x[0] for x in prod_names]
-
-
-def get_inferred_products():
-    """ Get all inferred products in raw"""
-    with get_session() as session:
-        inferred_prods = session.query(TrialRaw.inferred_product).all()
-    return list(inferred_prods)
 
 
 ##############################
@@ -78,27 +71,6 @@ def clean_null(data: pd.DataFrame):
     return data.where(data.notnull(), None)
 
 
-def create_inferred_products(data: pd.DataFrame):
-    tlogg.info("Creating inferred_products now ")
-    data["search_string"] = data["title"] + " " + data["intervention"]
-    product_names = get_product_names()
-    # print(product_names)
-    # print(type(product_names))
-
-    def get_name(val):
-        list_vals = val.split()
-        matches = []
-        for name in product_names:
-            if fuzz.partial_ratio(name, list_vals) > 80:
-                matches.append(name)
-        print(matches)
-        return ",".join(matches)
-
-    data["inferred_product"] = data["search_string"].apply(get_name)
-    # print(data["inferred_product"])
-    return data
-
-
 ######################################
 ### Product Source Transformations ###
 ######################################
@@ -114,8 +86,43 @@ def clean_product_raw(data: pd.DataFrame):
     # Build Drop Index for row removal
     drop_ind = [index for index, val in enumerate(name_check) if not val]
     temp_data = data.drop(index=drop_ind)
+
+    def lower(x):
+        """
+        Lowers capitalization of all observations in a given str type column.
+        """
+        try:
+            return x.lower()
+        except:
+            return x
+
+    # Apply functions
+    for col in temp_data.columns:
+        temp_data[col] = temp_data[col].apply(lower)
+
     return temp_data
 
+def infer_trial_products(data: pd.DataFrame):
+    df = data.copy()
+    tlogg.info("Inferring product names")
+    # Build search string
+    df["search_string"] = df["title"] + " " + df["intervention"]
+    # Dump product names from database
+    product_names = get_product_names()
+
+    def get_name(val, product_names):
+        list_vals = val.split()
+        matches = []
+        for name in product_names:
+            if fuzz.partial_ratio(name, list_vals) > 80:
+                matches.append(name)
+        return ",".join(matches)
+
+
+    get_name_fn = partial(get_name, product_names=product_names)
+    df["inferred_product"] = df["search_string"].apply(get_name_fn)
+    # print(df["inferred_product"])
+    return df
 
 def trial_cleaner(data: pd.DataFrame):
     df = data
@@ -166,6 +173,4 @@ def trial_cleaner(data: pd.DataFrame):
         df[col] = df[col].apply(lower)
         df[col] = df[col].apply(clean_lists)
 
-    # Apply get inferred product names
-    df = create_inferred_products(df)
     return df

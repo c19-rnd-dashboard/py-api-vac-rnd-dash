@@ -15,7 +15,7 @@ from io import StringIO
 
 from api import create_app
 from api.db import get_db, get_session, init_db
-from api.utils.transform.transforms import get_product_names, get_inferred_products
+from api.utils.transform.transforms import get_product_names
 
 # LIVE_URL = 'http://127.0.0.1:5000/'
 # DATA_URLS = []
