@@ -1,8 +1,8 @@
 from api.utils.ingest import run_ingest
-
-# from api.utils.ingest import assign_transformations, assign_writer, transform_data, write_data, __init__
+from api.db import init_db
 from flask import render_template, Blueprint, request, jsonify
 from markdown2 import Markdown
+from collections import namedtuple
 import os
 
 import logging
@@ -60,3 +60,33 @@ def render_home():
             return render_markdown(local_file_path)
         else:
             return "Could not load readme.  Welcome to the API."
+
+def check_password(password):
+    return password == 'virus'
+
+
+def run_database_update():
+    # Init the database
+    init_db()
+    # Load factory tables
+    # Run known ingest
+    jobs = [
+        ('product', 'https://raw.githubusercontent.com/c19-rnd-dashboard/py-api-vac-rnd-dash/master/data/vaccines/vaccineworkfile1_clean.csv'),
+        ('trial', 'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-03-25.csv')
+    ]
+    for job in jobs:
+        run_ingest(category=job[0], source=job[1])
+
+
+@admin_routes.route('/admin/update', methods=['POST'])
+def update_db():
+    if request.method == 'POST':
+        json_data = request.json 
+        routelogger.info('Update DB Request Received.  Verifying.')
+        if check_password(json_data['password']):
+            routelogger.info('Verified. Updating Database.')
+            run_database_update()
+            return "Database Updated"  # Consider making this updating, and an async process
+        else:
+            return "Verification Failed.  Database not updated."
+
