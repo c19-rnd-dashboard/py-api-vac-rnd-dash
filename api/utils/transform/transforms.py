@@ -79,6 +79,7 @@ def clean_null(data: pd.DataFrame):
 
 
 def create_inferred_products(data: pd.DataFrame):
+    tlogg.info("Creating inferred_products now ")
     data["search_string"] = data["title"] + " " + data["intervention"]
     product_names = get_product_names()
     # print(product_names)
