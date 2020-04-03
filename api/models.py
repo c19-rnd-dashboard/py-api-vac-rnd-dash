@@ -103,6 +103,7 @@ class TrialRaw(Base):
     data_reference = Column(String)
     data_source = Column(String)
     results_link = Column(String)
+    inferred_product = Column(String)
 
     def to_json(self):
         return {
