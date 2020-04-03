@@ -17,6 +17,7 @@ google-api-python-client = "*"
 google-auth-httplib2 = "*"
 google-auth-oauthlib = "*"
 flask-testing = "*"
+markdown2 = "*"
 psycopg2 = "*"
 python-dateutil = "*"
 
