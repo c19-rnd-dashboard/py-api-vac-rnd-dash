@@ -17,7 +17,9 @@ def get_ingest():
             routelogger.info(f'POST received at Ingest.  Running Ingest{ingest_request}')
             run_ingest(source=ingest_request['source'],
                        category=ingest_request['category'])
-            message = {"success": True, "message": data}
+            # print(ingest_request)
+            message = {"success": True, "message": f'Success!  Ingested {ingest_request}'}
+
         except Exception as ex:
             message = {"success": False, "message": f"Error occured {ex}"}
     return message
