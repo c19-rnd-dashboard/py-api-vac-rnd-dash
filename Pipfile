@@ -23,6 +23,7 @@ python-dateutil = "*"
 jupyter = "*"
 fuzzywuzzy = "*"
 python-levenshtein = "*"
+pycountry = "*"
 
 [dev-packages]
 black = "*"
