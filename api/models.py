@@ -120,7 +120,19 @@ class TrialRaw(Base):
             "data_reference": self.data_reference,
             "data_source": self.data_source,
             "results_link": self.results_link,
+            "phase_num": self.get_phase_num(self.phase),
+            "phase": self.phase
         }
+
+    def get_phase_num(self, phase):
+        nums = [int(i) for i in phase if i.isdigit()]
+        if len(nums) == 0:
+            if "applicable" in phase:
+                return None 
+            else:
+                return 0
+        else:
+            return max(nums)
 
 
 class Milestone(Base):
