@@ -18,20 +18,14 @@ querylogger = logging.getLogger(__name__)
 class Query():
     def __init__(self, data, model):
         self.data = data
+        self.model = model
         self.known_constraints = self.get_known_constraints(model)
-
-    # def check_constraints(self, session, model, record):
-    #     for foreign_key in get_known_constraints(model)['foreign_keys']:
-    #         key_name = foreign_key.split()[1]
-    #         if key_name in data.columns:
-    #             querylogger.info(f'{key_name} found in query.  Checking for existing entry.')
-    #             exists = check_exists(model=model, id_column=key_name, session=session, record)
-    #             if not exists:
-    #                 querylogger.info(f'{record[key_name]} did not return existing row.  Generating empty entry.')
-    #                 object_to_add = generate_new_object(model=model, record={foreign_key: record[foreign_key]})
-    #                 session.add(object_to_add)
-    #                 session.commit()
     
+    def instrospect_model(self):
+        constraints = get_known_constraints(self.model)
+        self._primary_keys = constraints['primary_keys']
+        self._foreign_keys = constraints['foreign_keys']
+
     @staticmethod
     def get_known_constraints(model):
         # Get primary keys in model
@@ -54,12 +48,36 @@ class Query():
 
 
     @staticmethod
+    def validate_constraints(session, model, record, foreign_keys):
+        for target_fullname in foreign_keys:
+            # Validate Constraints
+            key = target_fullname.split('.')[1]
+            model_name = target_fullname.split('.')[0]
+            key_model = eval(f'{model_name}')
+            exists = check_exists(session=session, model=key_model, record=record, id_column=key)
+            if not exists:
+                querylogger.info(f"{record['key']} did not return existing row.  Generating placeholder object.")
+                placeholder_object = eval(f"{model_name}({key}={record[key]})")
+                session.add(placeholder_object)
+                session.commit()
+
+    @staticmethod
     def dataframe_to_dict(data:pd.DataFrame) -> dict:
         return data.to_dict('records')
 
-
     @staticmethod 
-    def make_or_update(**kwargs):
-        #TODO
-        NotImplemented
+    def make_or_update(session, model, record, foreign_keys, primary_key):
+        exists = check_exists(session=session, model=key_model, record=record, id_column=primary_key)
+        if not exists:
+            querylogger.info(f"{record['key']} did not return existing row.  Generating placeholder object.")
+            placeholder_object = generate_object()
+            with session.no_autoflush:
+                session.add()
+        else:
+            with session.no_autoflush:
+                update_record(model=model, id_column=id_column, session=session, record=record)
     
+    @staticmethod
+    def update_record(model, id_column, record, session):
+        # Make command to evaluate
+        eval_string = f"session.query({model})"

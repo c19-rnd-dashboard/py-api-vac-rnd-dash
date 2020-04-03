@@ -26,16 +26,23 @@ writelogger = logging.getLogger(__name__)
 class Write(Query):
     def __init__(self, data:pd.DataFrame, model, **params):
         super().__init__(data=data, model=model)
+        self.instrospect_model()
         self.execute(**params)
 
     def execute(self, **params):
         writelogger.info('Starting write execution')
         with get_session() as session:
             for record in dataframe_to_dict(self.data):
-                make_or_update(model=model, record=record))
-            writelogger.info('Stack comitted.')
+                make_or_update(model=self.model, record=record, foreign_keys=self._foreign_keys))
             session.commit()
+            writelogger.info('Stack comitted.')
 
+
+###############################
+### Write Factory Functions ###
+###############################
+
+## TODO
 
 
 ### Control Function ###
