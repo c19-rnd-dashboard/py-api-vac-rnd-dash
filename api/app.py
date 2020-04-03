@@ -17,7 +17,7 @@ import logging
 # Local Environment Testing Only.
 #   Un-comment to build environment script in config.py
 # from instance import setup
-# setup.setup_env()
+# setup.setup_env(testing=True)
 
 
 # Set database name
@@ -42,7 +42,7 @@ def create_app(test_config=None):
         CACHE_TYPE=config('CACHE_TYPE', 'simple'),  # Configure caching
         # Long cache times probably ok for ML api
         CACHE_DEFAULT_TIMEOUT=config('CACHE_DEFAULT_TIMEOUT', 300),
-        TESTING=config('TESTING', default=True)
+        TESTING=config('TESTING', default='TRUE')
     )
 
     # Enable CORS header support
@@ -51,6 +51,7 @@ def create_app(test_config=None):
     # Enable caching
     cache = Cache(app)
 
+    
     ##############
     ### Routes ###
     ##############
@@ -68,7 +69,7 @@ def create_app(test_config=None):
     app.logger.handlers = gunicorn_logger.handlers
 
     # File logging. Remove in PROD
-    if app.config['TESTING'] == True:
+    if app.config['TESTING'] == 'TRUE':
         logging.basicConfig(filename=app.config['LOGFILE'], level=logging.INFO)
     
     logging.getLogger('flask_cors').level = logging.INFO

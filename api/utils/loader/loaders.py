@@ -139,16 +139,18 @@ def is_file(file_or_buffer):
 def validate_url(url):
     from urllib3.util import parse_url
     from urllib3 import PoolManager
+    try:
+        # Parse the URL
+        purl = parse_url(url)
+        # Use parsed URL as request and test for valid connection
+        http = PoolManager()
+        r = http.request('GET', purl.url)
 
-    # Parse the URL
-    purl = parse_url(url)
-    # Use parsed URL as request and test for valid connection
-    http = PoolManager()
-    r = http.request('GET', purl.url)
-
-    logmsg = f'Checking URL {url}.  Getting status {r.status}'
-    loadlogger.info(logmsg)
-    # print(logmsg)  # DEBUG
+        logmsg = f'Checking URL {url}.  Getting status {r.status}'
+        loadlogger.info(logmsg)
+        # print(logmsg)  # DEBUG
+    except:
+        return False
 
     return r.status == 200
 
