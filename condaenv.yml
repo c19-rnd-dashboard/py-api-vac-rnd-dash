@@ -36,5 +36,6 @@ dependencies:
     - urllib3==1.25.7
     - yelpapi==2.4.0
     - pylint
+    - pycountry
 # Change to env location on local machine
 prefix: /home/vincent/miniconda3/envs/covidbe

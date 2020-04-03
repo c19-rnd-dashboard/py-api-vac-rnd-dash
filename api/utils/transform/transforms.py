@@ -71,6 +71,18 @@ def clean_null(data: pd.DataFrame):
     # Force all null values to None rathre than mixed type with np.nan
     return data.where(data.notnull(), None)
 
+def clean_country(country_names):
+    result = []
+    for country in country_names.split(','):
+        try: 
+            curr_country = pycountry.countries.search_fuzzy(country)
+            result.append(curr_country[0].alpha_3)
+        except:
+            pass
+    if len(result) == 0:
+        return None
+    return ",".join(result)
+
 
 ######################################
 ### Product Source Transformations ###
@@ -178,5 +190,7 @@ def trial_cleaner(data: pd.DataFrame):
     for col in df.columns[df.dtypes == object]:
         df[col] = df[col].apply(lower)
         df[col] = df[col].apply(clean_lists)
+        if col == 'countries': 
+            df[col] = df[col].apply(clean_country)
 
     return df
