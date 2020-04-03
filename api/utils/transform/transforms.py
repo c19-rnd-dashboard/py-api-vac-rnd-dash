@@ -14,6 +14,7 @@ from dateutil.parser import parse
 from fuzzywuzzy import fuzz
 from functools import partial
 import logging
+import pycountry
 
 tlogg = logging.getLogger(__name__)
 
@@ -71,14 +72,16 @@ def clean_null(data: pd.DataFrame):
     # Force all null values to None rathre than mixed type with np.nan
     return data.where(data.notnull(), None)
 
-def clean_country(country_names):
+def clean_country(country_names:list) -> str:
     result = []
     for country in country_names.split(','):
         try: 
             curr_country = pycountry.countries.search_fuzzy(country)
             result.append(curr_country[0].alpha_3)
-        except:
-            pass
+        except LookupError:
+            pass 
+        except Exception as e:
+            tlogg.error(f'Error in country standardization {e}')
     if len(result) == 0:
         return None
     return ",".join(result)
@@ -137,8 +140,6 @@ def infer_trial_products(data: pd.DataFrame):
 
     get_name_fn = partial(get_name, product_names=product_names)
     df["inferred_product"] = df["search_string"].apply(get_name_fn)
-
-    # print(df["inferred_product"])
     return df
 
 
@@ -165,7 +166,6 @@ def trial_cleaner(data: pd.DataFrame):
             temp_item = item
             temp_item = temp_item.strip()
             temp_item = temp_item.replace('"', "")
-            # print(len(temp_item), temp_item)
             return temp_item
 
         return ",".join([clean_list_item(item) for item in temp_list])
@@ -190,7 +190,7 @@ def trial_cleaner(data: pd.DataFrame):
     for col in df.columns[df.dtypes == object]:
         df[col] = df[col].apply(lower)
         df[col] = df[col].apply(clean_lists)
-        if col == 'countries': 
-            df[col] = df[col].apply(clean_country)
+        
+    df['countries'] = df['countries'].apply(clean_country)
 
     return df
