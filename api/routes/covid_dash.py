@@ -9,15 +9,19 @@ routelogger = logging.getLogger(__name__)
 covid_dash = Blueprint("covid_dash", __name__)
 
 
-@covid_dash.route("/traditional-med")
+@covid_dash.route("/alternatives")
 def traditional_med():
     routelogger.info('Running Traditional Medicine Query')
     with get_session() as session:
         meds = (
             session.query(TrialRaw)
-            .filter(TrialRaw.intervention_type.like("%western%"))
+            .filter(
+                ~TrialRaw.intervention_type.like("%traditional%")
+                and ~TrialRaw.intervention_type.like("%drug%")
+                and ~TrialRaw.intervention.like("%vaccine%"))
             .all()
         )
+        alternatives = df[~(df["intervention_type"].str.contains("traditional") | df["intervention_type"].str.contains("drug")) & ~(df["intervention"].str.contains("vaccine"))]
     return jsonify([med.to_json() for med in meds])
 
 
@@ -28,8 +32,8 @@ def treatments():
         meds = (
             session.query(TrialRaw)
             .filter(
-                TrialRaw.intervention_type != "traditional medicine (drug)"
-                and TrialRaw.intervention_type != "diagnosis"
+                TrialRaw.intervention_type.like("%traditional%")
+                or TrialRaw.intervention_type.like("%drug%")
             )
             .all()
         )
@@ -40,5 +44,9 @@ def treatments():
 def products():
     routelogger.info('Running Vaccines Query')
     with get_session() as session:
-        prods = session.query(ProductRaw).all()
-    return jsonify([prod.to_json() for prod in prods])
+        meds = (
+            session.query(TrialRaw)
+            .filter(TrialRaw.intervention.like("%vaccine%"))
+            .all()
+        )
+    return jsonify([med.to_json() for med in meds])
