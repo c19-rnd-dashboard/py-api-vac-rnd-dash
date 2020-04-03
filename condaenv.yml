@@ -21,11 +21,13 @@ dependencies:
     - flask-caching
     - flask-cors
     - flask-testing
+    - fuzzywuzzy==0.18.0
     - gunicorn
     - httplib2==0.14.0
     - idna==2.8
     - jmespath==0.9.4
     - markdown2==2.3.8
+    - python-levenshtein==0.12.0
     - oauth2==1.9.0.post1
     - python-dateutil==2.8.0
     - python-decouple==3.3
