@@ -71,7 +71,7 @@ def clean_null(data: pd.DataFrame):
     return data.where(data.notnull(), None)
 
 
-def create_inferred_product(data: pd.DataFrame):
+def create_inferred_products(data: pd.DataFrame):
     data["search_string"] = data["title"] + " " + data["intervention"]
     product_names = get_product_names()
 
@@ -84,6 +84,7 @@ def create_inferred_product(data: pd.DataFrame):
         return ",".join(matches)
 
     data["inferred_product"] = data["search_string"].apply(get_name)
+    print(data)
     return data
 
 
@@ -155,5 +156,5 @@ def trial_cleaner(data: pd.DataFrame):
         df[col] = df[col].apply(clean_lists)
 
     # Apply get inferred product names
-    df = clean_product_raw(df)
+    df = create_inferred_products(df)
     return df
