@@ -19,6 +19,9 @@ google-auth-oauthlib = "*"
 flask-testing = "*"
 psycopg2 = "*"
 python-dateutil = "*"
+jupyter = "*"
+fuzzywuzzy = "*"
+python-levenshtein = "*"
 
 [dev-packages]
 black = "*"

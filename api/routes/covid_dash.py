@@ -5,21 +5,32 @@ from api.db import get_session
 covid_dash = Blueprint("covid_dash", __name__)
 
 
-@covid_dash.route('/traditional-med')
+@covid_dash.route("/traditional-med")
 def traditional_med():
     with get_session() as session:
-        meds = session.query(TrialRaw).filter(TrialRaw.intervention_type=='traditional medicine (drug)').all()
+        meds = (
+            session.query(TrialRaw)
+            .filter(TrialRaw.intervention_type.like("%western%"))
+            .all()
+        )
     return jsonify([med.to_json() for med in meds])
 
 
-@covid_dash.route('/treatments')
+@covid_dash.route("/treatments")
 def treatments():
     with get_session() as session:
-        meds = session.query(TrialRaw).filter(TrialRaw.intervention_type != 'traditional medicine (drug)' and TrialRaw.intervention_type != 'diagnosis').all()
+        meds = (
+            session.query(TrialRaw)
+            .filter(
+                TrialRaw.intervention_type != "traditional medicine (drug)"
+                and TrialRaw.intervention_type != "diagnosis"
+            )
+            .all()
+        )
     return jsonify([med.to_json() for med in meds])
 
 
-@covid_dash.route('/products')
+@covid_dash.route("/products")
 def products():
     with get_session() as session:
         prods = session.query(ProductRaw).all()
