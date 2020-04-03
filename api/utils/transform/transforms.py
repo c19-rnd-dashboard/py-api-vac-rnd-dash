@@ -39,7 +39,14 @@ def get_product_names():
     """ Get all product preferred names currently in raw """
     with get_session() as session:
         prod_names = session.query(ProductRaw.preferred_name).all()
-    return list(prod_names)
+    return [x[0] for x in prod_names]
+
+
+def get_inferred_products():
+    """ Get all inferred products in raw"""
+    with get_session() as session:
+        inferred_prods = session.query(TrialRaw.inferred_product).all()
+    return list(inferred_prods)
 
 
 ##############################
@@ -74,6 +81,8 @@ def clean_null(data: pd.DataFrame):
 def create_inferred_products(data: pd.DataFrame):
     data["search_string"] = data["title"] + " " + data["intervention"]
     product_names = get_product_names()
+    # print(product_names)
+    # print(type(product_names))
 
     def get_name(val):
         list_vals = val.split()
@@ -81,10 +90,11 @@ def create_inferred_products(data: pd.DataFrame):
         for name in product_names:
             if fuzz.partial_ratio(name, list_vals) > 80:
                 matches.append(name)
+        print(matches)
         return ",".join(matches)
 
     data["inferred_product"] = data["search_string"].apply(get_name)
-    print(data)
+    # print(data["inferred_product"])
     return data
 
 
