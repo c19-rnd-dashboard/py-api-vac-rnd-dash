@@ -20,6 +20,9 @@ flask-testing = "*"
 markdown2 = "*"
 psycopg2 = "*"
 python-dateutil = "*"
+jupyter = "*"
+fuzzywuzzy = "*"
+python-levenshtein = "*"
 
 [dev-packages]
 black = "*"
