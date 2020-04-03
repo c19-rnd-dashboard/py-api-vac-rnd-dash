@@ -10,7 +10,7 @@ covid_dash = Blueprint("covid_dash", __name__)
 
 
 @covid_dash.route("/alternatives")
-def traditional_med():
+def alternatives():
     routelogger.info('Running Alternatives Query')
     with get_session() as session:
         meds = (
