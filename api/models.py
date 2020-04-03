@@ -12,18 +12,9 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
-from sqlalchemy import (
-    Column,
-    Integer,
-    String,
-    ForeignKey,
-    DateTime,
-    Float,
-    Text,
-    Boolean,
-    UniqueConstraint,
-    ForeignKeyConstraint,
-)
+from sqlalchemy import \
+    (Column, Integer, String, ForeignKey, DateTime, Float, Text,
+        Boolean, UniqueConstraint, ForeignKeyConstraint)
 from sqlalchemy.orm import relationship
 
 
@@ -75,15 +66,15 @@ class ProductRaw(Base):
             "therapeutic_approach": self.therapeutic_approach,
             "other_partners": self.other_partners,
             "num_sites": self.num_sites,
-            "site_locations": self.site_locations,
+            "site_locations": self.site_locations
         }
 
 
 class TrialRaw(Base):
-    __tablename__ = "trialraw"
+    __tablename__ = 'trialraw'
 
     def id_default(context):
-        new_id = hash(context.get_current_parameters()["title"])
+        new_id = hash(context.get_current_parameters()['title'])
         # print(new_id)  # DEBUG
         return new_id
 
@@ -93,8 +84,6 @@ class TrialRaw(Base):
     registration_date = Column(DateTime)
     enrollment_date = Column(DateTime)
     start_date = Column(DateTime)
-    study_type = Column(String)
-    phase = Column(String)
     recruitment_status = Column(String)
     intervention_type = Column(String)
     intervention_notes = Column(Text)
@@ -119,12 +108,12 @@ class TrialRaw(Base):
             "countries": self.countries,
             "data_reference": self.data_reference,
             "data_source": self.data_source,
-            "results_link": self.results_link,
+            "results_link": self.results_link
         }
 
 
 class Milestone(Base):
-    __tablename__ = "milestone"
+    __tablename__ = 'milestone'
 
     milestone_id = Column(Integer, primary_key=True)
     name = Column(String)
@@ -132,26 +121,25 @@ class Milestone(Base):
 
 
 class ProductMilestone(ProductRaw):
-    __tablename__ = "productmilestone"
+    __tablename__ = 'productmilestone'
 
-    link_id = Column(Integer, primary_key=True)
-    milestone_id = Column(Integer, ForeignKey("milestone.milestone_id"))
-    product_id = Column(Integer, ForeignKey("productraw.product_id"))
+    link_id = Column(Integer, primary_key=True) 
+    milestone_id = Column(Integer, ForeignKey('milestone.milestone_id'))
+    product_id = Column(Integer, ForeignKey('productraw.product_id'))
     date_start = Column(DateTime)
     date_complete = Column(DateTime)
     status = Column(String)
 
 
 class TrialMilestone(TrialRaw):
-    __tablename__ = "trialmilestone"
+    __tablename__ = 'trialmilestone'
 
-    link_id = Column(Integer, primary_key=True)
-    milestone_id = Column(Integer, ForeignKey("milestone.milestone_id"))
-    trial_id = Column(String, ForeignKey("trialraw.trial_id"))
+    link_id = Column(Integer, primary_key=True) 
+    milestone_id = Column(Integer, ForeignKey('milestone.milestone_id'))
+    trial_id = Column(String, ForeignKey('trialraw.trial_id'))
     date_start = Column(DateTime)
     date_complete = Column(DateTime)
     status = Column(String)
-
 
 #######################
 ### Adv Data Models ###

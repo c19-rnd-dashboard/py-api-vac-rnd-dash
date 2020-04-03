@@ -9,7 +9,6 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 from api.models import *
-from api.db import get_session
 from dateutil.parser import parse
 
 import logging
@@ -32,14 +31,6 @@ def convert_to_datetime(time_string):
         return parse(time_string)
     except:
         return None
-
-
-def get_product_names():
-    """ Get all product preferred names currently in raw """
-    with get_session() as session:
-        prod_names = session.query(ProductRaw.preferred_name).all()
-    return list(prod_names)
-
 
 ##############################
 ### DataFrame Manipulation ###
@@ -65,7 +56,6 @@ def cast_dates(data:pd.DataFrame):
 def clean_null(data:pd.DataFrame):
     # Force all null values to None rathre than mixed type with np.nan
     return data.where(data.notnull(), None)
-
 
 ######################################
 ### Product Source Transformations ###
@@ -100,6 +90,7 @@ def trial_cleaner(data: pd.DataFrame):
             temp_list = x.split(';')
         else:
             return x
+
         def clean_list_item(item: str = None):
             assert type(item) == str
             temp_item = item

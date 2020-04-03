@@ -51,7 +51,6 @@ def create_app(test_config=None):
     # Enable caching
     cache = Cache(app)
 
-    
     ##############
     ### Routes ###
     ##############
