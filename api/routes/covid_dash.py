@@ -11,7 +11,7 @@ covid_dash = Blueprint("covid_dash", __name__)
 
 @covid_dash.route("/alternatives")
 def traditional_med():
-    routelogger.info('Running Traditional Medicine Query')
+    routelogger.info('Running Alternatives Query')
     with get_session() as session:
         meds = (
             session.query(TrialRaw)
@@ -21,7 +21,6 @@ def traditional_med():
                 and ~TrialRaw.intervention.like("%vaccine%"))
             .all()
         )
-        alternatives = df[~(df["intervention_type"].str.contains("traditional") | df["intervention_type"].str.contains("drug")) & ~(df["intervention"].str.contains("vaccine"))]
     return jsonify([med.to_json() for med in meds])
 
 
