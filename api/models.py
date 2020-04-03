@@ -141,6 +141,13 @@ class TrialMilestone(TrialRaw):
     date_complete = Column(DateTime)
     status = Column(String)
 
+
+#########################
+### Database MetaData ###
+#########################
+
+# Not Implemented
+
 #######################
 ### Adv Data Models ###
 #######################

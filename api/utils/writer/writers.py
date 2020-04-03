@@ -10,6 +10,32 @@ import pandas as pd
 
 from api.models import *
 from api.db import get_session
+from functools import partial
+from .query import Query
+
+import logging
+
+writelogger = logging.getLogger(__name__)
+
+
+####################
+### Writer Class ###
+####################
+
+
+class Write(Query):
+    def __init__(self, data:pd.DataFrame, model, **params):
+        super().__init__(data=data, model=model)
+        self.execute(**params)
+
+    def execute(self, **params):
+        writelogger.info('Starting write execution')
+        with get_session() as session:
+            for record in dataframe_to_dict(self.data):
+                make_or_update(model=model, record=record))
+            writelogger.info('Stack comitted.')
+            session.commit()
+
 
 
 ### Control Function ###
