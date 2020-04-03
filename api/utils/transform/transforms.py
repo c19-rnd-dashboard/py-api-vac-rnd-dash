@@ -21,6 +21,7 @@ tlogg = logging.getLogger(__name__)
 ### Helper Functions ###
 ########################
 
+
 def get_columns(model):
     """ Get all column names from SQL Alchemy Model """
     inst = inspect(model)
@@ -102,6 +103,7 @@ def clean_product_raw(data: pd.DataFrame):
 
     return temp_data
 
+
 def infer_trial_products(data: pd.DataFrame):
     df = data.copy()
     tlogg.info("Inferring product names")
@@ -116,13 +118,17 @@ def infer_trial_products(data: pd.DataFrame):
         for name in product_names:
             if fuzz.partial_ratio(name, list_vals) > 80:
                 matches.append(name)
-        return ",".join(matches)
-
+        data = ",".join(matches)
+        if len(data) == 0:
+            data = None
+        return data
 
     get_name_fn = partial(get_name, product_names=product_names)
     df["inferred_product"] = df["search_string"].apply(get_name_fn)
+
     # print(df["inferred_product"])
     return df
+
 
 def trial_cleaner(data: pd.DataFrame):
     df = data

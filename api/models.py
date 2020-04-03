@@ -97,7 +97,7 @@ class TrialRaw(Base):
     phase = Column(String)
     recruitment_status = Column(String)
     intervention_type = Column(String)
-    intervention_notes = Column(Text)
+    intervention = Column(Text)
     sponsors = Column(Text)
     countries = Column(Text)
     data_reference = Column(String)
@@ -115,21 +115,21 @@ class TrialRaw(Base):
             "start_date": self.start_date,
             "recruitment_status": self.recruitment_status,
             "intervention_type": self.intervention_type,
-            "intervention_notes": self.intervention_notes,
+            "intervention": self.intervention,
             "sponsors": self.sponsors,
             "countries": self.countries,
             "data_reference": self.data_reference,
             "data_source": self.data_source,
             "results_link": self.results_link,
             "phase_num": self.get_phase_num(self.phase),
-            "phase": self.phase
+            "phase": self.phase,
         }
 
     def get_phase_num(self, phase):
         nums = [int(i) for i in phase if i.isdigit()]
         if len(nums) == 0:
             if "applicable" in phase:
-                return None 
+                return None
             else:
                 return 0
         else:
