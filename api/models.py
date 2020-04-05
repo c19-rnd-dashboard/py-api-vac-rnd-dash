@@ -100,6 +100,7 @@ class TrialRaw(Base):
     intervention = Column(Text)
     sponsors = Column(Text)
     countries = Column(Text)
+    country_codes = Column(Text)
     data_reference = Column(String)
     data_source = Column(String)
     results_link = Column(String)
@@ -118,6 +119,7 @@ class TrialRaw(Base):
             "intervention": self.intervention,
             "sponsors": self.sponsors,
             "countries": self.countries,
+            "country_codes": self.country_codes,
             "data_reference": self.data_reference,
             "data_source": self.data_source,
             "results_link": self.results_link,
