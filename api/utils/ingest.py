@@ -21,7 +21,7 @@ from api.models import *
 
 import logging
 
-ingestlogger = logging.getLogger(__name__)
+ingestlogger = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
 
 class Ingest:
