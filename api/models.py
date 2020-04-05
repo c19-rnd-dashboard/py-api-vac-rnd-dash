@@ -168,6 +168,12 @@ class TrialMilestone(TrialRaw):
     status = Column(String)
 
 
+#########################
+### Database MetaData ###
+#########################
+
+# Not Implemented
+
 #######################
 ### Adv Data Models ###
 #######################
