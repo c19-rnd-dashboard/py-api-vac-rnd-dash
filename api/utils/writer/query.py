@@ -66,8 +66,13 @@ class Query():
         return data.to_dict('records')
 
     @staticmethod 
-    def make_or_update(session, model, record, foreign_keys, primary_key):
-        exists = check_exists(session=session, model=key_model, record=record, id_column=primary_key)
+    def make_or_update(session, model, record, primary_key, foreign_keys=None):
+        # Build Primary Key for Exists
+        if type(primary_key) == list:
+            first_primary_key = primary_key[0]
+        else:
+            first_primary_key = primary_key
+        exists = check_exists(session=session, model=key_model, record=record, id_column=first_primary_key)
         if not exists:
             querylogger.info(f"{record['key']} did not return existing row.  Generating placeholder object.")
             placeholder_object = generate_object()
