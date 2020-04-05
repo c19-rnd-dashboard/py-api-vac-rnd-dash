@@ -1,1 +1,1 @@
-web: gunicorn -w 3 api:APP --log-level=info --log-file=- --timeout 120
+web: gunicorn -w 3 api:APP --log-level=info --timeout 120
