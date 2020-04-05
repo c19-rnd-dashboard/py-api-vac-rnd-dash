@@ -33,7 +33,12 @@ class Write(Query):
         writelogger.info('Starting write execution')
         with get_session() as session:
             for record in dataframe_to_dict(self.data):
-                make_or_update(model=self.model, record=record, foreign_keys=self._foreign_keys))
+                # Only handles single primary key items in V0
+                make_or_update(
+                    model=self.model, 
+                    record=record, 
+                    primary_key=self._primary_keys, 
+                    foreign_keys=self._foreign_keys)
             session.commit()
             writelogger.info('Stack comitted.')
 
