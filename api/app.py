@@ -66,17 +66,20 @@ def create_app(test_config=None):
     # May significantly impair performance if writing logfile to disk (or network drive).
     # To enable different services, see README.md
     gunicorn_logger = logging.getLogger('gunicorn.error')
-    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.handlers.extend(gunicorn_logger.handlers)
+    app.logger.setLevel(logging.INFO)
+    app.logger.info('Application logging Set')
 
     # File logging. Remove in PROD
     if app.config['TESTING'] == 'TRUE':
+        app.logger.info('Using TESTING log config.')
         logging.basicConfig(filename=app.config['LOGFILE'], level=logging.INFO)
     
     logging.getLogger('flask_cors').level = logging.INFO
-    app_logger = logging.getLogger(__name__)
 
     # Register database functions.  Will allow db.close() to run on teardown
     from api import db
     db.init_app(app)
+    app.logger.info('Database functionality initialized.  Click commands available.')
 
     return app
