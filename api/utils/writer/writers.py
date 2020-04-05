@@ -26,35 +26,40 @@ writelogger = logging.getLogger(__name__)
 class Write(Query):
     def __init__(self, data:pd.DataFrame, model, **params):
         super().__init__(data=data, model=model)
-        self.instrospect_model()
         self.execute(**params)
 
     def execute(self, **params):
-        writelogger.info('Starting write execution')
+        writelogger.info(f'Starting write execution. Processing stack of: {len(self.data)}')
         with get_session() as session:
             for record in dataframe_to_dict(self.data):
-                # Only handles single primary key items in V0
                 make_or_update(
-                    model=self.model, 
-                    record=record, 
-                    primary_key=self._primary_keys, 
-                    foreign_keys=self._foreign_keys)
+                    model=model, 
+                    record=record,
+                    session=session,
+                    )
             session.commit()
             writelogger.info('Stack comitted.')
 
 
-###############################
-### Write Factory Functions ###
-###############################
+### Make Function ###
 
-## TODO
-
+def make_writer(data:pd.DataFrame, model, **kwargs):
+    return Write(
+        data = data,
+        model = model,
+        params = kwargs
+    )
 
 ### Control Function ###
 def write_trial(data: pd.DataFrame):
     """
     Adds a DataFrame of trials to the db as TrialRaw instances.
     """
+    # try:
+    #     writer = make_writer(data=data, model=TrialRaw)
+    # except Exception as e:
+        
+        
     with get_session() as session:
         for i in range(data.shape[0]):
             curr_data = data.iloc[i].to_dict()
