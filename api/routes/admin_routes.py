@@ -7,7 +7,7 @@ import os
 
 import logging
 
-routelogger = logging.getLogger(__name__)
+routelogger = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
 admin_routes = Blueprint("admin_routes", __name__)
 
