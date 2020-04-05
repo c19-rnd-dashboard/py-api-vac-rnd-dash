@@ -17,6 +17,7 @@ from flask.cli import with_appcontext
 
 import logging
 
+db_logger = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
 def get_db():
     """
@@ -24,7 +25,6 @@ def get_db():
     initiates connection to configured database.  Default is non-authenticated SQL.
     Modifty g.db = *connect to match intended database connection.
     """
-    db_logger = logging.getLogger(__name__ + '.getdb')
     if 'db' not in g:
         db_logger.info('DB connection not found. Attempting connection to {}.'.format(current_app.config['DATABASE_URI']))
         try:
