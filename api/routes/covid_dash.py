@@ -4,7 +4,7 @@ from api.db import get_session
 from sqlalchemy import or_, and_
 import logging
 
-routelogger = logging.getLogger(__name__)
+routelogger = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
 covid_dash = Blueprint("covid_dash", __name__)
 
