@@ -20,15 +20,17 @@ from api.utils.transform.transforms import get_product_names
 # LIVE_URL = 'http://127.0.0.1:5000/'
 # DATA_URLS = []
 
-with open(os.path.join(os.path.dirname(__file__), 'data.sql'), 'rb') as file:
-    _data_sql = file.read().decode('utf8')
+with open(os.path.join(os.path.dirname(__file__), "data.sql"), "rb") as file:
+    _data_sql = file.read().decode("utf8")
+
 
 class LocalDatabaseTest(LiveServerTestCase):
-
     def create_app(self):
         app = create_app()
         return app
-        
+
     def test_get_product_names(self):
         print(get_product_names())
-        
+
+    # def test_get_inferred_products(self):
+    #    print(get_inferred_products())
