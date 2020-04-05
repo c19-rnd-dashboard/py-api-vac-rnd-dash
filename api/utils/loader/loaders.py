@@ -8,7 +8,7 @@ import pandas as pd
 import logging
 
 # Logger
-loadlogger = logging.getLogger(__name__)
+loadlogger = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
 
 ### Base Class ###

@@ -16,7 +16,7 @@ from functools import partial
 import logging
 import pycountry
 
-tlogg = logging.getLogger(__name__)
+tlogg = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
 ########################
 ### Helper Functions ###
