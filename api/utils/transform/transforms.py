@@ -72,16 +72,17 @@ def clean_null(data: pd.DataFrame):
     # Force all null values to None rathre than mixed type with np.nan
     return data.where(data.notnull(), None)
 
-def clean_country(country_names:list) -> str:
+
+def clean_country(country_names: list) -> str:
     result = []
-    for country in country_names.split(','):
-        try: 
+    for country in country_names.split(","):
+        try:
             curr_country = pycountry.countries.search_fuzzy(country)
             result.append(curr_country[0].alpha_3)
         except LookupError:
-            pass 
+            pass
         except Exception as e:
-            tlogg.error(f'Error in country standardization {e}')
+            tlogg.error(f"Error in country standardization {e}")
     if len(result) == 0:
         return None
     return ",".join(result)
@@ -190,7 +191,7 @@ def trial_cleaner(data: pd.DataFrame):
     for col in df.columns[df.dtypes == object]:
         df[col] = df[col].apply(lower)
         df[col] = df[col].apply(clean_lists)
-        
-    df['countries'] = df['countries'].apply(clean_country)
+
+    df["country_codes"] = df["countries"].apply(clean_country)
 
     return df
