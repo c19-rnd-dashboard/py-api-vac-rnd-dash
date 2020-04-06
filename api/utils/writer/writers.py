@@ -15,7 +15,7 @@ from .query import Query
 
 import logging
 
-writelogger = logging.getLogger(__name__)
+writelogger = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
 
 ####################
@@ -31,11 +31,12 @@ class Write(Query):
     def execute(self, **params):
         writelogger.info(f'Starting write execution. Processing stack of: {len(self.data)}')
         with get_session() as session:
-            for record in dataframe_to_dict(self.data):
-                make_or_update(
-                    model=model, 
+            for record in self.dataframe_to_dict(self.data):
+                self.make_or_update(
+                    model=self.model, 
                     record=record,
                     session=session,
+                    primary_key=self._primary_keys,
                     )
             session.commit()
             writelogger.info('Stack comitted.')
@@ -43,38 +44,26 @@ class Write(Query):
 
 ### Make Function ###
 
-def make_writer(data:pd.DataFrame, model, **kwargs):
-    return Write(
+def run_write(data:pd.DataFrame, model, **kwargs):
+    Write(
         data = data,
         model = model,
         params = kwargs
     )
+
 
 ### Control Function ###
 def write_trial(data: pd.DataFrame):
     """
     Adds a DataFrame of trials to the db as TrialRaw instances.
     """
-    # try:
-    #     writer = make_writer(data=data, model=TrialRaw)
-    # except Exception as e:
-        
-        
-    with get_session() as session:
-        for i in range(data.shape[0]):
-            curr_data = data.iloc[i].to_dict()
-            curr_trial = TrialRaw(**curr_data)
-            session.add(curr_trial)
-        session.commit()
+    writelogger.info('Building TrialRaw writer.')
+    run_write(data=data, model=TrialRaw)
 
 
 def write_product(data: pd.DataFrame):
     """
     Adds a DataFrame of products to the db as ProductRaw instances.
     """
-    with get_session() as session:
-        for i in range(data.shape[0]):
-            curr_data = data.iloc[i].to_dict()
-            curr_product = ProductRaw(**curr_data)
-            session.add(curr_product)
-        session.commit()
+    writelogger.info('Building ProductRaw writer.')
+    run_write(data=data, model=ProductRaw)
