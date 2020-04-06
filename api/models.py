@@ -34,9 +34,9 @@ from sqlalchemy.orm import relationship
 
 class ProductRaw(Base):
     __tablename__ = "productraw"
+    _class_name = 'ProductRaw'
 
-    product_id = Column(Integer, primary_key=True, autoincrement=True)
-    preferred_name = Column(String)
+    preferred_name = Column(String,primary_key=True)
     chemical_name = Column(String)
     brand_name = Column(String)
     repurposed = Column(String)
@@ -81,6 +81,7 @@ class ProductRaw(Base):
 
 class TrialRaw(Base):
     __tablename__ = "trialraw"
+    _class_name = 'TrialRaw'
 
     def id_default(context):
         new_id = hash(context.get_current_parameters()["title"])
@@ -151,7 +152,7 @@ class ProductMilestone(ProductRaw):
 
     link_id = Column(Integer, primary_key=True)
     milestone_id = Column(Integer, ForeignKey("milestone.milestone_id"))
-    product_id = Column(Integer, ForeignKey("productraw.product_id"))
+    product_id = Column(Integer, ForeignKey("productraw.preferred_name"))
     date_start = Column(DateTime)
     date_complete = Column(DateTime)
     status = Column(String)
@@ -167,6 +168,12 @@ class TrialMilestone(TrialRaw):
     date_complete = Column(DateTime)
     status = Column(String)
 
+
+#########################
+### Database MetaData ###
+#########################
+
+# Not Implemented
 
 #######################
 ### Adv Data Models ###
