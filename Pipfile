@@ -23,6 +23,7 @@ pycountry = "*"
 redis = "*"
 rq = "*"
 sqlalchemy = "*"
+urllib3 = "*"
 
 [dev-packages]
 black = "*"
