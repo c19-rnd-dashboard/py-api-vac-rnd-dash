@@ -17,12 +17,7 @@ import logging
 # Local Environment Testing Only.
 #   Un-comment to build environment script in config.py
 # from instance import setup
-# setup.setup_env(testing=True)
-
-
-# Set database name
-# Change this or override with config.py file in instance/
-local_db_name = 'test.sqlite3'
+# setup.setup_env(testing='TRUE')
 
 
 def create_app(test_config=None):
@@ -35,14 +30,14 @@ def create_app(test_config=None):
         DEBUG=config('DEBUG', default=False),
         SECRET_KEY=config('SECRET_KEY', default='dev'),  # CHANGE THIS!!!!
         # For in-memory db: default='sqlite:///:memory:'),
-        DATABASE_URI=config('DATABASE_URI', 'sqlite:///' + \
-                            os.path.join(os.getcwd(), local_db_name)),
+        DATABASE_URI=config('DATABASE_URI'),
         LOGFILE=config('LOGFILE', os.path.join(
             app.instance_path, 'logs/debug.log')),
         CACHE_TYPE=config('CACHE_TYPE', 'simple'),  # Configure caching
         # Long cache times probably ok for ML api
         CACHE_DEFAULT_TIMEOUT=config('CACHE_DEFAULT_TIMEOUT', 300),
-        TESTING=config('TESTING', default='TRUE')
+        TESTING=config('TESTING', default='TRUE'),
+        REDISTOGO_URL=config('REDISTOGO_URL', default='redis://localhost:6379'),
     )
 
     # Enable CORS header support
@@ -51,7 +46,6 @@ def create_app(test_config=None):
     # Enable caching
     cache = Cache(app)
 
-    
     ##############
     ### Routes ###
     ##############

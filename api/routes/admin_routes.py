@@ -1,9 +1,10 @@
 from api.utils.ingest import run_ingest
 from api.db import init_db
-from flask import render_template, Blueprint, request, jsonify
+from flask import render_template, Blueprint, request, jsonify, current_app
 from markdown2 import Markdown
-from collections import namedtuple
 import os
+
+from api.mq import get_q
 
 import logging
 
@@ -61,15 +62,22 @@ def render_home():
         else:
             return "Could not load readme.  Welcome to the API."
 
+
 def check_password(password):
-    return password == 'virus'
+    import hashlib
+    m = hashlib.sha256()
+    m.update(
+        bytes(password, 'utf-8')
+        )
+    return m.hexdigest() == '2898a07b2cf23dda8530b14b6aa522e67b002886d170c02219acc3598fdb50f3'
 
 
 def run_database_update():
+    # Create a temporary application
     # Init the database
-    init_db()
-    # Load factory tables
-    # Run known ingest
+    init_db(context=False)
+    # # Load factory tables
+    # # Run known ingest
     jobs = [
         ('product', 'https://raw.githubusercontent.com/c19-rnd-dashboard/py-api-vac-rnd-dash/master/data/vaccines/vaccineworkfile1_clean.csv'),
         ('trial', 'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-03-25.csv')
@@ -85,8 +93,30 @@ def update_db():
         routelogger.info('Update DB Request Received.  Verifying.')
         if check_password(json_data['password']):
             routelogger.info('Verified. Updating Database.')
-            run_database_update()
-            return "Database Updated"  # Consider making this updating, and an async process
+            q = get_q()
+            job = q.enqueue_call(
+                    func=run_database_update, args=(), result_ttl=5000
+            )
+            return {
+                'message': 'Database Update Started.',
+                'job_id': job.get_id(),
+              }
         else:
             return "Verification Failed.  Database not updated."
 
+
+
+def test_func():
+    return 'Test Success!!'
+
+@admin_routes.route('/test/redis', methods=['GET', 'POST'])
+def test_redis():
+    if request.method == 'GET':
+        routelogger.info('Getting redis connection.')
+        q = get_q()
+        job = q.enqueue_call(
+            func=test_func, args=(), result_ttl=5000
+        )
+        routelogger.info(f'Job Created at {job.get_id()}')
+        
+    return 'Complete!'
