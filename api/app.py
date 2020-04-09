@@ -42,7 +42,8 @@ def create_app(test_config=None):
         CACHE_TYPE=config('CACHE_TYPE', 'simple'),  # Configure caching
         # Long cache times probably ok for ML api
         CACHE_DEFAULT_TIMEOUT=config('CACHE_DEFAULT_TIMEOUT', 300),
-        TESTING=config('TESTING', default='TRUE')
+        TESTING=config('TESTING', default='TRUE'),
+        REDISTOGO_URL=config('REDISTOGO_URL', default='redis://localhost:6379'),
     )
 
     # Enable CORS header support
@@ -51,7 +52,9 @@ def create_app(test_config=None):
     # Enable caching
     cache = Cache(app)
 
-    
+    # Enable Redis queue
+    from api import mq
+
     ##############
     ### Routes ###
     ##############

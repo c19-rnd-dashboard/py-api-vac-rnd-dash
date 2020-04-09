@@ -5,6 +5,8 @@ from markdown2 import Markdown
 from collections import namedtuple
 import os
 
+from api.mq import get_q
+
 import logging
 
 routelogger = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
@@ -62,7 +64,12 @@ def render_home():
             return "Could not load readme.  Welcome to the API."
 
 def check_password(password):
-    return password == 'virus'
+    import hashlib
+    m = hashlib.sha256()
+    m.update(
+        bytes(password, 'utf-8')
+        )
+    return m.hexdigest() == '2898a07b2cf23dda8530b14b6aa522e67b002886d170c02219acc3598fdb50f3'
 
 
 def run_database_update():
@@ -90,3 +97,19 @@ def update_db():
         else:
             return "Verification Failed.  Database not updated."
 
+
+
+def test_func():
+    return 'Test Success!!'
+
+@admin_routes.route('/test/redis', methods=['GET', 'POST'])
+def test_redis():
+    if request.method == 'GET':
+        routelogger.info('Getting redis connection.')
+        q = get_q()
+        job = q.enqueue_call(
+            func=test_func, args=(), result_ttl=5000
+        )
+        routelogger.info(f'Job Created at {job.get_id()}')
+        
+    return 'Complete!'
