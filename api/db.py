@@ -8,33 +8,39 @@ Database
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 import sys
+from decouple import config
 from contextlib import contextmanager
 from api.models import *
 
 import click
-from flask import current_app, g
+from flask import current_app, g, current_app
 from flask.cli import with_appcontext
 
 import logging
 
 db_logger = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
-def get_db():
+def get_db(context=False):
     """
     Returns current database connection.  If connection not present,
     initiates connection to configured database.  Default is non-authenticated SQL.
     Modifty g.db = *connect to match intended database connection.
     """
-    if 'db' not in g:
-        db_logger.info('DB connection not found. Attempting connection to {}.'.format(current_app.config['DATABASE_URI']))
-        try:
-            g.engine = create_engine(current_app.config['DATABASE_URI'])
-            g.db = g.engine.connect()
-        except:
-            db_logger.error('Could not establish connection.  Aborting.')
-            raise ConnectionError
+    if context:
+        if 'db' not in g:
+            db_logger.info('DB connection not found. Attempting connection to {}.'.format(current_app.config['DATABASE_URI']))
+            try:
+                g.engine = create_engine(current_app.config['DATABASE_URI'])
+                g.db = g.engine.connect()
+            except:
+                db_logger.error('Could not establish connection.  Aborting.')
+                raise ConnectionError
+        return g.db
 
-    return g.db
+    else:
+        db_logger.info("Creating new database connection without app context.")
+        engine = create_engine(config('DATABASE_URI'))
+        return engine.connect()
 
 
 @contextmanager
@@ -57,8 +63,8 @@ def close_db(e=None):
         engine.dispose()
 
 
-def init_db(out=sys.stdout):
-    db = get_db()
+def init_db(out=sys.stdout, context=True):
+    db = get_db(context)
     Base.metadata.create_all(db)
     out.write('init called')
 
