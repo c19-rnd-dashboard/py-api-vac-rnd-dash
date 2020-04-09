@@ -24,6 +24,8 @@ jupyter = "*"
 fuzzywuzzy = "*"
 python-levenshtein = "*"
 pycountry = "*"
+rq = "*"
+redis = "*"
 
 [dev-packages]
 black = "*"
