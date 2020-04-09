@@ -57,7 +57,6 @@ class ProductRaw(Base):
 
     def to_json(self):
         return {
-            "product_id": self.product_id,
             "preferred_name": self.preferred_name,
             "chemical_name": self.chemical_name,
             "brand_name": self.brand_name,
@@ -83,6 +82,7 @@ class TrialRaw(Base):
     __tablename__ = "trialraw"
     _class_name = 'TrialRaw'
 
+    @staticmethod
     def id_default(context):
         new_id = hash(context.get_current_parameters()["title"])
         # print(new_id)  # DEBUG
@@ -152,7 +152,7 @@ class ProductMilestone(ProductRaw):
 
     link_id = Column(Integer, primary_key=True)
     milestone_id = Column(Integer, ForeignKey("milestone.milestone_id"))
-    product_id = Column(Integer, ForeignKey("productraw.preferred_name"))
+    product_id = Column(String, ForeignKey("productraw.preferred_name"))
     date_start = Column(DateTime)
     date_complete = Column(DateTime)
     status = Column(String)
