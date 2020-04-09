@@ -20,6 +20,8 @@ psycopg2 = "*"
 python-dateutil = "*"
 python-levenshtein = "*"
 pycountry = "*"
+redis = "*"
+rq = "*"
 
 [dev-packages]
 black = "*"
