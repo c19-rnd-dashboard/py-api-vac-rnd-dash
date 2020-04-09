@@ -16,8 +16,8 @@ import logging
 ###########
 # Local Environment Testing Only.
 #   Un-comment to build environment script in config.py
-from instance import setup
-setup.setup_env(testing='TRUE')
+# from instance import setup
+# setup.setup_env(testing='TRUE')
 
 
 def create_app(test_config=None):
