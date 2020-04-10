@@ -7,6 +7,9 @@ import os
 import pandas as pd
 import logging
 
+from urllib3.util import parse_url
+from urllib3 import PoolManager
+
 # Logger
 loadlogger = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
@@ -137,8 +140,6 @@ def is_file(file_or_buffer):
 
 
 def validate_url(url):
-    from urllib3.util import parse_url
-    from urllib3 import PoolManager
     try:
         # Parse the URL
         purl = parse_url(url)
