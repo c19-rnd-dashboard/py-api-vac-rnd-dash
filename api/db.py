@@ -13,20 +13,28 @@ from contextlib import contextmanager
 from api.models import *
 
 import click
-from flask import current_app, g, current_app
+from flask import current_app, g
 from flask.cli import with_appcontext
 
 import logging
 
 db_logger = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
-def get_db(context=False):
+def get_db(context=True):
     """
     Returns current database connection.  If connection not present,
     initiates connection to configured database.  Default is non-authenticated SQL.
     Modifty g.db = *connect to match intended database connection.
     """
-    if context:
+
+    def check_context():
+        try:
+            current_app()
+            return True
+        except:
+            return False
+
+    if context and check_context():
         if 'db' not in g:
             db_logger.info('DB connection not found. Attempting connection to {}.'.format(current_app.config['DATABASE_URI']))
             try:
