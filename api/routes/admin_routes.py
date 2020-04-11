@@ -39,13 +39,14 @@ def get_ingest():
             routelogger.info(
                 f"POST received at Ingest.  Running Ingest{ingest_request}"
             )
-            run_ingest(
-                source=ingest_request["source"], category=ingest_request["category"]
+            q = get_q()
+            job = q.enqueue_call(
+                    func=run_ingest, args=(ingest_request["source"], ingest_request["category"]), result_ttl=5000
             )
             # print(ingest_request)
             message = {
-                "success": True,
-                "message": f"Success!  Ingested {ingest_request}",
+                "message": 'Job sent to queue.',
+                'job_id': job.get_id(),
             }
 
         except Exception as ex:
