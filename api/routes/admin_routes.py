@@ -91,7 +91,7 @@ def run_database_update():
         )
     ]
     for job in jobs:
-        run_ingest(category=job[0], source=job[1])
+        run_ingest(category=job[0], source=job[1], **job[2])
 
 
 @admin_routes.route('/admin/update', methods=['POST'])
