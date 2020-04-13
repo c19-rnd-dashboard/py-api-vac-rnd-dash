@@ -133,6 +133,8 @@ def drop_unnamed_columns(df:pd.DataFrame)->pd.DataFrame:
 
 
 def clean_product_raw(data: pd.DataFrame):
+    assert type(data) == pd.DataFrame
+    assert len(data) > 0
     # Drop columns with no name (assume no data or not relevant)
     temp_data = drop_unnamed_columns(data).copy()
     # Rename columns to db format/names
@@ -174,7 +176,6 @@ def clean_product_raw(data: pd.DataFrame):
     'CTG Identifier': 'trial_id',
     'Status': 'status',
     }
-
     temp_data = temp_data.rename(columns=product_schema)
 
     # Clean Sources and append to data rows
