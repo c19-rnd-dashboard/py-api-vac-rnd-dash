@@ -16,8 +16,8 @@ import logging
 ###########
 # Local Environment Testing Only.
 #   Un-comment to build environment script in config.py
-from instance import setup
-setup.setup_env(testing='TRUE')
+# from instance import setup
+# setup.setup_env(testing='TRUE')
 
 
 def create_app(test_config=None):
@@ -69,7 +69,7 @@ def create_app(test_config=None):
         app.logger.info('Using TESTING log config.')
         logging.basicConfig(
             filename=app.config['LOGFILE'], 
-            level=logging.DEBUG, 
+            level=logging.INFO, 
             format='[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S %z')
     
     logging.getLogger('flask_cors').level = logging.INFO
