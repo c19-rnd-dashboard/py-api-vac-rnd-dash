@@ -10,6 +10,12 @@ import logging
 from urllib3.util import parse_url
 from urllib3 import PoolManager
 
+import csv
+import numpy as np
+from contextlib import closing
+import requests
+import codecs
+
 # Logger
 loadlogger = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
@@ -45,9 +51,9 @@ class FileLoader(Loader):
         # Get filetype to assign loading function
         filetype = infer_filetype(self.filename)
         # Assign loading function
-        file_loader = self.assign_file_loader(filetype)
+        file_loader = self.assign_file_loader(filetype, **kwargs)
         # Execute loading function
-        load_kwargs = self.filter_kwargs(**kwargs)
+        # load_kwargs = self.filter_kwargs(**kwargs)
         return file_loader(self.filename, **kwargs)
 
     def transform(self, data=None, **kwargs):
@@ -58,18 +64,22 @@ class FileLoader(Loader):
             self.transformed_data = data
             return data # Null transform returns data
 
-    def assign_file_loader(self, filetype):
+    def assign_file_loader(self, filetype, **kwargs):
         print(f'<filetype {filetype}>')  # DEBUG
         lookup = {
             'csv': pd.read_csv,
             'xlsx': pd.read_excel,
-            'txt': load_text
+            'txt': load_text,
+            'unfiltered_csv': load_unfiltered_csv,
         }
+        # Look for explicit loader type
+        if 'loader' in kwargs:
+            return lookup[kwargs['loader']]
         return lookup[filetype]
 
-    def filter_kwargs(self, **kwargs):
-        # TODO add pertinent filter for Pandas.
-        return kwargs
+    # def filter_kwargs(self, **kwargs):
+    #     # TODO add pertinent filter for Pandas.
+    #     return kwargs
 
 
 class ObjectLoader(Loader):
@@ -100,11 +110,11 @@ class ObjectLoader(Loader):
 def load(file_or_buffer=None, **kwargs):
     print('file_or_buffer: ', file_or_buffer)  # DEBUG
     if type(file_or_buffer) == str and is_file(file_or_buffer):
-        loader = FileLoader(filename=file_or_buffer)
-        return loader.fetch_transform()
+        loader = FileLoader(filename=file_or_buffer, **kwargs)
+        return loader.fetch_transform(**kwargs)
     else:
-        loader = ObjectLoader(buffer_var=file_or_buffer)
-        return loader.fetch_transform()
+        loader = ObjectLoader(buffer_var=file_or_buffer, **kwargs)
+        return loader.fetch_transform(**kwargs)
 
 
 ###########################
@@ -115,6 +125,86 @@ def load_text(filepath, **kwargs):
     with open(filepath, 'r') as file:
         data = file.read()
     return data
+
+
+def load_unfiltered_csv(file_or_url: str, **kwargs):
+    loadlogger.info('<load_unfiltered_csv> Starting .csv data inference')
+    def read_to_array(reader)->np.array:
+        raw_data = []
+        for row in reader:
+            raw_data.append(row)
+        return np.array(raw_data)
+
+    def ingest_csv(file_or_url)->np.array:
+        # Handle HTTP requests
+        if 'http' in file_or_url:
+            with closing(requests.get(file_or_url, stream=True)) as r:
+                reader = csv.reader(
+                    codecs.iterdecode(r.iter_lines(), 'utf-8'), 
+                    delimiter=',', 
+                    quotechar='"',
+                )
+                return read_to_array(reader)
+
+        # Default handling of .csv file
+        with open(file_or_url, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=',')
+            return read_to_array(reader)
+
+    def get_line_counts(raw_file:np.array)->np.array:
+        def count_value(newline:np.array):
+            count = 0
+            for item in newline:
+                if len(item) > 0:
+                    count += 1
+            return count
+        
+        return {
+            'line_counts': np.array(list(map(count_value, raw_file)))
+        }
+
+    def infer_head_tail(line_counts:np.array)->dict:
+        max_val = max(line_counts)
+        
+        def get_first_max(line_counts:np.array, max_val:int)->int:
+            for index, val in enumerate(line_counts):
+                if val == max_val:
+                    return index
+        head = get_first_max(line_counts, max_val)
+        
+        def get_approximate_tail(line_counts:np.array, sensitivity=3):
+            lower_bound_val = min(np.quantile(line_counts, [0.95, 0.75, 0.5, 0.25, 0.125]))
+            end_region = []
+            for index in range(len(line_counts)-1, -1, -1):
+                if line_counts[index] >= lower_bound_val:
+                    end_region.append(index)
+                    if len(end_region) >= sensitivity:
+                        break
+            return max(end_region) # Control interp here
+                
+        tail_region = get_approximate_tail(line_counts)
+        
+        return {
+            'head': head, 
+            'tail': tail_region,
+        }
+
+    def profile_csv(raw_file:np.array)->dict:
+        profile = {}
+        profile.update(get_line_counts(raw_file))
+        profile.update(infer_head_tail(profile['line_counts']))
+        return profile
+
+    # Get raw .csv loaded as array
+    raw_import = ingest_csv(file_or_url)
+    # Profile the .csv file
+    profile = profile_csv(raw_import)
+    # Build dataframe from inferred attributes
+    df = pd.DataFrame(
+        raw_import[profile['head']+1:profile['tail']+1],
+        columns = raw_import[profile['head']]
+        )
+    return df
 
 
 ########################

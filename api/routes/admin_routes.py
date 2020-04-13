@@ -40,8 +40,17 @@ def get_ingest():
                 f"POST received at Ingest.  Running Ingest{ingest_request}"
             )
             q = get_q()
+            # Check for kwargs
+            if 'kwargs' in ingest_request:
+              kwargs = ingest_request['kwargs']
+            else:
+              kwargs = {}
             job = q.enqueue_call(
-                    func=run_ingest, args=(ingest_request["source"], ingest_request["category"]), result_ttl=5000
+                    func=run_ingest, 
+                    args=(
+                      ingest_request["source"], 
+                      ingest_request["category"])
+                    kwargs=kwargs, 
             )
             # print(ingest_request)
             message = {
@@ -80,11 +89,17 @@ def run_database_update():
     # # Load factory tables
     # # Run known ingest
     jobs = [
-        ('product', 'https://raw.githubusercontent.com/c19-rnd-dashboard/py-api-vac-rnd-dash/master/data/vaccines/vaccineworkfile1_clean.csv'),
-        ('trial', 'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-03-25.csv')
+        ('product', 
+        'https://raw.githubusercontent.com/c19-rnd-dashboard/py-api-vac-rnd-dash/master/data/vaccines/vaccineworkfile2.csv',
+        {'loader': "unfiltered_csv"}
+        ),
+        ('trial', 
+        'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-03-25.csv',
+        {}
+        )
     ]
     for job in jobs:
-        run_ingest(category=job[0], source=job[1])
+        run_ingest(category=job[0], source=job[1], **job[2])
 
 
 @admin_routes.route('/admin/update', methods=['POST'])

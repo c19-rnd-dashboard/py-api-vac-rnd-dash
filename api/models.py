@@ -36,46 +36,41 @@ class ProductRaw(Base):
     __tablename__ = "productraw"
     _class_name = 'ProductRaw'
 
+    product_id = Column(Integer)
     preferred_name = Column(String,primary_key=True)
     chemical_name = Column(String)
     brand_name = Column(String)
-    repurposed = Column(String)
-    notes = Column(Text)
-    disease = Column(String)
-    application = Column(Text)
-    data_reference = Column(String)
-    data_source = Column(String)
-    product_type = Column(String)
     sponsors = Column(Text)
     intervention_type = Column(String)
     indication = Column(String)
     molecule_type = Column(String)
     therapeutic_approach = Column(String)
+    repurposed = Column(String)
+    countries = Column(Text)
+    country_codes = Column(Text)
     other_partners = Column(Text)
+    notes = Column(Text)
+    status = Column(String)
+    current_status = Column(String)
+    # discovery_started_date = Column(DateTime)
+    # pre_clinical_studies_started_date = Column(DateTime)
+    # lead_selection_finalized_date = Column(DateTime)
+    # clinical_batch_finalized_date = Column(DateTime)
+    # ind_finalized_date = Column(DateTime)
+    # phase_1_started_date = Column(DateTime)
+    # phase_2_started_date = Column(DateTime)
+    # phase_3_started_date = Column(DateTime)
+    # nda_finalized = Column(String)
+    phase = Column(String)
+    condition_or_disease = Column(String)
+    product_type = Column(String)
+    trial_id = Column(String)
     num_sites = Column(Integer)
     site_locations = Column(Text)
 
     def to_json(self):
-        return {
-            "preferred_name": self.preferred_name,
-            "chemical_name": self.chemical_name,
-            "brand_name": self.brand_name,
-            "repurposed": self.repurposed,
-            "notes": self.notes,
-            "disease": self.disease,
-            "application": self.application,
-            "data_reference": self.data_reference,
-            "data_source": self.data_source,
-            "product_type": self.product_type,
-            "sponsors": self.sponsors,
-            "intervention_type": self.intervention_type,
-            "indication": self.indication,
-            "molecule_type": self.molecule_type,
-            "therapeutic_approach": self.therapeutic_approach,
-            "other_partners": self.other_partners,
-            "num_sites": self.num_sites,
-            "site_locations": self.site_locations,
-        }
+        raise NotImplementedError
+        # Out of date.  Need more flexible output creator.
 
 
 class TrialRaw(Base):
@@ -152,10 +147,10 @@ class ProductMilestone(ProductRaw):
 
     link_id = Column(Integer, primary_key=True)
     milestone_id = Column(Integer, ForeignKey("milestone.milestone_id"))
-    product_id = Column(String, ForeignKey("productraw.preferred_name"))
+    product_name = Column(String, ForeignKey("productraw.preferred_name"))
     date_start = Column(DateTime)
     date_complete = Column(DateTime)
-    status = Column(String)
+    milestone_status = Column(String)
 
 
 class TrialMilestone(TrialRaw):
