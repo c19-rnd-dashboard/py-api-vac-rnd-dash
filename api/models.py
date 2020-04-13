@@ -150,7 +150,7 @@ class ProductMilestone(ProductRaw):
     product_name = Column(String, ForeignKey("productraw.preferred_name"))
     date_start = Column(DateTime)
     date_complete = Column(DateTime)
-    status = Column(String)
+    milestone_status = Column(String)
 
 
 class TrialMilestone(TrialRaw):
