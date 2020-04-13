@@ -69,7 +69,7 @@ def create_app(test_config=None):
         app.logger.info('Using TESTING log config.')
         logging.basicConfig(
             filename=app.config['LOGFILE'], 
-            level=logging.INFO, 
+            level=logging.DEBUG, 
             format='[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S %z')
     
     logging.getLogger('flask_cors').level = logging.INFO

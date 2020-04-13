@@ -13,6 +13,7 @@ from api.db import get_session
 from dateutil.parser import parse
 from fuzzywuzzy import fuzz
 from functools import partial
+import string
 import logging
 import pycountry
 
@@ -33,7 +34,10 @@ def get_columns(model):
 
 def convert_to_datetime(time_string):
     try:
-        return parse(time_string)
+        date_val = parse(time_string)
+        if pd.isnull(date_val):
+            return None
+        return date_val
     except:
         return None
 
@@ -44,6 +48,41 @@ def get_product_names():
         prod_names = session.query(ProductRaw.preferred_name).all()
     return [x[0] for x in prod_names]
 
+
+def clean_country(country_names: str) -> str:
+    result = []
+    for country in country_names.split(","):
+        try:
+            curr_country = pycountry.countries.search_fuzzy(country)
+            result.append(curr_country[0].alpha_3)
+        except LookupError:
+            pass
+        except Exception as e:
+            tlogg.error(f"Error in country standardization {e}")
+    if len(result) == 0:
+        return None
+    return ",".join(result)
+
+
+def clean_lists(x):
+    if x is None:
+        return None 
+
+    if "," in x:
+        temp_list = x.split(",")
+    elif ";" in x:
+        temp_list = x.split(";")
+    else:
+        return x
+
+    def clean_list_item(item: str = None):
+        assert type(item) == str
+        temp_item = item
+        temp_item = temp_item.strip()
+        temp_item = temp_item.replace('"', "")
+        return temp_item
+
+    return ",".join([clean_list_item(item) for item in temp_list])
 
 ##############################
 ### DataFrame Manipulation ###
@@ -70,23 +109,22 @@ def cast_dates(data: pd.DataFrame):
 
 
 def clean_null(data: pd.DataFrame):
-    # Force all null values to None rathre than mixed type with np.nan
-    return data.where(data.notnull(), None)
+    # Force all null values to None rather than mixed type with np.nan
+    def replace_nat(x):
+        if pd.isnull(x):
+            return None
+        return x
+
+    temp_data = data
+    temp_data = temp_data.where(data.notnull(), None)
+    for col in temp_data.columns:
+        temp_data[col] = temp_data[col].apply(replace_nat)
+    return temp_data
 
 
-def clean_country(country_names: list) -> str:
-    result = []
-    for country in country_names.split(","):
-        try:
-            curr_country = pycountry.countries.search_fuzzy(country)
-            result.append(curr_country[0].alpha_3)
-        except LookupError:
-            pass
-        except Exception as e:
-            tlogg.error(f"Error in country standardization {e}")
-    if len(result) == 0:
-        return None
-    return ",".join(result)
+def drop_unnamed_columns(df:pd.DataFrame)->pd.DataFrame:
+    keep_columns = [col for col in df.columns if len(col)>0]
+    return df[keep_columns].copy()
 
 
 ######################################
@@ -95,16 +133,103 @@ def clean_country(country_names: list) -> str:
 
 
 def clean_product_raw(data: pd.DataFrame):
-    name_check = data.preferred_name
-    # Teste Names
-    def test_for_good_name(x):
-        return (x is not None) and (len(x) > 2) and (x != np.nan)
+    # Drop columns with no name (assume no data or not relevant)
+    temp_data = drop_unnamed_columns(data).copy()
+    # Rename columns to db format/names
+    product_schema = {
+    'ID': 'product_id',
+    'Source?': 'source',
+    'Product Name - Preferred': 'preferred_name',
+    'Product Name - Chemical': 'chemical_name',
+    'Product Name - Brand': 'brand_name',
+    'Sponsor': 'sponsors',
+    'Intervention Type': 'intervention_type',
+    'Indication': 'indication',
+    'Molecule Type': 'molecule_type',
+    'Therapeutic Approach': 'therapeutic_approach',
+    'New/Repurposed': 'repurposed',
+    'Notes': 'notes',
+    'Funding/Manufacturing/Research/Other Partners': 'other_partners',
+    'Country': 'countries',
+    'Current Status': 'current_status',
+    'Pre-Clinical Studies Started': 'pre_clinical_studies_started_date',
+    'Lead Selection Finalized': 'lead_selection_finalized_date',
+    'Clinical Batch Finalized': 'clinical_batch_finalized_date',
+    'IND or Equivalent Approval Finalized': 'ind_finalized_date',
+    'Phase 1 Started': 'phase_1_started_date',
+    'Phase 2 Started': 'phase_2_started_date',
+    'Phase 3 Started': 'phase_3_started_date',
+    'NDA or equivalent Approval Finalized': 'nda_finalized',
+    'Phase': 'phase',
+    'Condition or Disease': 'condition_or_disease',
+    'Number of Participants': 'number_participants',
+    'Accepts Healthy Subjects': 'accepts_healthy_subjects',
+    '# of Sites': 'num_sites',
+    'Sites Locations': 'site_locations',
+    'Study Start Date': 'study_start_date',
+    'Primary Completion DAte': 'primary_completion_date',
+    'Study Completion Date': 'study_completion_date', 
+    'How to participate': 'participation_link',
+    'Discovery Started': 'discovery_started_date',
+    'CTG Identifier': 'trial_id',
+    'Status': 'status',
+    }
 
-    name_check = [test_for_good_name(name) for name in name_check]
-    # Build Drop Index for row removal
-    drop_ind = [index for index, val in enumerate(name_check) if not val]
-    temp_data = data.drop(index=drop_ind)
+    temp_data = temp_data.rename(columns=product_schema)
 
+    # Clean Sources and append to data rows
+    def get_unique_sources(row_list:list)->dict:
+        url_list = []
+        for item in row_list:
+            if ('http' in item):
+                if item not in url_list:
+                    url_list.append(item)
+        urls = ','.join(url_list)
+        product_id = row_list[0]
+        return {
+        'product_id': product_id,
+        'source': urls,
+        }
+
+    def clean_valid_sources(df:pd.DataFrame):
+        data_rows = df.query("source == 'No'")
+        source_rows = df.query("source == 'Yes'")
+        
+        clean_sources = []
+        for i in range(len(source_rows)):
+            row_list = source_rows.iloc[i].to_list()
+            clean_sources.append(get_unique_sources(row_list=row_list))
+        
+        source_frame = pd.DataFrame(clean_sources)
+        clean_frame = data_rows.drop(columns=['source']).merge(source_frame, on='product_id')
+        
+        return clean_frame
+    
+    temp_data = clean_valid_sources(temp_data)
+
+    # Infer preferred_name from other names
+    def build_missing_preferred_names(df:pd.DataFrame)->pd.DataFrame:
+        def clean_(item):
+            teststr = item
+            return teststr.translate(str.maketrans('', '', string.punctuation)).replace(' ', '_')
+
+        df1 = df.copy()
+        for i in range(len(df)):
+            row = df1.iloc[i]
+            if len(row.preferred_name) < 2:
+                if (len(row.sponsors) > 0) and (len(row.chemical_name) > 0):
+                    df1.iloc[i].preferred_name = '-'.join([clean_(row.sponsors), row.chemical_name, row.product_id])
+                elif (len(row.sponsors) > 0) and (len(row.brand_name) > 0):
+                    df1.iloc[i].preferred_name = '-'.join([clean_(row.sponsors), row.brand_name, row.product_id])
+        
+        return df1[df1.preferred_name.str.len() > 0]
+
+    temp_data = build_missing_preferred_names(temp_data)
+    
+    # Generate country code lists
+    temp_data["country_codes"] = temp_data["countries"].apply(clean_country)
+
+    # Lowercase the dataset
     def lower(x):
         """
         Lowers capitalization of all observations in a given str type column.
@@ -114,16 +239,12 @@ def clean_product_raw(data: pd.DataFrame):
         except:
             return x
 
-    # Apply functions
-    for col in temp_data.columns:
+    for col in temp_data.columns[temp_data.dtypes == object]:
         temp_data[col] = temp_data[col].apply(lower)
+        temp_data[col] = temp_data[col].apply(clean_lists)
 
+    # Finally, return the prepared dataframe
     return temp_data
-
-
-def clean_product_raw2(data:pd.DataFrame)->pd.DataFrame:
-    pass
-
 
 
 
