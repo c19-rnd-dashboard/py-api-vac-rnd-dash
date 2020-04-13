@@ -54,3 +54,11 @@ def products():
             .all()
         )
     return jsonify([med.to_json() for med in meds])
+
+
+@covid_dash.route("/assets")
+def assets():
+    routelogger.info("Running Products Query")
+    with get_session() as session:
+        assets = session.query(ProductRaw).all()
+    return {count:item.json for count, item in enumerate(assets)}
