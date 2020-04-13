@@ -40,7 +40,9 @@ def get_ingest():
                 f"POST received at Ingest.  Running Ingest{ingest_request}"
             )
             run_ingest(
-                source=ingest_request["source"], category=ingest_request["category"]
+                source=ingest_request["source"], 
+                category=ingest_request["category"],
+                **ingest_request["kwargs"]
             )
             # print(ingest_request)
             message = {
@@ -79,8 +81,14 @@ def run_database_update():
     # # Load factory tables
     # # Run known ingest
     jobs = [
-        ('product', 'https://raw.githubusercontent.com/c19-rnd-dashboard/py-api-vac-rnd-dash/master/data/vaccines/vaccineworkfile1_clean.csv'),
-        ('trial', 'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-03-25.csv')
+        ('product', 
+        'https://raw.githubusercontent.com/c19-rnd-dashboard/py-api-vac-rnd-dash/master/data/vaccines/vaccineworkfile1_clean.csv',
+        {}
+        ),
+        ('trial', 
+        'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-03-25.csv',
+        {'loader': "unfiltered_csv"}
+        )
     ]
     for job in jobs:
         run_ingest(category=job[0], source=job[1])

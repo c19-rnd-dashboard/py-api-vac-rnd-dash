@@ -32,11 +32,11 @@ class Ingest:
     :type source: str or buffer
     """
 
-    def __init__(self, source, category: str = None):
+    def __init__(self, source, category: str = None, **kwargs):
         self.category = category
         self.source = source
         self.start_time = time()
-        self.data = load(source)
+        self.data = load(source, **kwargs)
         self.assign_transformations()
         self.assign_writer()
 
@@ -73,11 +73,11 @@ class Ingest:
 ### Control Function ###
 
 
-def run_ingest(source, category: str):
+def run_ingest(source, category: str, **kwargs):
     ingestlogger.info(f"Starting ingest of source: {source} category: {category}")
 
     try:  # will start load automatically
-        job = Ingest(source=source, category=category)
+        job = Ingest(source=source, category=category, **kwargs)
         process_time = time() - job.start_time
         ingestlogger.info(f"Load completed in: {process_time}")
     except Exception as e:

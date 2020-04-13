@@ -29,5 +29,11 @@ class IngestTest(LiveServerTestCase):
         error = run_ingest(source=self.test_trial_url, category=category)
         self.assertIsNone(error)
 
+    def test_explicit_ingest(self):
+        category = 'product'
+        loader = "unfiltered_csv"
+        error = run_ingest(source=self.test_product_url, category=category, loader=loader)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -10,6 +10,12 @@ import logging
 from urllib3.util import parse_url
 from urllib3 import PoolManager
 
+import csv
+import numpy as np
+from contextlib import closing
+import requests
+import codecs
+
 # Logger
 loadlogger = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
@@ -45,9 +51,9 @@ class FileLoader(Loader):
         # Get filetype to assign loading function
         filetype = infer_filetype(self.filename)
         # Assign loading function
-        file_loader = self.assign_file_loader(filetype)
+        file_loader = self.assign_file_loader(filetype, **kwargs)
         # Execute loading function
-        load_kwargs = self.filter_kwargs(**kwargs)
+        # load_kwargs = self.filter_kwargs(**kwargs)
         return file_loader(self.filename, **kwargs)
 
     def transform(self, data=None, **kwargs):
@@ -58,18 +64,22 @@ class FileLoader(Loader):
             self.transformed_data = data
             return data # Null transform returns data
 
-    def assign_file_loader(self, filetype):
+    def assign_file_loader(self, filetype, **kwargs):
         print(f'<filetype {filetype}>')  # DEBUG
         lookup = {
             'csv': pd.read_csv,
             'xlsx': pd.read_excel,
-            'txt': load_text
+            'txt': load_text,
+            'unfiltered_csv': load_unfiltered_csv,
         }
+        # Look for explicit loader type
+        if 'loader' in kwargs:
+            return lookup[kwargs['loader']]
         return lookup[filetype]
 
-    def filter_kwargs(self, **kwargs):
-        # TODO add pertinent filter for Pandas.
-        return kwargs
+    # def filter_kwargs(self, **kwargs):
+    #     # TODO add pertinent filter for Pandas.
+    #     return kwargs
 
 
 class ObjectLoader(Loader):
@@ -100,11 +110,11 @@ class ObjectLoader(Loader):
 def load(file_or_buffer=None, **kwargs):
     print('file_or_buffer: ', file_or_buffer)  # DEBUG
     if type(file_or_buffer) == str and is_file(file_or_buffer):
-        loader = FileLoader(filename=file_or_buffer)
-        return loader.fetch_transform()
+        loader = FileLoader(filename=file_or_buffer, **kwargs)
+        return loader.fetch_transform(**kwargs)
     else:
-        loader = ObjectLoader(buffer_var=file_or_buffer)
-        return loader.fetch_transform()
+        loader = ObjectLoader(buffer_var=file_or_buffer, **kwargs)
+        return loader.fetch_transform(**kwargs)
 
 
 ###########################
@@ -115,6 +125,11 @@ def load_text(filepath, **kwargs):
     with open(filepath, 'r') as file:
         data = file.read()
     return data
+
+
+def load_unfiltered_csv(file_or_url: str, **kwargs):
+    loadlogger.info('<load_unfiltered_csv> Starting .csv data inference')
+    pass
 
 
 ########################

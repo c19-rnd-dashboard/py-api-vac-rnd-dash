@@ -16,6 +16,7 @@ from functools import partial
 import logging
 import pycountry
 
+
 tlogg = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
 ########################
@@ -119,6 +120,16 @@ def clean_product_raw(data: pd.DataFrame):
 
     return temp_data
 
+
+def clean_product_raw2(data:pd.DataFrame)->pd.DataFrame:
+    pass
+
+
+
+
+####################################
+### Trial Source Transformations ###
+####################################
 
 def infer_trial_products(data: pd.DataFrame):
     df = data.copy()
