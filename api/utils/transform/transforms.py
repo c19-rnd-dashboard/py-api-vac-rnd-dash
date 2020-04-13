@@ -114,10 +114,18 @@ def clean_null(data: pd.DataFrame):
         if pd.isnull(x):
             return None
         return x
+    def replace_empty_strings(x):
+        if x == '':
+            return None 
+        return x
 
     temp_data = data
     temp_data = temp_data.where(data.notnull(), None)
-    for col in temp_data.columns:
+    for col in temp_data.columns[temp_data.dtypes == object]:
+        temp_data[col] = temp_data[col].apply(replace_empty_strings)
+    # Date cleanup
+    date_columns = [column for column in temp_data.columns if "date" in column]
+    for col in date_columns:
         temp_data[col] = temp_data[col].apply(replace_nat)
     return temp_data
 
