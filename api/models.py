@@ -9,6 +9,7 @@ https://docs.sqlalchemy.org/en/13/orm/inheritance.html#joined-table-inheritance
 """
 
 from sqlalchemy.ext.declarative import declarative_base
+import json
 
 Base = declarative_base()
 
@@ -26,6 +27,29 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
+
+### Helper Functions ##
+
+def to_dict(inst, cls):
+    """
+    Convert the sql alchemy query result to a clean python dictionary.
+    """
+    convert = dict()
+    # add your coversions for things like datetime's 
+    # and what-not that aren't serializable.
+    d = dict()
+    for c in cls.__table__.columns:
+        v = getattr(inst, c.name)
+        if c.type in convert.keys() and v is not None:
+            try:
+                d[c.name] = convert[c.type](v)
+            except:
+                d[c.name] = "Error:  Failed to covert using ", str(convert[c.type])
+        elif v is None:
+            d[c.name] = str()
+        else:
+            d[c.name] = v
+    return d
 
 #######################
 ### New Data Models ###
@@ -68,9 +92,9 @@ class ProductRaw(Base):
     num_sites = Column(Integer)
     site_locations = Column(Text)
 
-    def to_json(self):
-        raise NotImplementedError
-        # Out of date.  Need more flexible output creator.
+    @property
+    def json(self):
+        return to_dict(self, self.__class__)
 
 
 class TrialRaw(Base):
