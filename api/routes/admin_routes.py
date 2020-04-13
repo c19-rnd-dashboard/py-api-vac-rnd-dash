@@ -49,7 +49,7 @@ def get_ingest():
                     func=run_ingest, 
                     args=(
                       ingest_request["source"], 
-                      ingest_request["category"])
+                      ingest_request["category"]),
                     kwargs=kwargs, 
             )
             # print(ingest_request)
