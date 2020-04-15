@@ -179,7 +179,7 @@ class ProductMilestone(ProductRaw):
     _class_name = 'ProductMilestone'
 
     id = Column(Integer, primary_key=True)
-    milestone_name = Column(Integer, ForeignKey("milestone.name"))
+    milestone_name = Column(String, ForeignKey("milestone.name"))
     product_name = Column(String, ForeignKey("productraw.preferred_name"))
     date_start = Column(DateTime)
     date_end = Column(DateTime)
@@ -191,7 +191,7 @@ class TrialMilestone(TrialRaw):
     _class_name = 'TrialMilestone'
 
     id = Column(Integer, primary_key=True)
-    milestone_name = Column(Integer, ForeignKey("milestone.name"))
+    milestone_name = Column(String, ForeignKey("milestone.name"))
     trial_id = Column(String, ForeignKey("trialraw.trial_id"))
     date_start = Column(DateTime)
     date_end = Column(DateTime)
