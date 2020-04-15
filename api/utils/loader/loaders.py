@@ -77,10 +77,6 @@ class FileLoader(Loader):
             return lookup[kwargs['loader']]
         return lookup[filetype]
 
-    # def filter_kwargs(self, **kwargs):
-    #     # TODO add pertinent filter for Pandas.
-    #     return kwargs
-
 
 class ObjectLoader(Loader):
     def __init__(self, buffer_var):
@@ -89,8 +85,14 @@ class ObjectLoader(Loader):
         self.data_ = None
 
     def fetch(self, **kwargs):
-        print(type(self.buffer_var))
-        pass  # No Stream.  Var defined.
+        print(type(self.buffer_var), self.buffer_var)
+        if type(self.buffer_var) == dict or type(self.buffer_var) == tuple:
+            return pd.DataFrame(self.buffer_var)
+        elif type(self.buffer_var) == pd.DataFrame:
+            return self.buffer_var
+        else:
+            raise NotImplementedError('Only supporting dict, tuple of arrays, dataframe, objects currently')
+        
 
     def transform(self, data=None, **kwargs):
         if data is None and self.data_:

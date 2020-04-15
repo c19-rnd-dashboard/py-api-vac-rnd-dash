@@ -8,15 +8,8 @@ from time import time
 from functools import partial
 
 from .loader import load
-from .writer import write_trial, write_product
-from .transform import (
-    filter_columns,
-    cast_dates,
-    clean_product_raw,
-    clean_null,
-    trial_cleaner,
-    infer_trial_products
-)
+from .writer import *
+from .transform import *
 from api.models import *
 
 import logging
@@ -45,16 +38,18 @@ class Ingest:
             self._transforms = assign_trial_transforms()
         elif self.category == "product":
             self._transforms = assign_product_transforms()
+        elif self.category in ['country', 'milestone']:
+            # Factory tables should not need any filtering
+            self._transforms = [null_transform]
         else:
             raise ValueError("Invalid Category Type")
 
     def assign_writer(self):
-        if self.category == "trial":
-            self._writer = write_trial
-        elif self.category == "product":
-            self._writer = write_product
-        else:
-            raise ValueError("Invalid Category Type")
+        try:
+            self._writer = eval(f"write_{self.category}")
+        except Exception as e:
+            ingestlogger.error(f'Could not assign writer for \
+                {self.category}. {e}')
 
     def transform_data(self):
         self._transformed_data = self.data.copy()
