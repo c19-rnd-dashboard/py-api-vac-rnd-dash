@@ -56,6 +56,14 @@ def to_dict(inst, cls):
 #######################
 
 
+class Country(Base):
+    __tablename__ = 'country'
+    _class_name = 'Country'
+
+    name = Column(String, primary_key=True)
+    code = Column(String)
+
+
 class ProductRaw(Base):
     __tablename__ = "productraw"
     _class_name = 'ProductRaw'
@@ -160,31 +168,33 @@ class TrialRaw(Base):
 
 class Milestone(Base):
     __tablename__ = "milestone"
+    _class_name = 'Milestone'
 
-    milestone_id = Column(Integer, primary_key=True)
-    name = Column(String)
+    name = Column(String, primary_key=True, nullable=False)
     category = Column(String)
 
 
 class ProductMilestone(ProductRaw):
     __tablename__ = "productmilestone"
+    _class_name = 'ProductMilestone'
 
-    link_id = Column(Integer, primary_key=True)
-    milestone_id = Column(Integer, ForeignKey("milestone.milestone_id"))
+    id = Column(Integer, primary_key=True)
+    milestone_name = Column(Integer, ForeignKey("milestone.name"))
     product_name = Column(String, ForeignKey("productraw.preferred_name"))
     date_start = Column(DateTime)
-    date_complete = Column(DateTime)
+    date_end = Column(DateTime)
     milestone_status = Column(String)
 
 
 class TrialMilestone(TrialRaw):
     __tablename__ = "trialmilestone"
+    _class_name = 'TrialMilestone'
 
-    link_id = Column(Integer, primary_key=True)
-    milestone_id = Column(Integer, ForeignKey("milestone.milestone_id"))
+    id = Column(Integer, primary_key=True)
+    milestone_name = Column(Integer, ForeignKey("milestone.name"))
     trial_id = Column(String, ForeignKey("trialraw.trial_id"))
     date_start = Column(DateTime)
-    date_complete = Column(DateTime)
+    date_end = Column(DateTime)
     status = Column(String)
 
 
@@ -318,12 +328,6 @@ class TrialFunding(Trial):
     link_id = Column(Integer, primary_key=True) 
     funding_id = Column(Integer, ForeignKey('funding.funding_id'))
     trial_id = Column(String, ForeignKey('trial.trial_id'))
-
-
-class Country(Base):
-    __tablename__ = 'country'
-
-    country_name = Column(String, primary_key=True)
 
 
 class ProductCountry(Product):
