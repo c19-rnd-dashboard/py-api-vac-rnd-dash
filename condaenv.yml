@@ -15,7 +15,6 @@ dependencies:
   - pip
   - psycopg2=2.8.4
   - pip:
-    - alembic==1.4.2
     - chardet==3.0.4
     - docutils==0.15.2
     - flask-caching

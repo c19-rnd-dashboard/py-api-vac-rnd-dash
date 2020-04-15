@@ -67,3 +67,19 @@ def write_product(data: pd.DataFrame):
     """
     writelogger.info('Building ProductRaw writer.')
     run_write(data=data, model=ProductRaw)
+
+
+def write_milestone(data: pd.DataFrame):
+    """
+    Adds a DataFrame of milestone categories to the db as Milestone instances.
+    """
+    writelogger.info('Building Milestone writer.')
+    run_write(data=data, model=Milestone)
+
+
+def write_country(data: pd.DataFrame):
+    """
+    Adds a DataFrame of countries to the db as Country instances.
+    """
+    writelogger.info('Building Country writer.')
+    run_write(data=data, model=Country)

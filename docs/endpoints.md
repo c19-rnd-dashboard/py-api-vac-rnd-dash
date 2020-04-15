@@ -16,8 +16,11 @@ Ingest will take url, and parse csvs to load data into the database.
 {
     "source":"<url>.csv",
     "category":"trial" or "product"
+    (optional) "loader":'unfiltered_csv' 
 }
 ```
+> Do not use optional loader or any other kwargs with NoneType.  That could break assignment or cause unknown loading behavior.
+
 
 ### Vaccines
 

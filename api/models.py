@@ -9,6 +9,7 @@ https://docs.sqlalchemy.org/en/13/orm/inheritance.html#joined-table-inheritance
 """
 
 from sqlalchemy.ext.declarative import declarative_base
+import json
 
 Base = declarative_base()
 
@@ -27,55 +28,81 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 
 
+### Helper Functions ##
+
+def to_dict(inst, cls):
+    """
+    Convert the sql alchemy query result to a clean python dictionary.
+    """
+    convert = dict()
+    # add your coversions for things like datetime's 
+    # and what-not that aren't serializable.
+    d = dict()
+    for c in cls.__table__.columns:
+        v = getattr(inst, c.name)
+        if c.type in convert.keys() and v is not None:
+            try:
+                d[c.name] = convert[c.type](v)
+            except:
+                d[c.name] = "Error:  Failed to covert using ", str(convert[c.type])
+        elif v is None:
+            d[c.name] = str()
+        else:
+            d[c.name] = v
+    return d
+
 #######################
 ### New Data Models ###
 #######################
+
+
+class Country(Base):
+    __tablename__ = 'country'
+    _class_name = 'Country'
+
+    name = Column(String, primary_key=True)
+    code = Column(String)
 
 
 class ProductRaw(Base):
     __tablename__ = "productraw"
     _class_name = 'ProductRaw'
 
+    product_id = Column(Integer)
     preferred_name = Column(String,primary_key=True)
     chemical_name = Column(String)
     brand_name = Column(String)
-    repurposed = Column(String)
-    notes = Column(Text)
-    disease = Column(String)
-    application = Column(Text)
-    data_reference = Column(String)
-    data_source = Column(String)
-    product_type = Column(String)
     sponsors = Column(Text)
     intervention_type = Column(String)
     indication = Column(String)
     molecule_type = Column(String)
     therapeutic_approach = Column(String)
+    repurposed = Column(String)
+    countries = Column(Text)
+    country_codes = Column(Text)
     other_partners = Column(Text)
-    num_sites = Column(Integer)
+    notes = Column(Text)
+    status = Column(String)
+    current_status = Column(String)
+    # discovery_started_date = Column(DateTime)
+    # pre_clinical_studies_started_date = Column(DateTime)
+    # lead_selection_finalized_date = Column(DateTime)
+    # clinical_batch_finalized_date = Column(DateTime)
+    # ind_finalized_date = Column(DateTime)
+    # phase_1_started_date = Column(DateTime)
+    # phase_2_started_date = Column(DateTime)
+    # phase_3_started_date = Column(DateTime)
+    # nda_finalized = Column(String)
+    phase = Column(String)
+    condition_or_disease = Column(String)
+    product_type = Column(String)
+    trial_id = Column(String)
+    num_sites = Column(String)
     site_locations = Column(Text)
 
-    def to_json(self):
-        return {
-            "preferred_name": self.preferred_name,
-            "chemical_name": self.chemical_name,
-            "brand_name": self.brand_name,
-            "repurposed": self.repurposed,
-            "notes": self.notes,
-            "disease": self.disease,
-            "application": self.application,
-            "data_reference": self.data_reference,
-            "data_source": self.data_source,
-            "product_type": self.product_type,
-            "sponsors": self.sponsors,
-            "intervention_type": self.intervention_type,
-            "indication": self.indication,
-            "molecule_type": self.molecule_type,
-            "therapeutic_approach": self.therapeutic_approach,
-            "other_partners": self.other_partners,
-            "num_sites": self.num_sites,
-            "site_locations": self.site_locations,
-        }
+    @property
+    def json(self):
+        return to_dict(self, self.__class__)
 
 
 class TrialRaw(Base):
@@ -141,31 +168,33 @@ class TrialRaw(Base):
 
 class Milestone(Base):
     __tablename__ = "milestone"
+    _class_name = 'Milestone'
 
-    milestone_id = Column(Integer, primary_key=True)
-    name = Column(String)
+    name = Column(String, primary_key=True, nullable=False)
     category = Column(String)
 
 
 class ProductMilestone(ProductRaw):
     __tablename__ = "productmilestone"
+    _class_name = 'ProductMilestone'
 
-    link_id = Column(Integer, primary_key=True)
-    milestone_id = Column(Integer, ForeignKey("milestone.milestone_id"))
-    product_id = Column(String, ForeignKey("productraw.preferred_name"))
+    id = Column(Integer, primary_key=True)
+    milestone_name = Column(String, ForeignKey("milestone.name"))
+    product_name = Column(String, ForeignKey("productraw.preferred_name"))
     date_start = Column(DateTime)
-    date_complete = Column(DateTime)
-    status = Column(String)
+    date_end = Column(DateTime)
+    milestone_status = Column(String)
 
 
 class TrialMilestone(TrialRaw):
     __tablename__ = "trialmilestone"
+    _class_name = 'TrialMilestone'
 
-    link_id = Column(Integer, primary_key=True)
-    milestone_id = Column(Integer, ForeignKey("milestone.milestone_id"))
+    id = Column(Integer, primary_key=True)
+    milestone_name = Column(String, ForeignKey("milestone.name"))
     trial_id = Column(String, ForeignKey("trialraw.trial_id"))
     date_start = Column(DateTime)
-    date_complete = Column(DateTime)
+    date_end = Column(DateTime)
     status = Column(String)
 
 
@@ -299,12 +328,6 @@ class TrialFunding(Trial):
     link_id = Column(Integer, primary_key=True) 
     funding_id = Column(Integer, ForeignKey('funding.funding_id'))
     trial_id = Column(String, ForeignKey('trial.trial_id'))
-
-
-class Country(Base):
-    __tablename__ = 'country'
-
-    country_name = Column(String, primary_key=True)
 
 
 class ProductCountry(Product):

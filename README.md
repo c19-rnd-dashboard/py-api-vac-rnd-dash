@@ -58,98 +58,7 @@ From python shell:
 # Not Implemented
 ```
 
-## Mock Routes
-
-
-Route: `/mock1`
-Method: `GET`
-Result:
-```
-[
-  {
-    "discovery": [
-      {
-        "x": "Vax 1", 
-        "y": 0.3950416378989944
-      }, 
-      {
-        "x": "Vax 2", 
-        "y": 0.06409737261658588
-      }, 
-      {
-        "x": "Vax 3", 
-        "y": 0.19727813356604684
-      }
-    ]
-  }, 
- ...
-]
-```
-
-
-
-Route: `/mock2`
-Method: `GET`
-Result:
-```
-[
-  {
-    "milestones": [
-      {
-        "dates": [
-          {
-            "end": "05/09/20", 
-            "label": "Actual Progress", 
-            "name": "actual", 
-            "start": "03/28/20"
-          }, 
-          {
-            "end": "05/30/20", 
-            "label": "Best Case", 
-            "name": "best", 
-            "start": "03/28/20"
-          }, 
-          {
-            "end": "05/09/20", 
-            "label": "Worst Case", 
-            "name": "worst", 
-            "start": "03/28/20"
-          }
-        ], 
-        "label": "Discovery", 
-        "name": "discovery"
-      }, 
-      {
-        "dates": [
-          {
-            "end": "06/13/20", 
-            "label": "Actual Progress", 
-            "name": "actual", 
-            "start": "03/28/20"
-          }, 
-          {
-            "end": "05/30/20", 
-            "label": "Best Case", 
-            "name": "best", 
-            "start": "03/28/20"
-          }, 
-          {
-            "end": "06/13/20", 
-            "label": "Worst Case", 
-            "name": "worst", 
-            "start": "03/28/20"
-          }
-        ], 
-        "name": "clinicalBatch"
-      }
-    ], 
-    "name": "Vax 1"
-  }
-]
-```
-
 ## Tests
-
 
 Run unittests from application root folder (.../py-api-vac-rnd-dash/) with:
 
@@ -158,6 +67,27 @@ Run unittests from application root folder (.../py-api-vac-rnd-dash/) with:
 (Requirement Local) >> touch .../py-api-vac-rnd-dash/api/instance/logs/debg.log
 >> python -m unittests discover
 ```
+
+
+### Testing the Full Application locally
+Requires: redis server
+**May need three or more active terminals to run full server
+
+1. Start redis
+```bash
+>> redis-server
+```
+2. Start worker
+```bash
+>> cd <RootDirectory>
+>> python worker.py
+```
+3. Start Flask Application
+```bash
+>> cd <RootDirectory>
+>> python run.py
+```
+4. Start a command terminal or postman/insomnia instance to send requests to the server at <Default: 127.0.0.1:5000/route>
 
 
 ## Contributing

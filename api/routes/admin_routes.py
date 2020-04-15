@@ -1,5 +1,6 @@
 from api.utils.ingest import run_ingest
 from api.db import init_db
+from data import reference_tables
 from flask import render_template, Blueprint, request, jsonify, current_app
 from markdown2 import Markdown
 import os
@@ -39,13 +40,23 @@ def get_ingest():
             routelogger.info(
                 f"POST received at Ingest.  Running Ingest{ingest_request}"
             )
-            run_ingest(
-                source=ingest_request["source"], category=ingest_request["category"]
+            q = get_q()
+            # Check for kwargs
+            if 'kwargs' in ingest_request:
+              kwargs = ingest_request['kwargs']
+            else:
+              kwargs = {}
+            job = q.enqueue_call(
+                    func=run_ingest, 
+                    args=(
+                      ingest_request["source"], 
+                      ingest_request["category"]),
+                    kwargs=kwargs, 
             )
             # print(ingest_request)
             message = {
-                "success": True,
-                "message": f"Success!  Ingested {ingest_request}",
+                "message": 'Job sent to queue.',
+                'job_id': job.get_id(),
             }
 
         except Exception as ex:
@@ -79,11 +90,25 @@ def run_database_update():
     # # Load factory tables
     # # Run known ingest
     jobs = [
-        ('product', 'https://raw.githubusercontent.com/c19-rnd-dashboard/py-api-vac-rnd-dash/master/data/vaccines/vaccineworkfile1_clean.csv'),
-        ('trial', 'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-03-25.csv')
+        ('product', 
+        'https://raw.githubusercontent.com/c19-rnd-dashboard/py-api-vac-rnd-dash/master/data/vaccines/vaccineworkfile2.csv',
+        {'loader': "unfiltered_csv"}
+        ),
+        ('trial', 
+        'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-04-07.csv',
+        {}
+        ),
+        ('milestone',
+        reference_tables.milestones,
+        {}
+        ),
+        ('country',
+        reference_tables.countries,
+        {}
+        )
     ]
     for job in jobs:
-        run_ingest(category=job[0], source=job[1])
+        run_ingest(category=job[0], source=job[1], **job[2])
 
 
 @admin_routes.route('/admin/update', methods=['POST'])

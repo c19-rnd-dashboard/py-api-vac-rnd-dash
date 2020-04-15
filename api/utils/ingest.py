@@ -8,15 +8,8 @@ from time import time
 from functools import partial
 
 from .loader import load
-from .writer import write_trial, write_product
-from .transform import (
-    filter_columns,
-    cast_dates,
-    clean_product_raw,
-    clean_null,
-    trial_cleaner,
-    infer_trial_products
-)
+from .writer import *
+from .transform import *
 from api.models import *
 
 import logging
@@ -32,11 +25,11 @@ class Ingest:
     :type source: str or buffer
     """
 
-    def __init__(self, source, category: str = None):
+    def __init__(self, source, category: str = None, **kwargs):
         self.category = category
         self.source = source
         self.start_time = time()
-        self.data = load(source)
+        self.data = load(source, **kwargs)
         self.assign_transformations()
         self.assign_writer()
 
@@ -45,16 +38,18 @@ class Ingest:
             self._transforms = assign_trial_transforms()
         elif self.category == "product":
             self._transforms = assign_product_transforms()
+        elif self.category in ['country', 'milestone']:
+            # Factory tables should not need any filtering
+            self._transforms = [null_transform]
         else:
             raise ValueError("Invalid Category Type")
 
     def assign_writer(self):
-        if self.category == "trial":
-            self._writer = write_trial
-        elif self.category == "product":
-            self._writer = write_product
-        else:
-            raise ValueError("Invalid Category Type")
+        try:
+            self._writer = eval(f"write_{self.category}")
+        except Exception as e:
+            ingestlogger.error(f'Could not assign writer for \
+                {self.category}. {e}')
 
     def transform_data(self):
         self._transformed_data = self.data.copy()
@@ -73,11 +68,11 @@ class Ingest:
 ### Control Function ###
 
 
-def run_ingest(source, category: str):
+def run_ingest(source, category: str, **kwargs):
     ingestlogger.info(f"Starting ingest of source: {source} category: {category}")
 
     try:  # will start load automatically
-        job = Ingest(source=source, category=category)
+        job = Ingest(source=source, category=category, **kwargs)
         process_time = time() - job.start_time
         ingestlogger.info(f"Load completed in: {process_time}")
     except Exception as e:
