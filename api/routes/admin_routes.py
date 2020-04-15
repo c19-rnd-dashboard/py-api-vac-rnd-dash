@@ -95,7 +95,7 @@ def run_database_update():
         {'loader': "unfiltered_csv"}
         ),
         ('trial', 
-        'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-03-25.csv',
+        'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-04-07.csv',
         {}
         ),
         ('milestone',
