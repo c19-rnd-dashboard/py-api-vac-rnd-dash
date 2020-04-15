@@ -97,7 +97,7 @@ class ProductRaw(Base):
     condition_or_disease = Column(String)
     product_type = Column(String)
     trial_id = Column(String)
-    num_sites = Column(Integer)
+    num_sites = Column(String)
     site_locations = Column(Text)
 
     @property
