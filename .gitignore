@@ -76,6 +76,7 @@ db.sqlite3-journal
 instance/
 .webassets-cache
 *.sqlite3
+*.rdb
 
 # Scrapy stuff:
 .scrapy

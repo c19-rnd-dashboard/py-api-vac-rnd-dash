@@ -1,13 +1,16 @@
 from flask import render_template, Blueprint, request, jsonify
 from api.models import *
 from api.db import get_session
+from api.utils.serializer import DictionarySerializer
 from sqlalchemy import or_, and_
 import logging
+
 
 routelogger = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
 covid_dash = Blueprint("covid_dash", __name__)
 
+ccase_serializer = DictionarySerializer(transformer='camelcase_keys')
 
 @covid_dash.route("/alternatives")
 def alternatives():
@@ -61,4 +64,4 @@ def assets():
     routelogger.info("Running Products Query")
     with get_session() as session:
         assets = session.query(ProductRaw).all()
-    return {count:item.json for count, item in enumerate(assets)}
+    return jsonify([ccase_serializer.transform(item.json) for item in assets])
