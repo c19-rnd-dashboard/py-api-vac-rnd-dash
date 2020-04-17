@@ -227,7 +227,7 @@ def clean_product_raw(data: pd.DataFrame):
             row = df1.iloc[i]
             if len(row.preferred_name) < 2:
                 if len(row.brand_name) > 0:
-                    df1.iloc[i].preferred_name = row.brand_name
+                    df1.iloc[i].preferred_name = clean_(row.brand_name)
                 elif (len(row.sponsors) > 0) and (len(row.chemical_name) > 0):
                     df1.iloc[i].preferred_name = '-'.join([clean_(row.sponsors), row.chemical_name, row.product_id])
         
