@@ -15,9 +15,11 @@ import logging
 ###Setup###
 ###########
 # Local Environment Testing Only.
-#   Un-comment to build environment script in config.py
-# from instance import setup
-# setup.setup_env(testing='TRUE')
+#   Un-comment to build environment script in config.py or run setup files
+if os.path.isfile(os.path.join(os.getcwd(), 'instance/setup.py')):
+    print('Instance setup.py found at: ', os.path.join(os.getcwd(), 'instance/setup.py'))
+    from instance import setup
+    setup.setup_env(testing='TRUE')
 
 
 def create_app(test_config=None):
