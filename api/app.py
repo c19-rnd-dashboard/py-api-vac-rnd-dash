@@ -19,7 +19,7 @@ import logging
 if os.path.isfile(os.path.join(os.getcwd(), 'instance/setup.py')):
     print('Instance setup.py found at: ', os.path.join(os.getcwd(), 'instance/setup.py'))
     from instance import setup
-    setup.setup_env(testing='TRUE')
+    setup.setup_env(testing=True, local_dev=True)
 
 
 def create_app(test_config=None):
