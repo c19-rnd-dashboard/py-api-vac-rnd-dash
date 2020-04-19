@@ -68,8 +68,8 @@ class ProductRaw(Base):
     __tablename__ = "productraw"
     _class_name = 'ProductRaw'
 
-    product_id = Column(Integer)
-    preferred_name = Column(String,primary_key=True)
+    product_id = Column(Integer, primary_key=True)
+    preferred_name = Column(String)
     chemical_name = Column(String)
     brand_name = Column(String)
     sponsors = Column(Text)
@@ -90,6 +90,7 @@ class ProductRaw(Base):
     trial_id = Column(String)
     num_sites = Column(String)
     site_locations = Column(Text)
+    sources = Column(String)
 
     @property
     def json(self):
@@ -107,6 +108,7 @@ class TrialRaw(Base):
         return new_id
 
     trial_id = Column(String, primary_key=True, nullable=False, default=id_default)
+    preferred_name = Column(String)
     title = Column(String)
     registry = Column(String)
     registration_date = Column(DateTime)
@@ -115,6 +117,7 @@ class TrialRaw(Base):
     study_type = Column(String)
     phase = Column(String)
     recruitment_status = Column(String)
+    target_enrollment = Column(Integer)
     intervention_type = Column(String)
     intervention = Column(Text)
     sponsors = Column(Text)
@@ -171,7 +174,7 @@ class ProductMilestone(ProductRaw):
 
     id = Column(Integer, primary_key=True)
     milestone_name = Column(String, ForeignKey("milestone.name"))
-    product_name = Column(String, ForeignKey("productraw.preferred_name"))
+    product_id = Column(String, ForeignKey("productraw.product_id"))
     date_start = Column(DateTime)
     date_end = Column(DateTime)
     milestone_status = Column(String)
