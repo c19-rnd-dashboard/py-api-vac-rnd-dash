@@ -69,6 +69,7 @@ class ProductRaw(Base):
     _class_name = 'ProductRaw'
 
     product_id = Column(Integer, primary_key=True)
+    preferred_name = Column(String)
     chemical_name = Column(String)
     brand_name = Column(String)
     sponsors = Column(Text)
