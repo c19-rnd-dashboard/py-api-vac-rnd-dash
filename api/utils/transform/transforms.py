@@ -89,13 +89,16 @@ def clean_lists(x):
 ##############################
 
 
-def filter_columns(data: pd.DataFrame, model):
+def filter_columns(data: pd.DataFrame, model, columns: list = None):
     """ Return only columns that match filter from DataFrame """
-    valid_columns = set(get_columns(model))
-    supplied_columns = set(data.columns)
-    tlogg.info(f"Supplied Columns: {supplied_columns}\nValid Columns: {valid_columns}")
-    filter_set = list(valid_columns.intersection(supplied_columns))
-    return data[filter_set]
+    if columns is not None:
+        return data[columns]
+    else:
+        valid_columns = set(get_columns(model))
+        supplied_columns = set(data.columns)
+        tlogg.info(f"Supplied Columns: {supplied_columns}\nValid Columns: {valid_columns}")
+        filter_set = list(valid_columns.intersection(supplied_columns))
+        return data[filter_set]
 
 
 def cast_dates(data: pd.DataFrame):
@@ -197,7 +200,7 @@ def clean_product_raw(data: pd.DataFrame):
         product_id = row_list[0]
         return {
         'product_id': product_id,
-        'source': urls,
+        'sources': urls,
         }
 
     def clean_valid_sources(df:pd.DataFrame):
@@ -211,7 +214,6 @@ def clean_product_raw(data: pd.DataFrame):
         
         source_frame = pd.DataFrame(clean_sources)
         clean_frame = data_rows.drop(columns=['source']).merge(source_frame, on='product_id')
-        
         return clean_frame
     
     temp_data = clean_valid_sources(temp_data)
@@ -260,7 +262,6 @@ def clean_product_raw(data: pd.DataFrame):
 
     # Finally, return the prepared dataframe
     return temp_data
-
 
 
 ####################################
@@ -342,3 +343,16 @@ def trial_cleaner(data: pd.DataFrame):
     df["country_codes"] = df["countries"].apply(clean_country)
 
     return df
+
+
+#########################
+### Sponsor Transform ###
+#########################
+
+# TODO: SponsorTransform
+# Expand any lists found.  
+# Clean sponsor names of all punctuation. 
+# Capitalize names.
+
+def prep_product_sponsors(data: pd.DataFrame)-> pd.DataFrame:
+    pass

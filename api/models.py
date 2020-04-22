@@ -97,6 +97,7 @@ class ProductRaw(Base):
         return to_dict(self, self.__class__)
 
 
+
 class TrialRaw(Base):
     __tablename__ = "trialraw"
     _class_name = 'TrialRaw'
@@ -192,11 +193,27 @@ class TrialMilestone(TrialRaw):
     status = Column(String)
 
 
-#########################
-### Database MetaData ###
-#########################
 
-# Not Implemented
+class Sponsor(Base):
+    __tablename__ = 'sponsor'
+
+    sponsor_id = Column(Integer, primary_key=True)
+    name = Column(String)
+
+    products = relationship('ProductSponsor', back_populates='sponsor')
+
+
+class ProductSponsor(ProductRaw):
+    __tablename__ = 'productsponsor'
+
+    link_id = Column(Integer, primary_key=True) 
+    sponsor_id = Column(Integer, ForeignKey('sponsor.sponsor_id'))
+    product_id = Column(Integer, ForeignKey('productraw.product_id'))
+
+    sponsor = relationship('Sponsor', back_populates='products')
+
+
+
 
 #######################
 ### Adv Data Models ###

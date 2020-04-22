@@ -41,6 +41,8 @@ class Ingest:
         elif self.category in ['country', 'milestone']:
             # Factory tables should not need any filtering
             self._transforms = [null_transform]
+        elif self.category == 'productsponsor':
+            self._transforms = assign_product_sponsor_transforms()
         else:
             raise ValueError("Invalid Category Type")
 
@@ -115,6 +117,19 @@ def make_column_filter(model):
     return partial(filter_columns, model=model)
 
 
+def make_subset_ingest(model, columns:list = None):
+    # Run subset ingest and return unaltered data
+    def ingest_subset(data: pd.DataFrame, **kwargs):
+        run_ingest(
+            source=filter_columns(
+                data=data, model=kwargs['model'],columns=kwargs['columns']
+                ),
+            category=kwargs['model'].__tablename__,
+        )
+        return data
+    return partial(ingest_subset, model=model, columns=columns, )
+
+
 ##################
 ### Trial Data ###
 ##################
@@ -148,7 +163,24 @@ def assign_product_transforms(**kwargs):
         make_column_filter(ProductRaw),
         cast_dates,
         clean_null,
+        make_subset_ingest(model=ProductSponsor, columns=['product_id', 'sponsors']),
         # Add transforms here or
         # use transform_list.append(new_transform) for dynamic construction
+    ]
+    return transform_list
+
+
+################
+### Sponsors ###
+################
+
+
+## Product Sponsors ##
+
+def assign_product_sponsor_transforms(**kwargs):
+    transform_list = [
+        make_column_filter(ProductSponsor),
+        prep_product_sponsors,
+        clean_null,
     ]
     return transform_list
