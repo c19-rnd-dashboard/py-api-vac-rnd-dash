@@ -198,7 +198,7 @@ class Sponsor(Base):
     __tablename__ = 'sponsor'
 
     sponsor_id = Column(Integer, primary_key=True)
-    name = Column(String)
+    sponsor_name = Column(String)
 
     products = relationship('ProductSponsor', back_populates='sponsor')
 
@@ -206,7 +206,7 @@ class Sponsor(Base):
 class ProductSponsor(ProductRaw):
     __tablename__ = 'productsponsor'
 
-    link_id = Column(Integer, primary_key=True) 
+    link_id = Column(Integer, primary_key=True)
     sponsor_id = Column(Integer, ForeignKey('sponsor.sponsor_id'))
     product_id = Column(Integer, ForeignKey('productraw.product_id'))
 

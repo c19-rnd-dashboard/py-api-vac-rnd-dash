@@ -12,9 +12,12 @@ from .writer import *
 from .transform import *
 from api.models import *
 
+from api.utils.registry import Registry
+
 import logging
 
 ingestlogger = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
+listRegistry = Registry()
 
 
 class Ingest:
@@ -30,22 +33,18 @@ class Ingest:
         self.source = source
         self.start_time = time()
         self.data = load(source, **kwargs)
-        self.assign_transformations()
+        self.assign_transformations(**kwargs)
         self.assign_writer()
 
-    def assign_transformations(self):
-        if self.category == "trial":
-            self._transforms = assign_trial_transforms()
-        elif self.category == "product":
-            self._transforms = assign_product_transforms()
-        elif self.category in ['country', 'milestone']:
-            # Factory tables should not need any filtering
-            self._transforms = [null_transform]
-        elif self.category == 'productsponsor':
-            self._transforms = assign_product_sponsor_transforms()
-        else:
-            raise ValueError("Invalid Category Type")
-
+    def assign_transformations(self, **kwargs):
+        transformer_list = 'assign_' + self.category + '_transforms'
+        try:
+            assign_list = listRegistry[transformer_list]
+            self._transforms = assign_list()
+            ingestlogger.info(f'Assigned trasnformer {transformer_list}')
+        except Exception as e:
+            ingestlogger.error(f'Could not assign transformer. {e}')
+            
     def assign_writer(self):
         try:
             self._writer = eval(f"write_{self.category}")
@@ -148,7 +147,7 @@ def assign_trial_transforms(**kwargs):
         # use transform_list.append(new_transform) for dynamic construction
     ]
     return transform_list
-
+listRegistry.register(assign_trial_transforms)
 
 ####################
 ### Product Data ###
@@ -163,24 +162,29 @@ def assign_product_transforms(**kwargs):
         make_column_filter(ProductRaw),
         cast_dates,
         clean_null,
-        make_subset_ingest(model=ProductSponsor, columns=['product_id', 'sponsors']),
+        # make_subset_ingest(model=ProductSponsor, columns=['product_id', 'sponsors']),
         # Add transforms here or
         # use transform_list.append(new_transform) for dynamic construction
     ]
     return transform_list
-
+listRegistry.register(assign_product_transforms)
 
 ################
 ### Sponsors ###
 ################
 
+## Sponsor ##
+def assign_sponsor_transforms(**kwargs):
+    return [
+        clean_null,
+    ]
+listRegistry.register(assign_sponsor_transforms)
 
 ## Product Sponsors ##
-
 def assign_product_sponsor_transforms(**kwargs):
-    transform_list = [
+    return [
         make_column_filter(ProductSponsor),
         prep_product_sponsors,
         clean_null,
     ]
-    return transform_list
+listRegistry.register(assign_product_sponsor_transforms)
