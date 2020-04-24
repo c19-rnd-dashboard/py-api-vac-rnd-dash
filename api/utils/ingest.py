@@ -189,3 +189,20 @@ def assign_productsponsor_transforms(**kwargs):
         make_column_filter(ProductSponsor),
     ]
 listRegistry.register(assign_productsponsor_transforms)
+
+
+######################
+### Factory Tables ###
+######################
+
+def assign_milestone_transforms(**kwargs):
+    return [
+        null_transform,
+    ]
+listRegistry.register(assign_milestone_transforms)
+
+def assign_country_transforms(**kwargs):
+    return [
+        null_transform,
+    ]
+listRegistry.register(assign_country_transforms)

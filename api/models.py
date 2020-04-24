@@ -72,7 +72,6 @@ class ProductRaw(Base):
     preferred_name = Column(String)
     chemical_name = Column(String)
     brand_name = Column(String)
-    sponsors = Column(Text)
     intervention_type = Column(String)
     indication = Column(String)
     molecule_type = Column(String)
@@ -91,6 +90,8 @@ class ProductRaw(Base):
     num_sites = Column(String)
     site_locations = Column(Text)
     sources = Column(String)
+
+    sponsors = relationship('ProductSponsor', back_populates='product')
 
     @property
     def json(self):
@@ -213,6 +214,7 @@ class ProductSponsor(Base):
     product_id = Column(Integer, ForeignKey('productraw.product_id'))
 
     sponsor = relationship('Sponsor', back_populates='products')
+    product = relationship('ProductRaw', back_populates='sponsors')
 
 
 
