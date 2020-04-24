@@ -47,7 +47,7 @@ def get_db(context=True):
 
     else:
         db_logger.info("Creating new database connection without app context.")
-        db_logger.info('DB connection not found. Attempting connection to {}.'.format(current_app.config['DATABASE_URI']))
+        db_logger.info('DB connection not found. Attempting connection to {}.'.format(config('DATABASE_URI')))
         engine = create_engine(config('DATABASE_URI'))
         return engine.connect()
 
