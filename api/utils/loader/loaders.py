@@ -29,8 +29,13 @@ class Loader():
     def fetch(self):
         NotImplemented
     
-    def transform(self):
-        NotImplemented
+    def transform(self, data=None, **kwargs):
+        if data is None and self.data_:
+            self.transformed_data = self.data_
+            return self.data_
+        elif data is not None:
+            self.transformed_data = data
+            return data # Null transform returns data
     
     def fetch_transform(self, **kwargs):
         return self.transform(
@@ -53,16 +58,7 @@ class FileLoader(Loader):
         # Assign loading function
         file_loader = self.assign_file_loader(filetype, **kwargs)
         # Execute loading function
-        # load_kwargs = self.filter_kwargs(**kwargs)
         return file_loader(self.filename, **kwargs)
-
-    def transform(self, data=None, **kwargs):
-        if data is None and self.data_:
-            self.transformed_data = self.data_
-            return self.data_
-        elif data is not None:
-            self.transformed_data = data
-            return data # Null transform returns data
 
     def assign_file_loader(self, filetype, **kwargs):
         print(f'<filetype {filetype}>')  # DEBUG
@@ -87,22 +83,14 @@ class ObjectLoader(Loader):
     def fetch(self, **kwargs):
         print(type(self.buffer_var), self.buffer_var)
         if type(self.buffer_var) == dict or type(self.buffer_var) == tuple:
+            loadlogger.info(f"Detected vartype {type(self.buffer_var)}.  Attempting DataFrame casting.")
             return pd.DataFrame(self.buffer_var)
         elif type(self.buffer_var) == pd.DataFrame:
+            loadlogger.info(f"Detected pandas DataFrame.  Returning object of shape {self.buffer_var.shape}.")
             return self.buffer_var
         else:
             raise NotImplementedError('Only supporting dict, tuple of arrays, dataframe, objects currently')
         
-
-    def transform(self, data=None, **kwargs):
-        if data is None and self.data_:
-            self.transformed_data = self.data_
-            return self.data_
-        elif data is not None:
-            self.transformed_data = data
-            return data # Null transform returns data 
-        elif data is None:
-            return self.buffer_var # Null store return
 
 
 #########################
@@ -110,7 +98,7 @@ class ObjectLoader(Loader):
 #########################
 
 def load(file_or_buffer=None, **kwargs):
-    print('file_or_buffer: ', file_or_buffer)  # DEBUG
+    # print('file_or_buffer: ', file_or_buffer)  # DEBUG
     if type(file_or_buffer) == str and is_file(file_or_buffer):
         loader = FileLoader(filename=file_or_buffer, **kwargs)
         return loader.fetch_transform(**kwargs)
@@ -124,6 +112,7 @@ def load(file_or_buffer=None, **kwargs):
 ###########################
 
 def load_text(filepath, **kwargs):
+    raise NotImplementedError('Text files to DataFrame incomplete.')
     with open(filepath, 'r') as file:
         data = file.read()
     return data

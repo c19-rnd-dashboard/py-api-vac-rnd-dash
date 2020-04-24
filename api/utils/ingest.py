@@ -12,9 +12,12 @@ from .writer import *
 from .transform import *
 from api.models import *
 
+from api.utils.registry import Registry
+
 import logging
 
 ingestlogger = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
+listRegistry = Registry()
 
 
 class Ingest:
@@ -30,20 +33,18 @@ class Ingest:
         self.source = source
         self.start_time = time()
         self.data = load(source, **kwargs)
-        self.assign_transformations()
+        self.assign_transformations(**kwargs)
         self.assign_writer()
 
-    def assign_transformations(self):
-        if self.category == "trial":
-            self._transforms = assign_trial_transforms()
-        elif self.category == "product":
-            self._transforms = assign_product_transforms()
-        elif self.category in ['country', 'milestone']:
-            # Factory tables should not need any filtering
-            self._transforms = [null_transform]
-        else:
-            raise ValueError("Invalid Category Type")
-
+    def assign_transformations(self, **kwargs):
+        transformer_list = 'assign_' + self.category + '_transforms'
+        try:
+            assign_list = listRegistry[transformer_list]
+            self._transforms = assign_list()
+            ingestlogger.info(f'Assigned trasnformer {transformer_list}')
+        except Exception as e:
+            ingestlogger.error(f'Could not assign transformer. {e}')
+            
     def assign_writer(self):
         try:
             self._writer = eval(f"write_{self.category}")
@@ -115,6 +116,19 @@ def make_column_filter(model):
     return partial(filter_columns, model=model)
 
 
+def make_subset_ingest(model, columns:list = None):
+    # Run subset ingest and return unaltered data
+    ingestlogger.info(f"Beginning subset ingest of: {model._class_name}")
+    def ingest_subset(data: pd.DataFrame, **kwargs):
+        run_ingest(
+            source=data[columns].copy(),
+            category=kwargs['model'].__tablename__,
+        )
+        ingestlogger.info(f"Returning data of shape {data.shape}")
+        return data
+    return partial(ingest_subset, model=model, columns=columns)
+
+
 ##################
 ### Trial Data ###
 ##################
@@ -133,7 +147,7 @@ def assign_trial_transforms(**kwargs):
         # use transform_list.append(new_transform) for dynamic construction
     ]
     return transform_list
-
+listRegistry.register(assign_trial_transforms)
 
 ####################
 ### Product Data ###
@@ -144,6 +158,8 @@ def assign_product_transforms(**kwargs):
     """Assemble trial data transforms for clean write"""
     transform_list = [
         null_transform,
+        make_subset_ingest(model=Sponsor, columns=['Sponsor', 'Source?']),
+        make_subset_ingest(model=ProductSponsor, columns=['ID', 'Sponsor', 'Source?']),
         clean_product_raw,
         make_column_filter(ProductRaw),
         cast_dates,
@@ -152,3 +168,24 @@ def assign_product_transforms(**kwargs):
         # use transform_list.append(new_transform) for dynamic construction
     ]
     return transform_list
+listRegistry.register(assign_product_transforms)
+
+################
+### Sponsors ###
+################
+
+## Sponsor ##
+def assign_sponsor_transforms(**kwargs):
+    return [
+        prep_sponsors,
+        make_column_filter(Sponsor),
+    ]
+listRegistry.register(assign_sponsor_transforms)
+
+## Product Sponsors ##
+def assign_productsponsor_transforms(**kwargs):
+    return [
+        prep_product_sponsors,
+        make_column_filter(ProductSponsor),
+    ]
+listRegistry.register(assign_productsponsor_transforms)
