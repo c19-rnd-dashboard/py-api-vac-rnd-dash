@@ -175,7 +175,7 @@ class ProductMilestone(ProductRaw):
 
     id = Column(Integer, primary_key=True)
     milestone_name = Column(String, ForeignKey("milestone.name"))
-    product_id = Column(String, ForeignKey("productraw.product_id"))
+    product_id = Column(Integer, ForeignKey("productraw.product_id"))
     date_start = Column(DateTime)
     date_end = Column(DateTime)
     milestone_status = Column(String)
