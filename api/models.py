@@ -206,6 +206,7 @@ class Sponsor(Base):
 
 class ProductSponsor(Base):
     __tablename__ = 'productsponsor'
+    _class_name = 'ProductSponsor'
 
     link_id = Column(Integer, primary_key=True)
     sponsor_id = Column(String, ForeignKey('sponsor.sponsor_id'))

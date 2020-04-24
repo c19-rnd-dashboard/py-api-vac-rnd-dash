@@ -159,11 +159,11 @@ def assign_product_transforms(**kwargs):
     transform_list = [
         null_transform,
         make_subset_ingest(model=Sponsor, columns=['Sponsor', 'Source?']),
+        make_subset_ingest(model=ProductSponsor, columns=['ID', 'Sponsor', 'Source?']),
         clean_product_raw,
         make_column_filter(ProductRaw),
         cast_dates,
         clean_null,
-        # make_subset_ingest(model=ProductSponsor, columns=['product_id', 'sponsors']),
         # Add transforms here or
         # use transform_list.append(new_transform) for dynamic construction
     ]
@@ -183,9 +183,9 @@ def assign_sponsor_transforms(**kwargs):
 listRegistry.register(assign_sponsor_transforms)
 
 ## Product Sponsors ##
-def assign_product_sponsor_transforms(**kwargs):
+def assign_productsponsor_transforms(**kwargs):
     return [
         prep_product_sponsors,
         make_column_filter(ProductSponsor),
     ]
-listRegistry.register(assign_product_sponsor_transforms)
+listRegistry.register(assign_productsponsor_transforms)
