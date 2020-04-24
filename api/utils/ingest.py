@@ -118,15 +118,15 @@ def make_column_filter(model):
 
 def make_subset_ingest(model, columns:list = None):
     # Run subset ingest and return unaltered data
+    ingestlogger.info(f"Beginning subset ingest of: {model._class_name}")
     def ingest_subset(data: pd.DataFrame, **kwargs):
         run_ingest(
-            source=filter_columns(
-                data=data, model=kwargs['model'],columns=kwargs['columns']
-                ),
+            source=data[columns].copy(),
             category=kwargs['model'].__tablename__,
         )
+        ingestlogger.info(f"Returning data of shape {data.shape}")
         return data
-    return partial(ingest_subset, model=model, columns=columns, )
+    return partial(ingest_subset, model=model, columns=columns)
 
 
 ##################
@@ -158,6 +158,7 @@ def assign_product_transforms(**kwargs):
     """Assemble trial data transforms for clean write"""
     transform_list = [
         null_transform,
+        make_subset_ingest(model=Sponsor, columns=['Sponsor', 'Source?']),
         clean_product_raw,
         make_column_filter(ProductRaw),
         cast_dates,
@@ -176,15 +177,15 @@ listRegistry.register(assign_product_transforms)
 ## Sponsor ##
 def assign_sponsor_transforms(**kwargs):
     return [
-        clean_null,
+        prep_sponsors,
+        make_column_filter(Sponsor),
     ]
 listRegistry.register(assign_sponsor_transforms)
 
 ## Product Sponsors ##
 def assign_product_sponsor_transforms(**kwargs):
     return [
-        make_column_filter(ProductSponsor),
         prep_product_sponsors,
-        clean_null,
+        make_column_filter(ProductSponsor),
     ]
 listRegistry.register(assign_product_sponsor_transforms)

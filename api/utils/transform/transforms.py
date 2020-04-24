@@ -16,6 +16,7 @@ from functools import partial
 import string
 import logging
 import pycountry
+import hashlib
 
 
 tlogg = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
@@ -47,6 +48,13 @@ def get_product_names():
     with get_session() as session:
         prod_names = session.query(ProductRaw.preferred_name).all()
     return [x[0] for x in prod_names]
+
+
+def get_sponsors():
+    """ Get all sponsors currently in DB """
+    with get_session() as session:
+        sponsors = session.query(Sponsor.sponsor_id, Sponsor.sponsor_name).all()
+    return pd.DataFrame(sponsors, columns=['sponsor_id', 'sponsor_name'])
 
 
 def clean_country(country_names: str) -> str:
@@ -356,3 +364,45 @@ def trial_cleaner(data: pd.DataFrame):
 
 def prep_product_sponsors(data: pd.DataFrame)-> pd.DataFrame:
     pass
+
+def prep_sponsors(data: pd.DataFrame) -> pd.DataFrame:
+    tlogg.info(f"Transforming frame of shape {data.shape} and columns {data.columns}")
+    def filter_raw(df: pd.DataFrame)->np.array:
+        data_rows = df[df['Source?'] == 'No']
+        return data_rows.Sponsor.to_list()
+
+    def clean_sponsors(sponsors_raw: list)->pd.DataFrame:
+        def split_list(sponsor_string:str)->list:
+            # Infer separator
+            if ';' in sponsor_string:
+                separator = ';'
+            elif ',' in sponsor_string:
+                separator = ','
+            else:
+                separator = None
+            # Split the string or return unmodified
+            if separator is not None:
+                sponsors = sponsor_string.split(separator)
+            else:
+                sponsors = [sponsor_string]
+            return sponsors
+    
+        def clean_punct(single_sponsor:str)->str:
+            return single_sponsor.translate(str.maketrans('', '', string.punctuation)).strip()
+        
+        sponsor_list = []
+        for item in sponsors_raw:
+            for sponsor in split_list(item):
+                sponsor_list.append(
+                    clean_punct(sponsor)
+                )
+        sponsor_frame = pd.DataFrame({'sponsor_name': sponsor_list})
+        return sponsor_frame[sponsor_frame.sponsor_name.str.len() > 1]
+
+    def generate_sponsor_id(sponsor_name:str)->str:
+        return hashlib.sha1(sponsor_name.encode('utf-8')).hexdigest()
+
+    raw_sponsors = filter_raw(data)
+    prepared_sponsors = clean_sponsors(raw_sponsors)
+    prepared_sponsors['sponsor_id'] = prepared_sponsors.sponsor_name.apply(generate_sponsor_id)
+    return prepared_sponsors

@@ -85,6 +85,14 @@ def write_country(data: pd.DataFrame):
     run_write(data=data, model=Country)
 
 
+def write_sponsor(data: pd.DataFrame):
+    """
+    Adds a DataFrame of sponsors to the db as Sponsor instances
+    """
+    writelogger.info('Building Sponsor writer.')
+    run_write(data=data, model=Sponsor)
+
+
 def write_productsponsor(data: pd.DataFrame):
     """
     Adds a DataFrame of product sponsors to the db and ProductSponsor instances.

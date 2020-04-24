@@ -196,18 +196,19 @@ class TrialMilestone(TrialRaw):
 
 class Sponsor(Base):
     __tablename__ = 'sponsor'
+    _class_name = 'Sponsor'
 
-    sponsor_id = Column(Integer, primary_key=True)
+    sponsor_id = Column(String, primary_key=True)
     sponsor_name = Column(String)
 
     products = relationship('ProductSponsor', back_populates='sponsor')
 
 
-class ProductSponsor(ProductRaw):
+class ProductSponsor(Base):
     __tablename__ = 'productsponsor'
 
     link_id = Column(Integer, primary_key=True)
-    sponsor_id = Column(Integer, ForeignKey('sponsor.sponsor_id'))
+    sponsor_id = Column(String, ForeignKey('sponsor.sponsor_id'))
     product_id = Column(Integer, ForeignKey('productraw.product_id'))
 
     sponsor = relationship('Sponsor', back_populates='products')
