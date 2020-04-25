@@ -146,6 +146,18 @@ def drop_unnamed_columns(df:pd.DataFrame)->pd.DataFrame:
     return df[keep_columns].copy()
 
 
+def cast_to_int(series: pd.Series)->pd.Series:
+    for i, item in enumerate(series):
+        try:
+            if item is not None and item is not np.nan:
+                series.iloc[i] = int(item)
+            else:
+                series.iloc[i] = np.nan
+        except:
+            series.iloc[i] = np.nan
+    return series.copy()
+
+
 ######################################
 ### Product Source Transformations ###
 ######################################
@@ -349,7 +361,9 @@ def trial_cleaner(data: pd.DataFrame):
         df[col] = df[col].apply(clean_lists)
 
     df["country_codes"] = df["countries"].apply(clean_country)
-
+    tlogg.info(f'Trial Columns: {df.columns}')
+    if 'target_enrollment' in df.columns:
+        df["target_enrollment"] = cast_to_int(df.target_enrollment)
     return df
 
 
