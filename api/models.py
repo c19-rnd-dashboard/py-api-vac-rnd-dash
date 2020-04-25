@@ -202,6 +202,11 @@ class Sponsor(Base):
     sponsor_name = Column(String)
 
     products = relationship('ProductSponsor', back_populates='sponsor')
+    
+    @property
+    def json(self):
+        return to_dict(self, self.__class__)
+
 
 
 class ProductSponsor(Base):
@@ -214,7 +219,9 @@ class ProductSponsor(Base):
 
     sponsor = relationship('Sponsor', back_populates='products')
 
-
+    @property
+    def json(self):
+        return to_dict(self, self.__class__)
 
 
 #######################

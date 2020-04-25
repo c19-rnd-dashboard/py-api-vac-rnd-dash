@@ -63,5 +63,18 @@ def products():
 def assets():
     routelogger.info("Running Products Query")
     with get_session() as session:
+        # Get assets
         assets = session.query(ProductRaw).all()
-    return jsonify([ccase_serializer.transform(item.json) for item in assets])
+        # Serialize the assets 
+        serialized_assets = [ccase_serializer.transform(item.json) for item in assets]
+        # Bring in other data via joins and lookups
+            # Sponsors #
+        for asset in serialized_assets:
+            asset_sponsors = [
+                result.json \
+                for result in \
+                session.query(Sponsor).join(ProductSponsor).\
+                    filter(ProductSponsor.product_id == asset['productId']).all()
+            ]
+            asset['sponsors'] = asset_sponsors
+    return jsonify(serialized_assets)
