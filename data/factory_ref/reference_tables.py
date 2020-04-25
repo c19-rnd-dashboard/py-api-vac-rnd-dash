@@ -38,7 +38,15 @@ milestones = (
     {
         'name': 'nda',
         'category': 'regulatory',
-    }
+    },
+    {
+        'name': 'complete',
+        'category': 'completion',
+    },
+    {
+        'name': 'approved',
+        'category': 'completion',
+    },
 )
 
 
