@@ -165,7 +165,8 @@ class Milestone(Base):
     __tablename__ = "milestone"
     _class_name = 'Milestone'
 
-    name = Column(String, primary_key=True, nullable=False)
+    milestone_id = Column(Integer, primary_key=True, nullable=False)
+    name = Column(String, nullable=False)
     category = Column(String)
 
 
@@ -173,9 +174,9 @@ class ProductMilestone(ProductRaw):
     __tablename__ = "productmilestone"
     _class_name = 'ProductMilestone'
 
-    id = Column(Integer, primary_key=True)
-    milestone_name = Column(String, ForeignKey("milestone.name"))
-    product_id = Column(Integer, ForeignKey("productraw.product_id"))
+    link_id = Column(Integer, primary_key=True)
+    milestone_id = Column(Integer, ForeignKey("milestone.milestone_id"))
+    product_id = Column(Integer)
     date_start = Column(DateTime)
     date_end = Column(DateTime)
     milestone_status = Column(String)
@@ -191,7 +192,6 @@ class TrialMilestone(TrialRaw):
     date_start = Column(DateTime)
     date_end = Column(DateTime)
     status = Column(String)
-
 
 
 class Sponsor(Base):
