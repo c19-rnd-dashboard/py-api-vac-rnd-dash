@@ -45,13 +45,14 @@ def get_ingest():
             if 'kwargs' in ingest_request:
               kwargs = ingest_request['kwargs']
             else:
-              kwargs = {'job_timeout':3600}
+              kwargs = {}
             job = q.enqueue_call(
                     func=run_ingest, 
                     args=(
                       ingest_request["source"], 
                       ingest_request["category"]),
                     kwargs=kwargs, 
+                    timeout=1800,
             )
             # print(ingest_request)
             message = {
@@ -120,7 +121,7 @@ def update_db():
             routelogger.info('Verified. Updating Database.')
             q = get_q()
             job = q.enqueue_call(
-                    func=run_database_update, args=(), result_ttl=5000
+                    func=run_database_update, args=(), result_ttl=5000, timeout=1800,
             )
             return {
                 'message': 'Database Update Started.',
