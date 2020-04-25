@@ -91,7 +91,6 @@ class ProductRaw(Base):
     site_locations = Column(Text)
     sources = Column(String)
 
-    sponsors = relationship('ProductSponsor', back_populates='product')
 
     @property
     def json(self):
@@ -214,7 +213,6 @@ class ProductSponsor(Base):
     product_id = Column(Integer)
 
     sponsor = relationship('Sponsor', back_populates='products')
-    product = relationship('ProductRaw', back_populates='sponsors')
 
 
 
