@@ -152,7 +152,7 @@ listRegistry.register(assign_trial_transforms)
 ####################
 ### Product Data ###
 ####################
-
+#TODO: Allow writing of available product_ids right away.
 
 def assign_product_transforms(**kwargs):
     """Assemble trial data transforms for clean write"""
