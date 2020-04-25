@@ -118,7 +118,7 @@ class TrialRaw(Base):
     study_type = Column(String)
     phase = Column(String)
     recruitment_status = Column(String)
-    target_enrollment = Column(Integer)
+    target_enrollment = Column(String)
     intervention_type = Column(String)
     intervention = Column(Text)
     sponsors = Column(Text)
