@@ -211,7 +211,7 @@ class ProductSponsor(Base):
 
     link_id = Column(Integer, primary_key=True)
     sponsor_id = Column(String, ForeignKey('sponsor.sponsor_id'))
-    product_id = Column(Integer, ForeignKey('productraw.product_id'))
+    product_id = Column(Integer)
 
     sponsor = relationship('Sponsor', back_populates='products')
     product = relationship('ProductRaw', back_populates='sponsors')
