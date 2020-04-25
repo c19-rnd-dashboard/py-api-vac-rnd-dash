@@ -45,7 +45,7 @@ def get_ingest():
             if 'kwargs' in ingest_request:
               kwargs = ingest_request['kwargs']
             else:
-              kwargs = {}
+              kwargs = {'job_timeout':3600}
             job = q.enqueue_call(
                     func=run_ingest, 
                     args=(
