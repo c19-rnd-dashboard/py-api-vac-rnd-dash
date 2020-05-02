@@ -27,14 +27,7 @@ def get_db(context=True):
     Modifty g.db = *connect to match intended database connection.
     """
 
-    def check_context():
-        try:
-            current_app()
-            return True
-        except:
-            return False
-
-    if context and check_context():
+    if context == True:
         if 'db' not in g:
             db_logger.info('DB connection not found. Attempting connection to {}.'.format(current_app.config['DATABASE_URI']))
             try:
@@ -53,16 +46,16 @@ def get_db(context=True):
 
 
 @contextmanager
-def get_session():
+def get_session(context=True):
     # Setup session with thread engine.
     #   Allows for usage: with get_session() as session: session...
-    engine = get_db()
+    engine = get_db(context)
     session = scoped_session(sessionmaker(bind=engine))
     try:
         yield session
     finally:
         session.close()
-        close_db()  # May fix issues with connections to database remaining open, but not force connection closure until session activity complete.
+        close_db()  # May fix issues with connections to database remaining open, but not force connection closure until session activity completes
 
 
 def close_db(e=None):
