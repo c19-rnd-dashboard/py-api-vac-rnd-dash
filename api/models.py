@@ -171,7 +171,7 @@ class Milestone(Base):
 
     productmilestones = relationship('ProductMilestone', back_populates='milestone')
 
-class ProductMilestone(ProductRaw):
+class ProductMilestone(Base):
     __tablename__ = "productmilestone"
     _class_name = 'ProductMilestone'
 

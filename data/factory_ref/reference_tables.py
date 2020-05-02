@@ -12,52 +12,52 @@ milestones = (
     },
     {
         'milestone_id': 12,
-        'name': 'pre-clinical',
+        'name': 'pre_clinical_studies_started',
         'category': 'pre-clinical',
     },
     {
         'milestone_id': 13,
-        'name': 'lead_selection',
+        'name': 'lead_selection_finalized',
         'category': 'pre-clinical'
     },
     {
         'milestone_id': 21,
-        'name': 'clinical_batch',
+        'name': 'clinical_batch_finalized',
         'category': 'manufacturing',
     },
     {
         'milestone_id': 31,
-        'name': 'ind',
+        'name': 'ind_finalized',
         'category': 'regulatory',
     },
     {
         'milestone_id': 41,
-        'name': 'phase_1',
+        'name': 'phase_1_started',
         'category': 'clinical_development',
     },
     {
         'milestone_id': 42,
-        'name': 'phase_2',
+        'name': 'phase_2_started',
         'category': 'clinical_development',
     },
     {
         'milestone_id': 43,
-        'name': 'phase_3',
+        'name': 'phase_3_started,
         'category': 'clinical_development',
     },
     {
         'milestone_id': 44,
-        'name': 'phase_4',
+        'name': 'phase_4_started',
         'category': 'clinical_development',
     },
     {
         'milestone_id': 51,
-        'name': 'nda',
+        'name': 'nda_finalized',
         'category': 'regulatory',
     },
     {
         'milestone_id': 61,
-        'name': 'complete',
+        'name': 'completed',
         'category': 'completion',
     },
     {

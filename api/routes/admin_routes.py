@@ -1,6 +1,6 @@
 from api.utils.ingest import run_ingest
 from api.db import init_db
-from data import reference_tables
+from data import factory_countries, factory_milestones
 from flask import render_template, Blueprint, request, jsonify, current_app
 from markdown2 import Markdown
 import os
@@ -100,13 +100,13 @@ def run_database_update():
         {}
         ),
         ('milestone',
-        reference_tables.milestones,
+        factory_milestones,
         {}
         ),
         ('country',
-        reference_tables.countries,
+        factory_countries,
         {}
-        )
+        ),
     ]
     for job in jobs:
         run_ingest(category=job[0], source=job[1], **job[2])

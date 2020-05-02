@@ -1,1 +1,4 @@
-from .factory_ref import reference_tables
+from .factory_ref.reference_tables import (
+    countries as factory_countries, 
+    milestones as factory_milestones
+    )
