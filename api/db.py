@@ -62,6 +62,7 @@ def get_session():
         yield session
     finally:
         session.close()
+        close_db()  # May fix issues with connections to database remaining open, but not force connection closure until session activity complete.
 
 
 def close_db(e=None):
