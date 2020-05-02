@@ -20,12 +20,13 @@ psycopg2 = "*"
 python-dateutil = "*"
 python-levenshtein = "*"
 pycountry = "*"
-
 redis = "*"
 rq = "*"
 requests = "*"
 sqlalchemy = "*"
 urllib3 = "*"
+python-dotenv = "*"
+googlemaps = "*"
 
 [dev-packages]
 black = "*"

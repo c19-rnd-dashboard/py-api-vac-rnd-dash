@@ -1,6 +1,9 @@
 import pathlib
 from decouple import config
+from dotenv import load_dotenv
 import os
+
+load_dotenv()
 
 PACKAGE_ROOT = pathlib.Path(__file__).resolve().parent.parent
 
@@ -21,5 +24,7 @@ class DevelopmentConfig(Config):
     pass
 
 # Setup requirements for local environment
+
+
 def local_setup():
     raise NotImplemented
