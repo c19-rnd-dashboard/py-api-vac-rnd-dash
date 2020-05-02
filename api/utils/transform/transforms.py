@@ -15,6 +15,7 @@ from functools import partial
 import string
 import logging
 import hashlib
+from api.utils.geolocation import Geolocation
 
 
 tlogg = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
@@ -33,48 +34,52 @@ def clean_product_raw(data: pd.DataFrame):
     temp_data = drop_unnamed_columns(data).copy()
     # Rename columns to db format/names
     product_schema = {
-    'ID': 'product_id',
-    'Source?': 'source',
-    'Product Name - Preferred': 'preferred_name',
-    'Product Name - Chemical': 'chemical_name',
-    'Product Name - Brand': 'brand_name',
-    'Sponsor': 'sponsors',
-    'Intervention Type': 'intervention_type',
-    'Indication': 'indication',
-    'Molecule Type': 'molecule_type',
-    'Therapeutic Approach': 'therapeutic_approach',
-    'New/Repurposed': 'repurposed',
-    'Notes': 'notes',
-    'Funding/Manufacturing/Research/Other Partners': 'other_partners',
-    'Country': 'countries',
-    'Current Status': 'current_status',
-    'Pre-Clinical Studies Started': 'pre_clinical_studies_started_date',
-    'Lead Selection Finalized': 'lead_selection_finalized_date',
-    'Clinical Batch Finalized': 'clinical_batch_finalized_date',
-    'IND or Equivalent Approval Finalized': 'ind_finalized_date',
-    'Phase 1 Started': 'phase_1_started_date',
-    'Phase 2 Started': 'phase_2_started_date',
-    'Phase 3 Started': 'phase_3_started_date',
-    'NDA or equivalent Approval Finalized': 'nda_finalized',
-    'Phase': 'phase',
-    'Condition or Disease': 'condition_or_disease',
-    'Number of Participants': 'number_participants',
-    'Accepts Healthy Subjects': 'accepts_healthy_subjects',
-    '# of Sites': 'num_sites',
-    'Sites Locations': 'site_locations',
-    'Study Start Date': 'study_start_date',
-    'Primary Completion DAte': 'primary_completion_date',
-    'Study Completion Date': 'study_completion_date', 
-    'How to participate': 'participation_link',
-    'Discovery Started': 'discovery_started_date',
-    'CTG Identifier': 'trial_id',
-    'Status': 'status',
+        'ID': 'product_id',
+        'Source?': 'source',
+        'Product Name - Preferred': 'preferred_name',
+        'Product Name - Chemical': 'chemical_name',
+        'Product Name - Brand': 'brand_name',
+        'Sponsor': 'sponsors',
+        'Intervention Type': 'intervention_type',
+        'Indication': 'indication',
+        'Molecule Type': 'molecule_type',
+        'Therapeutic Approach': 'therapeutic_approach',
+        'New/Repurposed': 'repurposed',
+        'Notes': 'notes',
+        'Funding/Manufacturing/Research/Other Partners': 'other_partners',
+        'Country': 'countries',
+        'Current Status': 'current_status',
+        'Pre-Clinical Studies Started': 'pre_clinical_studies_started_date',
+        'Lead Selection Finalized': 'lead_selection_finalized_date',
+        'Clinical Batch Finalized': 'clinical_batch_finalized_date',
+        'IND or Equivalent Approval Finalized': 'ind_finalized_date',
+        'Phase 1 Started': 'phase_1_started_date',
+        'Phase 2 Started': 'phase_2_started_date',
+        'Phase 3 Started': 'phase_3_started_date',
+        'NDA or equivalent Approval Finalized': 'nda_finalized',
+        'Phase': 'phase',
+        'Condition or Disease': 'condition_or_disease',
+        'Number of Participants': 'number_participants',
+        'Accepts Healthy Subjects': 'accepts_healthy_subjects',
+        '# of Sites': 'num_sites',
+        'Sites Locations': 'site_locations',
+        'Study Start Date': 'study_start_date',
+        'Primary Completion DAte': 'primary_completion_date',
+        'Study Completion Date': 'study_completion_date',
+        'How to participate': 'participation_link',
+        'Discovery Started': 'discovery_started_date',
+        'CTG Identifier': 'trial_id',
+        'Status': 'status',
     }
     temp_data = temp_data.rename(columns=product_schema)
 
     # Clean Sources and append to data rows
-    def get_unique_sources(row_list:list)->dict:
+<< << << < HEAD
+    def get_unique_sources(row_list: list) -> dict:
         tlogg.info('Getting unique sources.')
+== == == =
+    def get_unique_sources(row_list: list) -> dict:
+>>>>>> > f2cc1cc... transform site_locations str to geolocation data.
         url_list = []
         for item in row_list:
             if ('http' in item):
@@ -83,24 +88,29 @@ def clean_product_raw(data: pd.DataFrame):
         urls = ','.join(url_list)
         product_id = row_list[0]
         return {
-        'product_id': product_id,
-        'sources': urls,
+            'product_id': product_id,
+            'sources': urls,
         }
 
-    def clean_valid_sources(df:pd.DataFrame):
+<< << << < HEAD
+    def clean_valid_sources(df: pd.DataFrame):
         tlogg.info('Cleaning valid sources.')
+== == == =
+    def clean_valid_sources(df: pd.DataFrame):
+>>>>>> > f2cc1cc... transform site_locations str to geolocation data.
         data_rows = df.query("source == 'No'")
         source_rows = df.query("source == 'Yes'")
-        
+
         clean_sources = []
         for i in range(len(source_rows)):
             row_list = source_rows.iloc[i].to_list()
             clean_sources.append(get_unique_sources(row_list=row_list))
-        
+
         source_frame = pd.DataFrame(clean_sources)
-        clean_frame = data_rows.drop(columns=['source']).merge(source_frame, on='product_id')
+        clean_frame = data_rows.drop(columns=['source']).merge(
+            source_frame, on='product_id')
         return clean_frame
-    
+
     temp_data = clean_valid_sources(temp_data)
 
     # Infer preferred_name from other names
@@ -121,14 +131,14 @@ def clean_product_raw(data: pd.DataFrame):
                 elif (len(row.sponsors) > 0):
                     df1.iloc[i].preferred_name = '-'.join(
                         [
-                            clean_(row.sponsors.split(',')[0]), 
+                            clean_(row.sponsors.split(',')[0]),
                             row.product_id
                         ])
-        
+
         return df1[df1.preferred_name.str.len() > 0]
 
     temp_data = build_missing_preferred_names(temp_data)
-    
+
     # Generate country code lists
     temp_data["country_codes"] = temp_data["countries"].apply(clean_country)
 
@@ -241,15 +251,22 @@ def trial_cleaner(data: pd.DataFrame):
 ### Sponsor Transform ###
 #########################
 
-def prep_product_sponsors(data: pd.DataFrame)-> pd.DataFrame:
+# TODO: SponsorTransform
+# Expand any lists found.
+# Clean sponsor names of all punctuation.
+# Capitalize names.
+
+def prep_product_sponsors(data: pd.DataFrame) -> pd.DataFrame:
     tlogg.info("Starting prep_product_sponsors")
-    tlogg.info(f"Transforming frame of shape {data.shape} and columns {data.columns}")
-    def filter_raw(df: pd.DataFrame)->np.array:
+    tlogg.info(
+        f"Transforming frame of shape {data.shape} and columns {data.columns}")
+
+    def filter_raw(df: pd.DataFrame) -> np.array:
         data_rows = df[df['Source?'] == 'No']
         return data_rows[['ID', 'Sponsor']].to_numpy()
 
-    def clean_sponsors(sponsors_raw: np.array)->pd.DataFrame:
-        def split_list(sponsor_string:str)->list:
+    def clean_sponsors(sponsors_raw: np.array) -> pd.DataFrame:
+        def split_list(sponsor_string: str) -> list:
             # Infer separator
             if ';' in sponsor_string:
                 separator = ';'
@@ -263,11 +280,11 @@ def prep_product_sponsors(data: pd.DataFrame)-> pd.DataFrame:
             else:
                 sponsors = [sponsor_string]
             return sponsors
-    
-        def clean_punct(single_sponsor:str)->str:
+
+        def clean_punct(single_sponsor: str) -> str:
             return single_sponsor.translate(str.maketrans('', '', string.punctuation)).strip()
-        
-        link_id=0
+
+        link_id = 0
         product_sponsor_list = []
         for item in sponsors_raw:
             for sponsor in split_list(item[1]):
@@ -275,10 +292,11 @@ def prep_product_sponsors(data: pd.DataFrame)-> pd.DataFrame:
                     (link_id, item[0], clean_punct(sponsor))
                 )
                 link_id += 1
-        sponsor_frame = pd.DataFrame(product_sponsor_list, columns=['link_id', 'product_id', 'sponsor_name'])
+        sponsor_frame = pd.DataFrame(product_sponsor_list, columns=[
+                                     'link_id', 'product_id', 'sponsor_name'])
         return sponsor_frame[sponsor_frame.sponsor_name.str.len() > 1]
-    
-    def generate_sponsor_id(sponsor_name:str)->str:
+
+    def generate_sponsor_id(sponsor_name: str) -> str:
         return hashlib.sha1(sponsor_name.encode('utf-8')).hexdigest()
 
     raw_product_sponsors = filter_raw(data)
@@ -289,7 +307,6 @@ def prep_product_sponsors(data: pd.DataFrame)-> pd.DataFrame:
     return prepared_product_sponsors
 
 
-
 def prep_sponsors(data: pd.DataFrame) -> pd.DataFrame:
     tlogg.info("Starting prep_sponsors")
     tlogg.info(f"Transforming frame of shape {data.shape} and columns {data.columns}")
@@ -297,8 +314,8 @@ def prep_sponsors(data: pd.DataFrame) -> pd.DataFrame:
         data_rows = df[df['Source?'] == 'No']
         return data_rows.Sponsor.to_list()
 
-    def clean_sponsors(sponsors_raw: list)->pd.DataFrame:
-        def split_list(sponsor_string:str)->list:
+    def clean_sponsors(sponsors_raw: list) -> pd.DataFrame:
+        def split_list(sponsor_string: str) -> list:
             # Infer separator
             if ';' in sponsor_string:
                 separator = ';'
@@ -312,10 +329,10 @@ def prep_sponsors(data: pd.DataFrame) -> pd.DataFrame:
             else:
                 sponsors = [sponsor_string]
             return sponsors
-    
-        def clean_punct(single_sponsor:str)->str:
+
+        def clean_punct(single_sponsor: str) -> str:
             return single_sponsor.translate(str.maketrans('', '', string.punctuation)).strip()
-        
+
         sponsor_list = []
         for item in sponsors_raw:
             for sponsor in split_list(item):
@@ -325,10 +342,15 @@ def prep_sponsors(data: pd.DataFrame) -> pd.DataFrame:
         sponsor_frame = pd.DataFrame({'sponsor_name': sponsor_list})
         return sponsor_frame[sponsor_frame.sponsor_name.str.len() > 1]
 
-    def generate_sponsor_id(sponsor_name:str)->str:
+    def generate_sponsor_id(sponsor_name: str) -> str:
         return hashlib.sha1(sponsor_name.encode('utf-8')).hexdigest()
 
     raw_sponsors = filter_raw(data)
     prepared_sponsors = clean_sponsors(raw_sponsors)
-    prepared_sponsors['sponsor_id'] = prepared_sponsors.sponsor_name.apply(generate_sponsor_id)
+    prepared_sponsors['sponsor_id'] = prepared_sponsors.sponsor_name.apply(
+        generate_sponsor_id)
     return prepared_sponsors
+
+
+def add_geolocation_to_site_locations(data: pd.DataFrame):
+    return Geolocation.transform(data)

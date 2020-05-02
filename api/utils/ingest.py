@@ -70,7 +70,8 @@ class Ingest:
 
 
 def run_ingest(source, category: str, **kwargs):
-    ingestlogger.info(f"Starting ingest of source: {source} category: {category}")
+    ingestlogger.info(
+        f"Starting ingest of source: {source} category: {category}")
 
     try:  # will start load automatically
         job = Ingest(source=source, category=category, **kwargs)
@@ -165,6 +166,7 @@ def assign_product_transforms(**kwargs):
         make_column_filter(ProductRaw),
         cast_dates,
         clean_null,
+        add_geolocation_to_site_locations,
         # Add transforms here or
         # use transform_list.append(new_transform) for dynamic construction
     ]
