@@ -33,7 +33,7 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
 
 > ```bash``` >> conda env create -f condaenv.yml
 
-> Start environment with: ```bash``` >> conda activate condabe
+> Start environment with: ```bash``` >> conda activate covidbe
 
 ## How to access Google Sheet data using the Python API and convert to Pandas dataframe ?
 
