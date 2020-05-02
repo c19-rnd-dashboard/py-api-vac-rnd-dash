@@ -4,7 +4,7 @@ from api.routes.mock_routes import mock_routes
 from api.routes.admin_routes import admin_routes
 from api.routes.covid_dash import covid_dash
 from flask_cors import CORS
-from flask_caching import Cache
+from api.cache import cache
 from decouple import config
 import os
 
@@ -46,7 +46,7 @@ def create_app(test_config=None):
     CORS(app)
 
     # Enable caching
-    cache = Cache(app)
+    cache.init_app(app)
 
     ##############
     ### Routes ###
