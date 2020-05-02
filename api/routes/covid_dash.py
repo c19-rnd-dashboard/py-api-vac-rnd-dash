@@ -15,7 +15,7 @@ ccase_serializer = DictionarySerializer(transformer='camelcase_keys')
 @covid_dash.route("/alternatives")
 def alternatives():
     routelogger.info("Running Alternatives Query")
-    with get_session() as session:
+    with get_session(context=True) as session:
         meds = (
             session.query(TrialRaw)
             .filter(
@@ -33,7 +33,7 @@ def alternatives():
 @covid_dash.route("/treatments")
 def treatments():
     routelogger.info("Running Treatments Query")
-    with get_session() as session:
+    with get_session(context=True) as session:
         meds = (
             session.query(TrialRaw)
             .filter(
@@ -50,7 +50,7 @@ def treatments():
 @covid_dash.route("/vaccines")
 def products():
     routelogger.info("Running Vaccines Query")
-    with get_session() as session:
+    with get_session(context=True) as session:
         meds = (
             session.query(TrialRaw)
             .filter(TrialRaw.intervention.like("%vaccine%"))
@@ -62,6 +62,6 @@ def products():
 @covid_dash.route("/assets")
 def assets():
     routelogger.info("Running Products Query")
-    with get_session() as session:
+    with get_session(context=True) as session:
         assets = session.query(ProductRaw).all()
     return jsonify([ccase_serializer.transform(item.json) for item in assets])
