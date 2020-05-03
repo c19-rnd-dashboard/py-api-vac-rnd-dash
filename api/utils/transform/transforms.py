@@ -4,127 +4,19 @@ Transforms
 Contains custom source transforms
 """
 
-from .common import *
 import pandas as pd
 import numpy as np
-from datetime import datetime
-from api.models import *
-from api.db import get_session
+
+from .common import *
 
 from fuzzywuzzy import fuzz
 from functools import partial
 import string
 import logging
-import pycountry
 import hashlib
 
 
 tlogg = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
-
-########################
-### Helper Functions ###
-########################
-
-
-def clean_country(country_names: str) -> str:
-    result = []
-    for country in country_names.split(","):
-        try:
-            curr_country = pycountry.countries.search_fuzzy(country)
-            result.append(curr_country[0].alpha_3)
-        except LookupError:
-            pass
-        except Exception as e:
-            tlogg.error(f"Error in country standardization {e}")
-    if len(result) == 0:
-        return None
-    return ",".join(result)
-
-
-def clean_lists(x):
-    if x is None:
-        return None 
-
-    if "," in x:
-        temp_list = x.split(",")
-    elif ";" in x:
-        temp_list = x.split(";")
-    else:
-        return x
-
-    def clean_list_item(item: str = None):
-        assert type(item) == str
-        temp_item = item
-        temp_item = temp_item.strip()
-        temp_item = temp_item.replace('"', "")
-        return temp_item
-
-    return ",".join([clean_list_item(item) for item in temp_list])
-
-##############################
-### DataFrame Manipulation ###
-##############################
-
-
-def filter_columns(data: pd.DataFrame, model, columns: list = None):
-    """ Return only columns that match filter from DataFrame """
-    if columns is not None:
-        return data[columns]
-    else:
-        valid_columns = set(get_columns(model))
-        supplied_columns = set(data.columns)
-        tlogg.info(f"Supplied Columns: {supplied_columns}\nValid Columns: {valid_columns}")
-        filter_set = list(valid_columns.intersection(supplied_columns))
-        return data[filter_set]
-
-
-def cast_dates(data: pd.DataFrame):
-    """ Check for date columns and cast objects as datetime """
-    tlogg.info("Starting date casting")
-    temp_data = data.copy()
-    date_columns = [column for column in temp_data.columns if "date" in column]
-    for col in date_columns:
-        temp_data[col] = temp_data[col].apply(convert_to_datetime)
-    return temp_data
-
-
-def clean_null(data: pd.DataFrame):
-    # Force all null values to None rather than mixed type with np.nan
-    def replace_nat(x):
-        if pd.isnull(x):
-            return None
-        return x
-    def replace_empty_strings(x):
-        if x == '':
-            return None 
-        return x
-
-    temp_data = data
-    temp_data = temp_data.where(data.notnull(), None)
-    for col in temp_data.columns[temp_data.dtypes == object]:
-        temp_data[col] = temp_data[col].apply(replace_empty_strings)
-    # Date cleanup
-    date_columns = [column for column in temp_data.columns if "date" in column]
-    for col in date_columns:
-        temp_data[col] = temp_data[col].apply(replace_nat)
-    return temp_data
-
-
-def drop_unnamed_columns(df:pd.DataFrame)->pd.DataFrame:
-    keep_columns = [col for col in df.columns if len(col)>0]
-    return df[keep_columns].copy()
-
-
-def cast_to_int(series: pd.Series)->pd.Series:
-    for i, item in enumerate(series):
-        try:
-            if item is not None and item is not np.nan:
-                series.iloc[i] = int(item)
-            else:
-                series.iloc[i] = np.nan
-        except:
-            series.iloc[i] = np.nan
-    return series.copy()
 
 
 ######################################
