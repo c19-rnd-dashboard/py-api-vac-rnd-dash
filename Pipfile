@@ -30,6 +30,7 @@ googlemaps = "*"
 
 [dev-packages]
 black = "*"
+ipdb = "*"
 
 [requires]
 python_version = "3.7"

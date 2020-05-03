@@ -44,7 +44,7 @@ class Ingest:
             ingestlogger.info(f'Assigned trasnformer {transformer_list}')
         except Exception as e:
             ingestlogger.error(f'Could not assign transformer. {e}')
-            
+
     def assign_writer(self):
         try:
             self._writer = eval(f"write_{self.category}")
@@ -72,7 +72,6 @@ class Ingest:
 def run_ingest(source, category: str, **kwargs):
     ingestlogger.info(
         f"Starting ingest of source: {source} category: {category}")
-
     try:  # will start load automatically
         job = Ingest(source=source, category=category, **kwargs)
         process_time = time() - job.start_time
@@ -117,9 +116,10 @@ def make_column_filter(model):
     return partial(filter_columns, model=model)
 
 
-def make_subset_ingest(model, columns:list = None):
+def make_subset_ingest(model, columns: list = None):
     # Run subset ingest and return unaltered data
     ingestlogger.info(f"Beginning subset ingest of: {model._class_name}")
+
     def ingest_subset(data: pd.DataFrame, **kwargs):
         run_ingest(
             source=data[columns].copy(),
@@ -148,29 +148,37 @@ def assign_trial_transforms(**kwargs):
         # use transform_list.append(new_transform) for dynamic construction
     ]
     return transform_list
+
+
 listRegistry.register(assign_trial_transforms)
 
 ####################
 ### Product Data ###
 ####################
-#TODO: Allow writing of available product_ids right away.
+# TODO: Allow writing of available product_ids right away.
+
 
 def assign_product_transforms(**kwargs):
     """Assemble trial data transforms for clean write"""
     transform_list = [
         null_transform,
         make_subset_ingest(model=Sponsor, columns=['Sponsor', 'Source?']),
-        make_subset_ingest(model=ProductSponsor, columns=['ID', 'Sponsor', 'Source?']),
-        make_subset_ingest(model=ProductMilestone, columns=list(get_milestone_renaming_schema().keys())),
+        make_subset_ingest(model=ProductSponsor, columns=[
+                           'ID', 'Sponsor', 'Source?']),
+        make_subset_ingest(model=ProductMilestone, columns=list(
+            get_milestone_renaming_schema().keys())),
+        make_subset_ingest(model=SiteLocation, columns=[
+            'ID', 'Sites Locations']),
         clean_product_raw,
         make_column_filter(ProductRaw),
         cast_dates,
         clean_null,
-        add_geolocation_to_site_locations,
         # Add transforms here or
         # use transform_list.append(new_transform) for dynamic construction
     ]
     return transform_list
+
+
 listRegistry.register(assign_product_transforms)
 
 ################
@@ -178,20 +186,40 @@ listRegistry.register(assign_product_transforms)
 ################
 
 ## Sponsor ##
+
+
 def assign_sponsor_transforms(**kwargs):
     return [
         prep_sponsors,
         make_column_filter(Sponsor),
     ]
+
+
 listRegistry.register(assign_sponsor_transforms)
 
 ## Product Sponsors ##
+
+
 def assign_productsponsor_transforms(**kwargs):
     return [
         prep_product_sponsors,
         make_column_filter(ProductSponsor),
     ]
+
+
 listRegistry.register(assign_productsponsor_transforms)
+
+## Product Site Locations ##
+
+
+def assign_sitelocation_transforms(**kwargs):
+    return [
+        prep_product_sitelocation,
+        make_column_filter(SiteLocation),
+    ]
+
+
+listRegistry.register(assign_sitelocation_transforms)
 
 
 ##################
@@ -206,20 +234,28 @@ def assign_productmilestone_transforms(**kwargs):
         clean_null,
         make_column_filter(ProductMilestone)
     ]
+
+
 listRegistry.register(assign_productmilestone_transforms)
 
 ######################
 ### Factory Tables ###
 ######################
 
+
 def assign_milestone_transforms(**kwargs):
     return [
         null_transform,
     ]
+
+
 listRegistry.register(assign_milestone_transforms)
+
 
 def assign_country_transforms(**kwargs):
     return [
         null_transform,
     ]
+
+
 listRegistry.register(assign_country_transforms)

@@ -1,7 +1,17 @@
 import unittest
+import pandas as pd
+from pandas._testing import assert_frame_equal
 from utils.geolocation_pure import Geolocation, _map_geocode_to_site_location
 
 raw_locations = "kaiser permanente washington health research institute - seattle - washington,emory children's center - decatur - georgia"
+
+df_sitelocations = pd.DataFrame(
+    {
+        'ID': [1, 2],
+        'Sites Locations': [raw_locations, raw_locations],
+    },
+    columns=['ID', 'Sites Locations']
+)
 
 gmap_location = [{'access_points': [],
                   'address_components': [{'long_name': '1730',
@@ -45,6 +55,42 @@ gmap_location = [{'access_points': [],
                                 'global_code': '84VVJM8C+Q5'},
                   'types': ['establishment', 'point_of_interest']}]
 
+secondlocation = [{'access_points': [],
+                   'address_components': [{'long_name': '1405',
+                                           'short_name': '1405',
+                                           'types': ['street_number']},
+                                          {'long_name': 'East Clifton Road Northeast',
+                                           'short_name': 'E Clifton Rd NE',
+                                           'types': ['route']},
+                                          {'long_name': 'Atlanta',
+                                           'short_name': 'Atlanta',
+                                           'types': ['locality', 'political']},
+                                          {'long_name': 'DeKalb County',
+                                           'short_name': 'Dekalb County',
+                                           'types': ['administrative_area_level_2',
+                                                     'political']},
+                                          {'long_name': 'Georgia',
+                                           'short_name': 'GA',
+                                           'types': ['administrative_area_level_1',
+                                                     'political']},
+                                          {'long_name': 'United States',
+                                           'short_name': 'US',
+                                           'types': ['country', 'political']},
+                                          {'long_name': '30322',
+                                           'short_name': '30322',
+                                           'types': ['postal_code']}],
+                   'formatted_address': '1405 E Clifton Rd NE, Atlanta, GA 30322, USA',
+                   'geometry': {'location': {'lat': 33.7934917, 'lng': -84.3195325},
+                                'location_type': 'ROOFTOP',
+                                'viewport': {'northeast': {'lat': 33.79484068029149,
+                                                           'lng': -84.31818351970848},
+                                             'southwest': {'lat': 33.79214271970849,
+                                                           'lng': -84.3208814802915}}},
+                   'place_id': 'ChIJR4J4LPoG9YgRJLnI9mqd85c',
+                   'plus_code': {'compound_code': 'QMVJ+95 Atlanta, Georgia, United States',
+                                 'global_code': '865QQMVJ+95'},
+                   'types': ['establishment', 'health', 'hospital', 'point_of_interest']}]
+
 
 class LocationsTest(unittest.TestCase):
 
@@ -69,10 +115,38 @@ class LocationsTest(unittest.TestCase):
         self.assertEqual(result, self.expected)
 
     def test_geolocation_transform(self):
+        expected_frame = pd.DataFrame({
+            'product_id': [
+                1,
+                1,
+                2,
+                2
+            ],
+            'name': [
+                '1730 Minor Ave, Seattle, WA 98101, USA',
+                '1730 Minor Ave, Seattle, WA 98101, USA',
+                '1730 Minor Ave, Seattle, WA 98101, USA',
+                '1730 Minor Ave, Seattle, WA 98101, USA'
+            ],
+            'city': [
+                'Seattle',
+                'Seattle',
+                'Seattle',
+                'Seattle',
+            ],
+            'state': [
+                'WA',
+                'WA',
+                'WA',
+                'WA',
+            ],
+            'country': ['US', 'US', 'US', 'US'],
+            'lat': [47.6169397, 47.6169397, 47.6169397, 47.6169397, ],
+            'lng': [-122.329572, -122.329572, -122.329572, -122.329572, ]
+        }, columns=['product_id', 'name', 'city', 'state', 'country', 'lat', 'lng'])
         geolocation = Geolocation(lambda _: gmap_location)
-        result = geolocation.transform(
-            {'site_locations': raw_locations})
-        self.assertEqual(result['site_locations'][0], self.expected)
+        resulting_frame = geolocation.transform(df_sitelocations)
+        assert_frame_equal(expected_frame, resulting_frame)
 
 
 if __name__ == "__main__":
