@@ -178,8 +178,8 @@ class ProductMilestone(Base):
     link_id = Column(Integer, primary_key=True)
     milestone_id = Column(Integer, ForeignKey("milestone.milestone_id"))
     product_id = Column(Integer, nullable=False)
-    date_start = Column(DateTime, nullable=True)
-    milestone_status = Column(String, nullable=True)
+    date = Column(DateTime, nullable=True)
+    status = Column(String, nullable=True)
 
     milestone = relationship('Milestone', back_populates='productmilestones')
 

@@ -4,13 +4,13 @@ Transforms
 Contains custom source transforms
 """
 
-from sqlalchemy import inspect
+from .common import *
 import pandas as pd
 import numpy as np
 from datetime import datetime
 from api.models import *
 from api.db import get_session
-from dateutil.parser import parse
+
 from fuzzywuzzy import fuzz
 from functools import partial
 import string
@@ -24,37 +24,6 @@ tlogg = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 ########################
 ### Helper Functions ###
 ########################
-
-
-def get_columns(model):
-    """ Get all column names from SQL Alchemy Model """
-    inst = inspect(model)
-    column_names = [c_attr.key for c_attr in inst.mapper.column_attrs]
-    return column_names
-
-
-def convert_to_datetime(time_string):
-    try:
-        date_val = parse(time_string)
-        if pd.isnull(date_val):
-            return None
-        return date_val
-    except:
-        return None
-
-
-def get_product_names():
-    """ Get all product preferred names currently in raw """
-    with get_session() as session:
-        prod_names = session.query(ProductRaw.preferred_name).all()
-    return [x[0] for x in prod_names]
-
-
-def get_sponsors():
-    """ Get all sponsors currently in DB """
-    with get_session() as session:
-        sponsors = session.query(Sponsor.sponsor_id, Sponsor.sponsor_name).all()
-    return pd.DataFrame(sponsors, columns=['sponsor_id', 'sponsor_name'])
 
 
 def clean_country(country_names: str) -> str:
@@ -370,11 +339,6 @@ def trial_cleaner(data: pd.DataFrame):
 #########################
 ### Sponsor Transform ###
 #########################
-
-# TODO: SponsorTransform
-# Expand any lists found.  
-# Clean sponsor names of all punctuation. 
-# Capitalize names.
 
 def prep_product_sponsors(data: pd.DataFrame)-> pd.DataFrame:
     tlogg.info("Starting prep_product_sponsors")
