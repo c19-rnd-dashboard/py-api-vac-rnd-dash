@@ -2,6 +2,7 @@ from flask import render_template, Blueprint, request, jsonify
 from api.models import *
 from api.db import get_session
 from api.utils.serializer import DictionarySerializer
+from api.cache import cache
 from sqlalchemy import or_, and_
 import logging
 
@@ -13,6 +14,7 @@ covid_dash = Blueprint("covid_dash", __name__)
 ccase_serializer = DictionarySerializer(transformer='camelcase_keys')
 
 @covid_dash.route("/alternatives")
+@cache.cached(timeout=6000)
 def alternatives():
     routelogger.info("Running Alternatives Query")
     with get_session(context=True) as session:
@@ -31,6 +33,7 @@ def alternatives():
 
 
 @covid_dash.route("/treatments")
+@cache.cached(timeout=6000)
 def treatments():
     routelogger.info("Running Treatments Query")
     with get_session(context=True) as session:
@@ -48,6 +51,7 @@ def treatments():
 
 
 @covid_dash.route("/vaccines")
+@cache.cached(timeout=6000)
 def products():
     routelogger.info("Running Vaccines Query")
     with get_session(context=True) as session:
@@ -80,6 +84,7 @@ def fetch_value(dictionary, key):
         return []
 
 @covid_dash.route("/assets")
+@cache.cached(timeout=6000)
 def assets():
     routelogger.info("Running Products Query")
     with get_session(context=True) as session:
