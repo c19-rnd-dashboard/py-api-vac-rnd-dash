@@ -337,5 +337,5 @@ def prep_sponsors(data: pd.DataFrame) -> pd.DataFrame:
     return prepared_sponsors
 
 
-def add_geolocation_to_site_locations(data: pd.DataFrame):
+def prep_product_sitelocation(data: pd.DataFrame):
     return Geolocation.transform(data)
