@@ -37,4 +37,4 @@ def get_product_milestones():
             ProductMilestone.link_id,
             ProductMilestone.product_id, ProductMilestone.milestone_id, ProductMilestone.date, ProductMilestone.status,
             Milestone.name, Milestone.category).join(ProductMilestone).all()
-    return pd.DataFrame(milesone_info, columns=['link_id', 'product_id', 'milestone_id', 'date', 'status', 'name', 'category'])
+    return pd.DataFrame(milesone_info, columns=['link_id', 'product_id', 'milestone_id', 'date', 'status', 'milestone_name', 'category'])
