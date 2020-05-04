@@ -12,3 +12,5 @@ from .transforms import (
     prep_sponsors)
 
 from .milestones import milestone_transformer, get_milestone_renaming_schema
+
+from .endpoint.covid_dash import *
