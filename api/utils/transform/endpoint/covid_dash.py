@@ -29,11 +29,10 @@ def condense_milestones(milestone_results: pd.DataFrame) -> dict:
         result = milestone_results.iloc[i]
         milestone_info = {
             'milestoneId': int(result.milestone_id),
-            'name': result.name,
+            'name': result.milestone_name,
             'category': result.category,
             'date': _clean_date(result.date),
             'status': result.status,
-            
         }
         milestone_dict[result.product_id] = milestone_dict[result.product_id] + [milestone_info]
     return milestone_dict
