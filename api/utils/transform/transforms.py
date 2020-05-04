@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 
 from .common import *
+from .milestones import milestone_transformer
 
 from fuzzywuzzy import fuzz
 from functools import partial

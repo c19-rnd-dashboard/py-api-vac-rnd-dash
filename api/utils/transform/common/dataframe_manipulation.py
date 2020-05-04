@@ -9,7 +9,7 @@ from functools import partial
 
 import logging
 
-tlogg = logging.getLogger(__name__)
+tlogg = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
 
 def filter_columns(data: pd.DataFrame, model, columns: list = None):

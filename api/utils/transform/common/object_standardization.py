@@ -1,7 +1,7 @@
 import logging
 import pycountry
 
-tlogg = logging.getLogger(__name__)
+tlogg = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
 def clean_country(country_names: str) -> str:
     result = []
