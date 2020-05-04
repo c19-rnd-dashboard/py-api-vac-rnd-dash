@@ -29,7 +29,7 @@ def get_db(context=True):
 
     if context == True:
         if 'db' not in g:
-            db_logger.info('DB connection not found. Attempting connection to {}.'.format(config['DATABASE_URI']))
+            db_logger.info('DB connection not found. Attempting connection to {}.'.format(config('DATABASE_URI')))
             try:
                 g.engine = create_engine(current_app.config['DATABASE_URI'])
                 g.db = g.engine.connect()
