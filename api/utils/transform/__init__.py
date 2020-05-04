@@ -13,4 +13,6 @@ from .transforms import (
 
 from .milestones import milestone_transformer, get_milestone_renaming_schema
 
-from .endpoint.covid_dash import *
+from .endpoint import *
+
+from .common import *

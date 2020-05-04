@@ -2,7 +2,11 @@ from flask import render_template, Blueprint, request, jsonify
 from api.models import *
 from api.db import get_session
 from api.utils.serializer import DictionarySerializer
-from api.utils.transform import condense_sponsors, fetch_value, condense_milestones
+from api.utils.transform import (
+    fetch_value, 
+    get_product_sponsors, condense_sponsors,
+    get_product_milestones, condense_milestones
+)
 from api.cache import cache
 from sqlalchemy import or_, and_
 import logging
@@ -73,22 +77,15 @@ def assets():
         assets = session.query(ProductRaw).all()
         # Serialize the assets 
         serialized_assets = [ccase_serializer.transform(item.json) for item in assets]
-        # Bring in other data via joins and lookups
-        # Sponsors #
-        sponsors_info = session.query(ProductSponsor.product_id, Sponsor.sponsor_id, Sponsor.sponsor_name).join(ProductSponsor).all()
-        sponsors = condense_sponsors(sponsors_info)
-        # Milestones #
-        milesone_info = session.query(
-            ProductMilestone.product_id, ProductMilestone.milestone_id, ProductMilestone.date, ProductMilestone.status,
-            Milestone.name, Milestone.category).join(ProductMilestone).all()
-        milestones = condense_milestones(milesone_info)
+        # Sponsors
+        sponsors = condense_sponsors(get_product_sponsors())
+        # Milestones
+        milestones = condense_milestones(get_product_milestones())
 
-        for asset in serialized_assets:
-            asset_sponsors = fetch_value(sponsors, asset['productId'])
-            asset['sponsors'] = asset_sponsors
-            asset_milestones = fetch_value(milestones, asset['productId'])
-            asset['milestones'] = asset_milestones
-            asset['sources'] = asset['sources'].split(',')
+    for asset in serialized_assets:
+        asset['sponsors'] = fetch_value(sponsors, asset['productId'])
+        asset['milestones'] = fetch_value(milestones, asset['productId'])
+        asset['sources'] = asset['sources'].split(',')
     return jsonify(serialized_assets)
 
 
