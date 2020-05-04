@@ -30,7 +30,7 @@ class Write(Query):
 
     def execute(self, **params):
         writelogger.info(f'Starting write execution. Processing stack of: {len(self.data)}')
-        with get_session() as session:
+        with get_session(context=False) as session:
             for record in self.dataframe_to_dict(self.data):
                 self.make_or_update(
                     model=self.model, 
