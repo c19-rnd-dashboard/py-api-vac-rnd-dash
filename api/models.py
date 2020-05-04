@@ -127,7 +127,6 @@ class TrialRaw(Base):
     data_source = Column(String)
     results_link = Column(String)
     inferred_product = Column(String)
-    site_locations = relationship('SiteLocation')
 
     def to_json(self):
         return {
@@ -169,7 +168,9 @@ class Milestone(Base):
     name = Column(String, nullable=False)
     category = Column(String)
 
-    productmilestones = relationship('ProductMilestone', back_populates='milestone')
+    productmilestones = relationship(
+        'ProductMilestone', back_populates='milestone')
+
 
 class ProductMilestone(Base):
     __tablename__ = "productmilestone"
@@ -182,6 +183,7 @@ class ProductMilestone(Base):
     status = Column(String, nullable=True)
 
     milestone = relationship('Milestone', back_populates='productmilestones')
+
 
 class Sponsor(Base):
     __tablename__ = 'sponsor'
@@ -216,14 +218,30 @@ class SiteLocation(Base):
     __tablename__ = 'sitelocation'
     _class_name = 'SiteLocation'
 
-    site_location_id = Column(String, primary_key=True, autoincrement=True)
-    product_id = Column(Integer, ForeignKey("productraw.product_id"))
+    site_location_id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     city = Column(String)
     state = Column(String)
     country = Column(String)
     lat = Column(Float, nullable=False)
     lng = Column(Float, nullable=False)
+
+    productsitelocation = relationship(
+        'ProductSiteLocation', back_populates='sitelocation'
+    )
+
+
+class ProductSiteLocation(Base):
+    __tablename__ = "productsitelocation"
+    _class_name = 'ProductSiteLocation'
+
+    link_id = Column(Integer, primary_key=True)
+    site_location_id = Column(Integer, ForeignKey(
+        "sitelocation.site_location_id"))
+    product_id = Column(Integer, nullable=False)
+
+    sitelocation = relationship(
+        'SiteLocation', back_populates='productsitelocation')
 
 
 #######################
