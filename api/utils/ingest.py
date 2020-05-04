@@ -200,6 +200,7 @@ def assign_productmilestone_transforms(**kwargs):
     return [
         milestone_transformer,
         cast_dates,
+        dates_to_string,
         clean_null,
         make_column_filter(ProductMilestone)
     ]

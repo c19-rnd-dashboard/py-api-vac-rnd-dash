@@ -35,27 +35,38 @@ def cast_dates(data: pd.DataFrame):
 
 
 def clean_null(data: pd.DataFrame):
-    # Force all null values to None rather than mixed type with np.nan
-    def replace_nat(x):
-        if pd.isnull(x):
-            return None
-        return x
-    def replace_empty_strings(x):
+    # Force all null values to None rather than mixed type with np.nan, NaT
+    def _replace_nat(series:pd.Series)->pd.Series:
+        new_series = series.mask(series.isnull(), None)
+        return new_series
+
+    def _replace_empty_strings(x):
         if x == '':
             return None 
         return x
 
-    temp_data = data
+    temp_data = data.copy()
     temp_data = temp_data.where(data.notnull(), None)
     for col in temp_data.columns[temp_data.dtypes == object]:
-        temp_data[col] = temp_data[col].apply(replace_empty_strings)
+        temp_data[col] = temp_data[col].apply(_replace_empty_strings)
     # Date cleanup
     date_columns = [column for column in temp_data.columns if "date" in column]
     for col in date_columns:
-        temp_data[col] = temp_data[col].apply(replace_nat)
+        temp_data[col] = temp_data[col].astype('object')
+        tlogg.info(f'Cleaning Null Dates from Column: {col}')
+        temp_data[col] = _replace_nat(temp_data[col])
     return temp_data
 
 
 def drop_unnamed_columns(df:pd.DataFrame)->pd.DataFrame:
     keep_columns = [col for col in df.columns if len(col)>0]
     return df[keep_columns].copy()
+
+
+def dates_to_string(df:pd.DataFrame)->pd.DataFrame:
+    temp_data = df.copy()
+    date_columns = [column for column in temp_data.columns if "date" in column]
+    
+    for column in date_columns:
+        temp_data[column] = temp_data[column].astype('object')
+    return temp_data
