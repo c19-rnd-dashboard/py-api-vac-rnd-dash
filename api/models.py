@@ -165,33 +165,23 @@ class Milestone(Base):
     __tablename__ = "milestone"
     _class_name = 'Milestone'
 
-    name = Column(String, primary_key=True, nullable=False)
+    milestone_id = Column(Integer, primary_key=True, nullable=False)
+    name = Column(String, nullable=False)
     category = Column(String)
 
+    productmilestones = relationship('ProductMilestone', back_populates='milestone')
 
-class ProductMilestone(ProductRaw):
+class ProductMilestone(Base):
     __tablename__ = "productmilestone"
     _class_name = 'ProductMilestone'
 
-    id = Column(Integer, primary_key=True)
-    milestone_name = Column(String, ForeignKey("milestone.name"))
-    product_id = Column(Integer, ForeignKey("productraw.product_id"))
-    date_start = Column(DateTime)
-    date_end = Column(DateTime)
-    milestone_status = Column(String)
+    link_id = Column(Integer, primary_key=True)
+    milestone_id = Column(Integer, ForeignKey("milestone.milestone_id"))
+    product_id = Column(Integer, nullable=False)
+    date = Column(DateTime, nullable=True)
+    status = Column(String, nullable=True)
 
-
-class TrialMilestone(TrialRaw):
-    __tablename__ = "trialmilestone"
-    _class_name = 'TrialMilestone'
-
-    id = Column(Integer, primary_key=True)
-    milestone_name = Column(String, ForeignKey("milestone.name"))
-    trial_id = Column(String, ForeignKey("trialraw.trial_id"))
-    date_start = Column(DateTime)
-    date_end = Column(DateTime)
-    status = Column(String)
-
+    milestone = relationship('Milestone', back_populates='productmilestones')
 
 
 class Sponsor(Base):

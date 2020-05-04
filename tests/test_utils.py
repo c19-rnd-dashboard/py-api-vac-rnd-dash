@@ -7,6 +7,7 @@ Basic Unittests for application utilities
 from flask_testing import LiveServerTestCase
 import unittest
 from api.utils import run_ingest
+from data import factory_countries, factory_milestones
 
 from api import create_app
 
@@ -18,11 +19,8 @@ class IngestTest(LiveServerTestCase):
     def setUp(self):
         self.test_trial_url = 'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-03-25.csv'
         self.test_product_url = 'https://raw.githubusercontent.com/c19-rnd-dashboard/py-api-vac-rnd-dash/master/data/vaccines/vaccineworkfile2.csv'
-
-    # def test_product_ingest(self):  # Need fuller transformer assignment.  
-    #     category = 'product'
-    #     error = run_ingest(source=self.test_product_url, category=category)
-    #     self.assertIsNone(error)
+        self.test_factory_milestones = factory_milestones
+        self.test_factory_countries = factory_countries
 
     def test_trial_ingest(self):
         category = 'trial'
@@ -34,6 +32,14 @@ class IngestTest(LiveServerTestCase):
         loader = "unfiltered_csv"
         error = run_ingest(source=self.test_product_url, category=category, loader=loader)
         self.assertIsNone(error)
+
+    def test_object_ingest_countries(self):
+        error_a = run_ingest(source=self.test_factory_countries, category='country')
+        self.assertIsNone(error_a)
+
+    def test_object_ingest_milestones(self):
+        error_b = run_ingest(source=self.test_factory_milestones, category='milestone')
+        self.assertIsNone(error_b)
 
 
 if __name__ == "__main__":

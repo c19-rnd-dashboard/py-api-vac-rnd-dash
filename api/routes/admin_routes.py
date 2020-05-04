@@ -1,6 +1,6 @@
 from api.utils.ingest import run_ingest
 from api.db import init_db
-from data import reference_tables
+from data import factory_countries, factory_milestones
 from flask import render_template, Blueprint, request, jsonify, current_app
 from markdown2 import Markdown
 import os
@@ -91,6 +91,14 @@ def run_database_update():
     # # Load factory tables
     # # Run known ingest
     jobs = [
+        ('milestone',
+        factory_milestones,
+        {}
+        ),
+        ('country',
+        factory_countries,
+        {}
+        ),
         ('product', 
         'https://raw.githubusercontent.com/c19-rnd-dashboard/py-api-vac-rnd-dash/master/data/vaccines/vaccineworkfile2.csv',
         {'loader': "unfiltered_csv"}
@@ -99,14 +107,6 @@ def run_database_update():
         'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-04-07.csv',
         {}
         ),
-        ('milestone',
-        reference_tables.milestones,
-        {}
-        ),
-        ('country',
-        reference_tables.countries,
-        {}
-        )
     ]
     for job in jobs:
         run_ingest(category=job[0], source=job[1], **job[2])

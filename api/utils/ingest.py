@@ -160,6 +160,7 @@ def assign_product_transforms(**kwargs):
         null_transform,
         make_subset_ingest(model=Sponsor, columns=['Sponsor', 'Source?']),
         make_subset_ingest(model=ProductSponsor, columns=['ID', 'Sponsor', 'Source?']),
+        make_subset_ingest(model=ProductMilestone, columns=list(get_milestone_renaming_schema().keys())),
         clean_product_raw,
         make_column_filter(ProductRaw),
         cast_dates,
@@ -190,6 +191,20 @@ def assign_productsponsor_transforms(**kwargs):
     ]
 listRegistry.register(assign_productsponsor_transforms)
 
+
+##################
+### Milestones ###
+##################
+
+def assign_productmilestone_transforms(**kwargs):
+    return [
+        milestone_transformer,
+        cast_dates,
+        dates_to_string,
+        clean_null,
+        make_column_filter(ProductMilestone)
+    ]
+listRegistry.register(assign_productmilestone_transforms)
 
 ######################
 ### Factory Tables ###
