@@ -91,20 +91,20 @@ def run_database_update():
     # # Load factory tables
     # # Run known ingest
     jobs = [
-        ('product', 
-        'https://raw.githubusercontent.com/c19-rnd-dashboard/py-api-vac-rnd-dash/master/data/vaccines/vaccineworkfile2.csv',
-        {'loader': "unfiltered_csv"}
-        ),
-        ('trial', 
-        'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-04-07.csv',
-        {}
-        ),
         ('milestone',
         factory_milestones,
         {}
         ),
         ('country',
         factory_countries,
+        {}
+        ),
+        ('product', 
+        'https://raw.githubusercontent.com/c19-rnd-dashboard/py-api-vac-rnd-dash/master/data/vaccines/vaccineworkfile2.csv',
+        {'loader': "unfiltered_csv"}
+        ),
+        ('trial', 
+        'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-04-07.csv',
         {}
         ),
     ]
