@@ -2,6 +2,11 @@ from flask import render_template, Blueprint, request, jsonify
 from api.models import *
 from api.db import get_session
 from api.utils.serializer import DictionarySerializer
+from api.utils.transform import (
+    fetch_value, 
+    get_product_sponsors, condense_sponsors,
+    get_product_milestones, condense_milestones
+)
 from api.cache import cache
 from sqlalchemy import or_, and_
 import logging
@@ -64,25 +69,6 @@ def products():
 
 
 
-def condense_sponsors(sponsor_results):
-    # Requires sponsors in the form (product_id, sponsor_id, sponsor_name)
-    unique_ids = sorted(list(set(result[0] for result in sponsor_results)))
-    sponsor_dict= {}
-    [sponsor_dict.update({unique_id:[]}) for unique_id in unique_ids]
-    for result in sponsor_results:
-        prod_id = result[0]
-        spon_id = result[1]
-        spon_name = result[2]
-        sponsor_info = {'sponsorId': spon_id, 'sponsorName': spon_name}
-        sponsor_dict[prod_id] = sponsor_dict[prod_id] + [sponsor_info]
-    return sponsor_dict
-
-def fetch_value(dictionary, key):
-    if key in dictionary:
-        return dictionary[key]
-    else:
-        return []
-
 @covid_dash.route("/assets")
 @cache.cached(timeout=6000)
 def assets():
@@ -91,15 +77,15 @@ def assets():
         assets = session.query(ProductRaw).all()
         # Serialize the assets 
         serialized_assets = [ccase_serializer.transform(item.json) for item in assets]
-        # Bring in other data via joins and lookups
-        # Sponsors #
-        sponsors_info = session.query(ProductSponsor.product_id, Sponsor.sponsor_id, Sponsor.sponsor_name).join(ProductSponsor).all()
-        sponsors = condense_sponsors(sponsors_info)
+        # Sponsors
+        sponsors = condense_sponsors(get_product_sponsors())
+        # Milestones
+        milestones = condense_milestones(get_product_milestones())
 
-        for asset in serialized_assets:
-            asset_sponsors = fetch_value(sponsors, asset['productId'])
-            asset['sponsors'] = asset_sponsors
-            asset['sources'] = asset['sources'].split(',')
+    for asset in serialized_assets:
+        asset['sponsors'] = fetch_value(sponsors, asset['productId'])
+        asset['milestones'] = fetch_value(milestones, asset['productId'])
+        asset['sources'] = asset['sources'].split(',')
     return jsonify(serialized_assets)
 
 

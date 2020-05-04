@@ -1,3 +1,4 @@
+import pandas as pd
 from sqlalchemy import inspect
 from api.models import *
 from api.db import get_session
@@ -23,3 +24,17 @@ def get_sponsors():
     return pd.DataFrame(sponsors, columns=['sponsor_id', 'sponsor_name'])
 
 
+def get_product_sponsors():
+    with get_session() as session:
+        sponsors_info = session.query(ProductSponsor.product_id, Sponsor.sponsor_id, Sponsor.sponsor_name).join(ProductSponsor).all()
+    return sponsors_info
+
+
+def get_product_milestones():
+    """ Get all product_milestones currently in DB"""
+    with get_session() as session:
+        milesone_info = session.query(
+            ProductMilestone.link_id,
+            ProductMilestone.product_id, ProductMilestone.milestone_id, ProductMilestone.date, ProductMilestone.status,
+            Milestone.name, Milestone.category).join(ProductMilestone).all()
+    return pd.DataFrame(milesone_info, columns=['link_id', 'product_id', 'milestone_id', 'date', 'status', 'name', 'category'])

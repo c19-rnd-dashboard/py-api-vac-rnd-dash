@@ -91,6 +91,9 @@ def build_link_id(dataframe: pd.DataFrame) -> pd.DataFrame:
     dataframe['link_id'] = dataframe.index.tolist()
     return dataframe
 
+def drop_unavailable_milestones(dataframe: pd.DataFrame) -> pd.DataFrame:
+    temp = dataframe[dataframe.status.notna()]
+    return temp
 
 def milestone_transformer(dataframe: pd.DataFrame) -> pd.DataFrame:
     clean_data = clean_rename_data(dataframe, get_milestone_renaming_schema())
@@ -101,4 +104,4 @@ def milestone_transformer(dataframe: pd.DataFrame) -> pd.DataFrame:
     )
     build_status(formatted_data)
     build_link_id(formatted_data)
-    return formatted_data
+    return drop_unavailable_milestones(formatted_data)
