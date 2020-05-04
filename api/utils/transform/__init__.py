@@ -10,4 +10,4 @@ from .transforms import (
     prep_product_sponsors, 
     prep_sponsors)
 
-from .milestones import milestone_transformer
+from .milestones import milestone_transformer, get_milestone_renaming_schema

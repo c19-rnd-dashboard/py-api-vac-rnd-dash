@@ -99,3 +99,11 @@ def write_productsponsor(data: pd.DataFrame):
     """
     writelogger.info('Building ProductSponsor writer.')
     run_write(data=data, model=ProductSponsor)
+
+
+def write_productmilestone(data: pd.DataFrame):
+    """
+    Adds a DataFrame of product milestones to the db and ProductMilestone instances.
+    """
+    writelogger.info('Building ProductMilestone writer.')
+    run_write(data=data, model=ProductMilestone)
