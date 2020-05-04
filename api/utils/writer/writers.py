@@ -31,15 +31,9 @@ class Write(Query):
     def execute(self, **params):
 
 
-<< << << < HEAD
    writelogger.info(
        f'Starting write execution. Processing stack of: {len(self.data)}')
     with get_session(context=False) as session:
-== == == =
-   writelogger.info(
-        f'Starting write execution. Processing stack of: {len(self.data)}')
-    with get_session() as session:
->>>>>> > b02bdff... add writer
    for record in self.dataframe_to_dict(self.data):
         self.make_or_update(
             model=self.model,
