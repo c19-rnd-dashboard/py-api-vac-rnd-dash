@@ -6,6 +6,7 @@ Database
 
 
 from sqlalchemy import create_engine
+from sqlalchemy.pool import NullPool
 from sqlalchemy.orm import sessionmaker, scoped_session
 import sys
 from decouple import config
@@ -31,7 +32,7 @@ def get_db(context=True):
         if 'db' not in g:
             db_logger.info('DB connection not found. Attempting connection to {}.'.format(current_app.config['DATABASE_URI']))
             try:
-                g.engine = create_engine(current_app.config['DATABASE_URI'])
+                g.engine = create_engine(current_app.config['DATABASE_URI'], poolclass=NullPool)
                 g.db = g.engine.connect()
             except:
                 db_logger.error('Could not establish connection.  Aborting.')
@@ -41,7 +42,7 @@ def get_db(context=True):
     else:
         db_logger.info("Creating new database connection without app context.")
         db_logger.info('DB connection not found. Attempting connection to {}.'.format(config('DATABASE_URI')))
-        engine = create_engine(config('DATABASE_URI'))
+        engine = create_engine(config('DATABASE_URI'), poolclass=NullPool)
         return engine.connect()
 
 
@@ -55,7 +56,6 @@ def get_session(context=True):
         yield session
     finally:
         session.close()
-        db.close()  # May fix issues with connections to database remaining open, but not force connection closure until session activity completes
 
 
 def close_db(e=None):
