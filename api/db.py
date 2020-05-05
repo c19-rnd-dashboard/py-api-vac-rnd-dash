@@ -29,7 +29,7 @@ def get_db(context=True):
 
     if context == True:
         if 'db' not in g:
-            db_logger.info('DB connection not found. Attempting connection to {}.'.format(config('DATABASE_URI')))
+            db_logger.info('DB connection not found. Attempting connection to {}.'.format(current_app.config['DATABASE_URI']))
             try:
                 g.engine = create_engine(current_app.config['DATABASE_URI'])
                 g.db = g.engine.connect()
@@ -49,13 +49,13 @@ def get_db(context=True):
 def get_session(context=True):
     # Setup session with thread engine.
     #   Allows for usage: with get_session() as session: session...
-    engine = get_db(context)
-    session = scoped_session(sessionmaker(bind=engine))
+    db = get_db(context)
+    session = scoped_session(sessionmaker(bind=db))
     try:
         yield session
     finally:
         session.close()
-        close_db()  # May fix issues with connections to database remaining open, but not force connection closure until session activity completes
+        db.close()  # May fix issues with connections to database remaining open, but not force connection closure until session activity completes
 
 
 def close_db(e=None):
