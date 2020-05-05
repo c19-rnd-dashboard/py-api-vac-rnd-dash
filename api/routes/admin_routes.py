@@ -44,6 +44,7 @@ def get_ingest():
             # Check for kwargs
             if 'kwargs' in ingest_request:
               kwargs = ingest_request['kwargs']
+              routelogger.info(f'KWARGS received {kwargs}')
             else:
               kwargs = {}
             job = q.enqueue_call(

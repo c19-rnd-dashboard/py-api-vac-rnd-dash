@@ -28,6 +28,7 @@ tlogg = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 def clean_product_raw(data: pd.DataFrame):
     assert type(data) == pd.DataFrame
     assert len(data) > 0
+    tlogg.info("Starting clean_product_raw")
     # Drop columns with no name (assume no data or not relevant)
     temp_data = drop_unnamed_columns(data).copy()
     # Rename columns to db format/names
@@ -73,6 +74,7 @@ def clean_product_raw(data: pd.DataFrame):
 
     # Clean Sources and append to data rows
     def get_unique_sources(row_list:list)->dict:
+        tlogg.info('Getting unique sources.')
         url_list = []
         for item in row_list:
             if ('http' in item):
@@ -86,6 +88,7 @@ def clean_product_raw(data: pd.DataFrame):
         }
 
     def clean_valid_sources(df:pd.DataFrame):
+        tlogg.info('Cleaning valid sources.')
         data_rows = df.query("source == 'No'")
         source_rows = df.query("source == 'Yes'")
         
@@ -102,6 +105,7 @@ def clean_product_raw(data: pd.DataFrame):
 
     # Infer preferred_name from other names
     def build_missing_preferred_names(df:pd.DataFrame)->pd.DataFrame:
+        tlogg.info('Build missing preferred names')
         def clean_(item):
             teststr = item
             return teststr.translate(str.maketrans('', '', string.punctuation)).replace(' ', '_')
@@ -139,7 +143,9 @@ def clean_product_raw(data: pd.DataFrame):
             return x
 
     for col in temp_data.columns[temp_data.dtypes == object]:
+        tlogg.info('Standardizing string formats.')
         temp_data[col] = temp_data[col].apply(lower)
+        tlogg.info('Standardsizing list formats.')
         temp_data[col] = temp_data[col].apply(clean_lists)
 
     # Finally, return the prepared dataframe
@@ -175,7 +181,7 @@ def infer_trial_products(data: pd.DataFrame):
 
 
 def trial_cleaner(data: pd.DataFrame):
-    df = data
+    df = data.copy()
     tlogg.info("Starting trial_cleaner.")
 
     def lower(x):
@@ -219,7 +225,9 @@ def trial_cleaner(data: pd.DataFrame):
     # Apply function
     df = rename_cols(df)
     for col in df.columns[df.dtypes == object]:
+        tlogg.info('Standardizing string formats.')
         df[col] = df[col].apply(lower)
+        tlogg.info('Standardsizing list formats.')
         df[col] = df[col].apply(clean_lists)
 
     df["country_codes"] = df["countries"].apply(clean_country)
@@ -283,6 +291,7 @@ def prep_product_sponsors(data: pd.DataFrame)-> pd.DataFrame:
 
 
 def prep_sponsors(data: pd.DataFrame) -> pd.DataFrame:
+    tlogg.info("Starting prep_sponsors")
     tlogg.info(f"Transforming frame of shape {data.shape} and columns {data.columns}")
     def filter_raw(df: pd.DataFrame)->np.array:
         data_rows = df[df['Source?'] == 'No']

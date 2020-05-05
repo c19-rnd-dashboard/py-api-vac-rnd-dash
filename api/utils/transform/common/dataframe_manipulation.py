@@ -14,6 +14,7 @@ tlogg = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
 def filter_columns(data: pd.DataFrame, model, columns: list = None):
     """ Return only columns that match filter from DataFrame """
+    tlogg.info('filter_columns')
     if columns is not None:
         return data[columns]
     else:
@@ -25,6 +26,7 @@ def filter_columns(data: pd.DataFrame, model, columns: list = None):
 
 
 def cast_dates(data: pd.DataFrame):
+    tlogg.info('cast_dates')
     """ Check for date columns and cast objects as datetime """
     tlogg.info("Starting date casting")
     temp_data = data.copy()
@@ -35,6 +37,7 @@ def cast_dates(data: pd.DataFrame):
 
 
 def clean_null(data: pd.DataFrame):
+    tlogg.info('clean_null')
     # Force all null values to None rather than mixed type with np.nan, NaT
     def _replace_nat(series:pd.Series)->pd.Series:
         new_series = series.mask(series.isnull(), None)
@@ -59,11 +62,13 @@ def clean_null(data: pd.DataFrame):
 
 
 def drop_unnamed_columns(df:pd.DataFrame)->pd.DataFrame:
+    tlogg.info('drop_unnamed_columns')
     keep_columns = [col for col in df.columns if len(col)>0]
     return df[keep_columns].copy()
 
 
 def dates_to_string(df:pd.DataFrame)->pd.DataFrame:
+    tlogg.info('dates_to_string')
     temp_data = df.copy()
     date_columns = [column for column in temp_data.columns if "date" in column]
     
