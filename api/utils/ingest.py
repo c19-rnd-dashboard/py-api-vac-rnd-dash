@@ -103,17 +103,9 @@ def run_ingest(source, category: str, **kwargs):
     ingestlogger.info(f"Ingest completed in {time() - job.start_time}")
 
 
-#########################
-### Common Transforms ###
-#########################
-
-
-def null_transform(data: pd.DataFrame):
-    return data
-
-
-def make_column_filter(model):
-    return partial(filter_columns, model=model)
+###################
+### Common Util ###
+###################
 
 
 def make_subset_ingest(model, columns: list = None):
@@ -168,7 +160,7 @@ def assign_product_transforms(**kwargs):
         make_subset_ingest(model=ProductMilestone, columns=list(
             get_milestone_renaming_schema().keys())),
         make_subset_ingest(model=SiteLocation, columns=[
-            'ID', 'Sites Locations']),
+            'ID', 'Sites Locations', 'Source?']),
         clean_product_raw,
         make_column_filter(ProductRaw),
         cast_dates,
