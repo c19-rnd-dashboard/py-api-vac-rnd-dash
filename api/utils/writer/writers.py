@@ -10,8 +10,11 @@ import pandas as pd
 
 from api.models import *
 from api.db import get_session
+from api.utils.transform import make_column_filter
 from functools import partial
 from .query import Query
+
+
 
 import logging
 
@@ -112,4 +115,7 @@ def write_productmilestone(data: pd.DataFrame):
 
 def write_sitelocation(data: pd.DataFrame):
     writelogger.info('Building SiteLocation writer.')
-    run_write(data=data, model=SiteLocation)
+    sitelocation_filter = make_column_filter(model=SiteLocation)
+    productsitelocation_filter = make_column_filter(model=ProductSiteLocation)
+    run_write(data=sitelocation_filter(data), model=SiteLocation)
+    run_write(data=productsitelocation_filter(data), model=ProductSiteLocation)

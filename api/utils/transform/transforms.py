@@ -344,4 +344,9 @@ def prep_sponsors(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def prep_product_sitelocation(data: pd.DataFrame):
-    return Geolocation.transform(data)
+    tlogg.info("Starting prep_product_sitelocations")
+    tlogg.info(
+        f"Transforming frame of shape {data.shape} and columns {data.columns}")
+    ndata = data[data['Source?'] == 'No'].copy()
+    ndata = ndata[['ID', 'Sites Locations']]
+    return Geolocation.transform(ndata)

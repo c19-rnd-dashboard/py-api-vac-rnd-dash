@@ -5,5 +5,6 @@ from .writers import (
     write_milestone,
     write_sponsor,
     write_productsponsor,
-    write_productmilestone)
+    write_productmilestone,
+    write_sitelocation,)
 from .query import Query
