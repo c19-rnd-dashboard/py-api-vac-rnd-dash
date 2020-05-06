@@ -11,7 +11,7 @@ def get_columns(model):
     return column_names
 
 
-def get_product_names():
+def get_product_names(context=False):
     """ Get all product preferred names currently in raw """
     with get_session() as session:
         prod_names = session.query(ProductRaw.preferred_name).all()
