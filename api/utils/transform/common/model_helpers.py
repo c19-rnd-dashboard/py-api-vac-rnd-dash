@@ -46,3 +46,15 @@ def get_product_milestones():
 def get_site_locations():
     with get_session() as session:
         return session.query(SiteLocation).all()
+
+def get_product_locations():
+    with get_session() as session:
+        location_info = session.query(
+            ProductSiteLocation.link_id,
+            ProductSiteLocation.product_id, ProductSiteLocation.site_location_id,
+            SiteLocation.name, SiteLocation.city, SiteLocation.state, SiteLocation.country,
+            SiteLocation.lat, SiteLocation.lng
+        ).join(ProductSiteLocation).all()
+    return pd.DataFrame(location_info, columns=[
+        'link_id', 'product_id', 'site_location_id', 'name', 'city', 'state', 'country', 'lat', 'lng',
+    ])

@@ -114,5 +114,9 @@ def write_productmilestone(data: pd.DataFrame):
 
 
 def write_sitelocation(data: pd.DataFrame):
+    location_filter = make_column_filter(model=SiteLocation)
+    product_location_filter = make_column_filter(model=ProductSiteLocation)
     writelogger.info('Building SiteLocation writer.')
-    run_write(data=data, model=SiteLocation)
+    run_write(data=location_filter(data), model=SiteLocation)
+    writelogger.info('Building ProductSiteLocation writer.')
+    run_write(data=product_location_filter(data), model=ProductSiteLocation)

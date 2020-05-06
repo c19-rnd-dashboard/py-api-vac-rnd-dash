@@ -219,7 +219,6 @@ class SiteLocation(Base):
     _class_name = 'SiteLocation'
 
     site_location_id = Column(String, primary_key=True)
-    product_id = Column(Integer)
     name = Column(String, nullable=False)
     city = Column(String)
     state = Column(String)
@@ -227,8 +226,24 @@ class SiteLocation(Base):
     lat = Column(Float, nullable=False)
     lng = Column(Float, nullable=False)
 
-    def to_dict(self):
+    products = relationship('ProductSiteLocation', back_populates='sitelocation')
+
+    @property
+    def json(self):
         return to_dict(self, self.__class__)
 
-    def to_json(self):
-        return json.dumps(self.to_dict())
+
+
+class ProductSiteLocation(Base):
+    __tablename__ = 'productsitelocation'
+    _class_name = 'ProductSiteLocation'
+
+    link_id = Column(Integer, primary_key=True)
+    site_location_id = Column(String, ForeignKey('sitelocation.site_location_id'))
+    product_id = Column(Integer)
+
+    sitelocation = relationship('SiteLocation', back_populates='products')
+
+    @property
+    def json(self):
+        return to_dict(self, self.__class__)

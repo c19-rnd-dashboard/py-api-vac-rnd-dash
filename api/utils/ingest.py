@@ -207,7 +207,6 @@ listRegistry.register(assign_productsponsor_transforms)
 def assign_sitelocation_transforms(**kwargs):
     return [
         prep_product_sitelocation,
-        make_column_filter(SiteLocation),
     ]
 
 

@@ -75,7 +75,6 @@ def clean_product_raw(data: pd.DataFrame):
 
     # Clean Sources and append to data rows
     def get_unique_sources(row_list: list) -> dict:
-        tlogg.info('Getting unique sources.')
         url_list = []
         for item in row_list:
             if ('http' in item):
@@ -89,7 +88,6 @@ def clean_product_raw(data: pd.DataFrame):
         }
 
     def clean_valid_sources(df: pd.DataFrame):
-        tlogg.info('Cleaning valid sources.')
         data_rows = df.query("source == 'No'")
         source_rows = df.query("source == 'Yes'")
 
@@ -107,7 +105,6 @@ def clean_product_raw(data: pd.DataFrame):
 
     # Infer preferred_name from other names
     def build_missing_preferred_names(df: pd.DataFrame) -> pd.DataFrame:
-        tlogg.info('Build missing preferred names')
 
         def clean_(item):
             teststr = item
@@ -226,9 +223,7 @@ def trial_cleaner(data: pd.DataFrame):
     # Apply function
     df = rename_cols(df)
     for col in df.columns[df.dtypes == object]:
-        tlogg.info('Standardizing string formats.')
         df[col] = df[col].apply(lower)
-        tlogg.info('Standardsizing list formats.')
         df[col] = df[col].apply(clean_lists)
 
     df["country_codes"] = df["countries"].apply(clean_country)
@@ -344,15 +339,16 @@ def prep_sponsors(data: pd.DataFrame) -> pd.DataFrame:
         generate_sponsor_id)
     return prepared_sponsors
 
+def _add_index_as_col(dataframe:pd.DataFrame, col_name) -> pd.DataFrame:
+    tlogg.info(f'Adding Column {col_name} to dataframe')
+    temp = dataframe.copy()
+    temp[col_name] = np.array(temp.index.values)
+    return temp
 
 def prep_product_sitelocation(data: pd.DataFrame):
-<<<<<<< HEAD
     tlogg.info("Starting prep_product_sitelocations")
     tlogg.info(
         f"Transforming frame of shape {data.shape} and columns {data.columns}")
     ndata = data[data['Source?'] == 'No'].copy()
     ndata = ndata[['ID', 'Sites Locations']]
-    return Geolocation.transform(ndata)
-=======
-    return Geolocation.transform(data)
->>>>>>> 0be3f42300e5dcb18e5aa28deeca61865c41f7a0
+    return _add_index_as_col(Geolocation.transform(ndata), 'link_id')
