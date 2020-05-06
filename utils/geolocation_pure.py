@@ -58,7 +58,6 @@ def _map_record_to_locations(get_location):
             result = [assign_prop('product_id', product_id, address)
                       for address in site_locations]
             for index in range(len(result)):
-                print(addresses[index]+str(product_id))
                 result[index]['site_location_id'] = generate_hash(
                     addresses[index]+str(product_id))
             return result
