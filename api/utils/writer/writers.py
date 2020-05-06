@@ -115,7 +115,11 @@ def write_productmilestone(data: pd.DataFrame):
 
 def write_sitelocation(data: pd.DataFrame):
     writelogger.info('Building SiteLocation writer.')
+<<<<<<< HEAD
     sitelocation_filter = make_column_filter(model=SiteLocation)
     productsitelocation_filter = make_column_filter(model=ProductSiteLocation)
     run_write(data=sitelocation_filter(data), model=SiteLocation)
     run_write(data=productsitelocation_filter(data), model=ProductSiteLocation)
+=======
+    run_write(data=data, model=SiteLocation)
+>>>>>>> 0be3f42300e5dcb18e5aa28deeca61865c41f7a0

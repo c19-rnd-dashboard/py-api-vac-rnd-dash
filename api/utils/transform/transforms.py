@@ -75,6 +75,10 @@ def clean_product_raw(data: pd.DataFrame):
 
     # Clean Sources and append to data rows
     def get_unique_sources(row_list: list) -> dict:
+<<<<<<< HEAD
+=======
+        tlogg.info('Getting unique sources.')
+>>>>>>> 0be3f42300e5dcb18e5aa28deeca61865c41f7a0
         url_list = []
         for item in row_list:
             if ('http' in item):
@@ -88,6 +92,10 @@ def clean_product_raw(data: pd.DataFrame):
         }
 
     def clean_valid_sources(df: pd.DataFrame):
+<<<<<<< HEAD
+=======
+        tlogg.info('Cleaning valid sources.')
+>>>>>>> 0be3f42300e5dcb18e5aa28deeca61865c41f7a0
         data_rows = df.query("source == 'No'")
         source_rows = df.query("source == 'Yes'")
 
@@ -105,6 +113,11 @@ def clean_product_raw(data: pd.DataFrame):
 
     # Infer preferred_name from other names
     def build_missing_preferred_names(df: pd.DataFrame) -> pd.DataFrame:
+<<<<<<< HEAD
+=======
+        tlogg.info('Build missing preferred names')
+
+>>>>>>> 0be3f42300e5dcb18e5aa28deeca61865c41f7a0
         def clean_(item):
             teststr = item
             return teststr.translate(str.maketrans('', '', string.punctuation)).replace(' ', '_')
@@ -344,9 +357,13 @@ def prep_sponsors(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def prep_product_sitelocation(data: pd.DataFrame):
+<<<<<<< HEAD
     tlogg.info("Starting prep_product_sitelocations")
     tlogg.info(
         f"Transforming frame of shape {data.shape} and columns {data.columns}")
     ndata = data[data['Source?'] == 'No'].copy()
     ndata = ndata[['ID', 'Sites Locations']]
     return Geolocation.transform(ndata)
+=======
+    return Geolocation.transform(data)
+>>>>>>> 0be3f42300e5dcb18e5aa28deeca61865c41f7a0

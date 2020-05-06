@@ -1,5 +1,5 @@
 from .writers import (
-    write_trial, 
+    write_trial,
     write_product,
     write_country,
     write_milestone,
@@ -7,4 +7,5 @@ from .writers import (
     write_productsponsor,
     write_productmilestone,
     write_sitelocation,)
+
 from .query import Query
