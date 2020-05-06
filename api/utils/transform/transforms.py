@@ -75,10 +75,7 @@ def clean_product_raw(data: pd.DataFrame):
 
     # Clean Sources and append to data rows
     def get_unique_sources(row_list: list) -> dict:
-<<<<<<< HEAD
-=======
         tlogg.info('Getting unique sources.')
->>>>>>> 0be3f42300e5dcb18e5aa28deeca61865c41f7a0
         url_list = []
         for item in row_list:
             if ('http' in item):
@@ -92,10 +89,7 @@ def clean_product_raw(data: pd.DataFrame):
         }
 
     def clean_valid_sources(df: pd.DataFrame):
-<<<<<<< HEAD
-=======
         tlogg.info('Cleaning valid sources.')
->>>>>>> 0be3f42300e5dcb18e5aa28deeca61865c41f7a0
         data_rows = df.query("source == 'No'")
         source_rows = df.query("source == 'Yes'")
 
@@ -113,11 +107,8 @@ def clean_product_raw(data: pd.DataFrame):
 
     # Infer preferred_name from other names
     def build_missing_preferred_names(df: pd.DataFrame) -> pd.DataFrame:
-<<<<<<< HEAD
-=======
         tlogg.info('Build missing preferred names')
 
->>>>>>> 0be3f42300e5dcb18e5aa28deeca61865c41f7a0
         def clean_(item):
             teststr = item
             return teststr.translate(str.maketrans('', '', string.punctuation)).replace(' ', '_')
@@ -155,9 +146,7 @@ def clean_product_raw(data: pd.DataFrame):
             return x
 
     for col in temp_data.columns[temp_data.dtypes == object]:
-        tlogg.info('Standardizing string formats.')
         temp_data[col] = temp_data[col].apply(lower)
-        tlogg.info('Standardsizing list formats.')
         temp_data[col] = temp_data[col].apply(clean_lists)
 
     # Finally, return the prepared dataframe

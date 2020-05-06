@@ -108,10 +108,6 @@ def run_ingest(source, category: str, **kwargs):
 ###################
 
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 0be3f42300e5dcb18e5aa28deeca61865c41f7a0
 def make_subset_ingest(model, columns: list = None):
     # Run subset ingest and return unaltered data
     ingestlogger.info(f"Beginning subset ingest of: {model._class_name}")
@@ -164,11 +160,7 @@ def assign_product_transforms(**kwargs):
         make_subset_ingest(model=ProductMilestone, columns=list(
             get_milestone_renaming_schema().keys())),
         make_subset_ingest(model=SiteLocation, columns=[
-<<<<<<< HEAD
             'ID', 'Sites Locations', 'Source?']),
-=======
-            'ID', 'Sites Locations']),
->>>>>>> 0be3f42300e5dcb18e5aa28deeca61865c41f7a0
         clean_product_raw,
         make_column_filter(ProductRaw),
         cast_dates,

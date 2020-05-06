@@ -132,10 +132,7 @@ def update_db():
             return "Verification Failed.  Database not updated."
 
 
-<<<<<<< HEAD
-=======
 @admin_routes.route('/test', methods=['GET'])
->>>>>>> 0be3f42300e5dcb18e5aa28deeca61865c41f7a0
 def test_func():
     run_ingest(category='product', source='https://raw.githubusercontent.com/c19-rnd-dashboard/py-api-vac-rnd-dash/master/data/vaccines/vaccineworkfile2.csv', **{})
     return 'Test Success!!'
