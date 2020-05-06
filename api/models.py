@@ -8,11 +8,7 @@ On relationship with Base/Inheritance
 https://docs.sqlalchemy.org/en/13/orm/inheritance.html#joined-table-inheritance
 """
 
-from sqlalchemy.ext.declarative import declarative_base
-import json
-
-Base = declarative_base()
-
+from sqlalchemy.orm import relationship
 from sqlalchemy import (
     Column,
     Integer,
@@ -25,7 +21,10 @@ from sqlalchemy import (
     UniqueConstraint,
     ForeignKeyConstraint,
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base
+import json
+
+Base = declarative_base()
 
 
 ### Helper Functions ##
@@ -35,7 +34,7 @@ def to_dict(inst, cls):
     Convert the sql alchemy query result to a clean python dictionary.
     """
     convert = dict()
-    # add your coversions for things like datetime's 
+    # add your coversions for things like datetime's
     # and what-not that aren't serializable.
     d = dict()
     for c in cls.__table__.columns:
@@ -44,7 +43,8 @@ def to_dict(inst, cls):
             try:
                 d[c.name] = convert[c.type](v)
             except:
-                d[c.name] = "Error:  Failed to covert using ", str(convert[c.type])
+                d[c.name] = "Error:  Failed to covert using ", str(
+                    convert[c.type])
         elif v is None:
             d[c.name] = str()
         else:
@@ -88,14 +88,11 @@ class ProductRaw(Base):
     product_type = Column(String)
     trial_id = Column(String)
     num_sites = Column(String)
-    site_locations = Column(Text)
     sources = Column(String)
-
 
     @property
     def json(self):
         return to_dict(self, self.__class__)
-
 
 
 class TrialRaw(Base):
@@ -108,7 +105,8 @@ class TrialRaw(Base):
         # print(new_id)  # DEBUG
         return new_id
 
-    trial_id = Column(String, primary_key=True, nullable=False, default=id_default)
+    trial_id = Column(String, primary_key=True,
+                      nullable=False, default=id_default)
     preferred_name = Column(String)
     title = Column(String)
     registry = Column(String)
@@ -148,6 +146,7 @@ class TrialRaw(Base):
             "results_link": self.results_link,
             "phase_num": self.get_phase_num(self.phase),
             "phase": self.phase,
+            "site_locations": self.get_site_locations(),
         }
 
     def get_phase_num(self, phase):
@@ -169,7 +168,9 @@ class Milestone(Base):
     name = Column(String, nullable=False)
     category = Column(String)
 
-    productmilestones = relationship('ProductMilestone', back_populates='milestone')
+    productmilestones = relationship(
+        'ProductMilestone', back_populates='milestone')
+
 
 class ProductMilestone(Base):
     __tablename__ = "productmilestone"
@@ -192,11 +193,10 @@ class Sponsor(Base):
     sponsor_name = Column(String)
 
     products = relationship('ProductSponsor', back_populates='sponsor')
-    
+
     @property
     def json(self):
         return to_dict(self, self.__class__)
-
 
 
 class ProductSponsor(Base):
@@ -214,168 +214,36 @@ class ProductSponsor(Base):
         return to_dict(self, self.__class__)
 
 
-#######################
-### Adv Data Models ###
-#######################
+class SiteLocation(Base):
+    __tablename__ = 'sitelocation'
+    _class_name = 'SiteLocation'
 
-"""
-class Product(Base):
-    __tablename__ = "product"
+    site_location_id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
+    city = Column(String)
+    state = Column(String)
+    country = Column(String)
+    lat = Column(Float, nullable=False)
+    lng = Column(Float, nullable=False)
 
-    product_id = Column(Integer, primary_key=True)
-    preferred_name = Column(String)
-    chemical_name = Column(String)
-    brand_name = Column(String)
-    repurposed = Column(Boolean)
-    notes = Column(Text)
+    products = relationship('ProductSiteLocation', back_populates='sitelocation')
 
-
-class Trial(Base):
-    __tablename__ = 'trial'
-
-    trial_id = Column(String, primary_key=True)
-    title = Column(String)
-    registry = Column(String)
-    registration_date = Column(DateTime)
-    start_date = Column(DateTime)
-    recruitment_status = Column(String)
+    @property
+    def json(self):
+        return to_dict(self, self.__class__)
 
 
-class Source(Base):
-    __tablename__ = 'source'
 
-    source_id = Column(Integer, primary_key=True)
-    name = Column(String)
-    link = Column(String)
+class ProductSiteLocation(Base):
+    __tablename__ = 'productsitelocation'
+    _class_name = 'ProductSiteLocation'
 
+    link_id = Column(Integer, primary_key=True)
+    site_location_id = Column(String, ForeignKey('sitelocation.site_location_id'))
+    product_id = Column(Integer)
 
-class ProductSource(Product):
-    __tablename__ = 'productsource'
+    sitelocation = relationship('SiteLocation', back_populates='products')
 
-    link_id = Column(Integer, primary_key=True) 
-    source_id = Column(Integer, ForeignKey('source.source_id'))
-    product_id = Column(Integer, ForeignKey('product.product_id'))
-
-
-class TrialSource(Trial):
-    __tablename__ = 'trialsource'
-
-    link_id = Column(Integer, primary_key=True) 
-    source_id = Column(Integer, ForeignKey('source.source_id'))
-    trial_id = Column(String, ForeignKey('trial.trial_id'))
-
-
-class Intervention(Base):
-    __tablename__ = 'intervention'
-    
-    intervention_id = Column(Integer, primary_key=True)
-    intervention_type = Column(String)
-    description = Column(Text)
-
-
-class ProductIntervention(Product):
-    __tablename__ = 'productintervention'
-
-    link_id = Column(Integer, primary_key=True) 
-    intervention_id = Column(Integer, ForeignKey('intervention.intervention_id'))
-    product_id = Column(Integer, ForeignKey('product.product_id'))
-    description = Column(Text)
-
-
-class TrialIntervention(Trial):
-    __tablename__ = 'trialintervention'
-
-    link_id = Column(Integer, primary_key=True) 
-    intervention_id = Column(Integer, ForeignKey('intervention.intervention_id'))
-    trial_id = Column(String, ForeignKey('trial.trial_id'))
-    description = Column(Text)
-
-
-class Sponsor(Base):
-    __tablename__ = 'sponsor'
-
-    sponsor_id = Column(Integer, primary_key=True)
-    full_name = Column(String)
-    short_name = Column(String)
-    link = Column(String)
-
-
-class ProductSponsor(Product):
-    __tablename__ = 'productsponsor'
-
-    link_id = Column(Integer, primary_key=True) 
-    sponsor_id = Column(Integer, ForeignKey('sponsor.sponsor_id'))
-    product_id = Column(Integer, ForeignKey('product.product_id'))
-
-
-class TrialSponsor(Trial):
-    __tablename__ = 'trialsponsor'
-
-    link_id = Column(Integer, primary_key=True) 
-    sponsor_id = Column(Integer, ForeignKey('sponsor.sponsor_id'))
-    trial_id = Column(String, ForeignKey('trial.trial_id'))
-
-
-class Funding(Base):
-    __tablename__ = 'funding'
-
-    funding_id = Column(Integer, primary_key=True)
-    name = Column(String)
-    link = Column(String)
-
-
-class ProductFunding(Product):
-    __tablename__ = 'productfunding'
-
-    link_id = Column(Integer, primary_key=True) 
-    funding_id = Column(Integer, ForeignKey('funding.funding_id'))
-    product_id = Column(Integer, ForeignKey('product.product_id'))
-
-
-class TrialFunding(Trial):
-    __tablename__ = 'trialfunding'
-
-    link_id = Column(Integer, primary_key=True) 
-    funding_id = Column(Integer, ForeignKey('funding.funding_id'))
-    trial_id = Column(String, ForeignKey('trial.trial_id'))
-
-
-class ProductCountry(Product):
-    __tablename__ = 'productcountry'
-
-    link_id = Column(Integer, primary_key=True) 
-    country_name = Column(String, ForeignKey('country.country_name'))
-    product_id = Column(Integer, ForeignKey('product.product_id'))
-
-
-class TrialCountry(Trial):
-    __tablename__ = 'trialcountry'
-
-    link_id = Column(Integer, primary_key=True) 
-    country_name = Column(String, ForeignKey('country.country_name'))
-    trial_id = Column(String, ForeignKey('trial.trial_id'))
-
-
-class Milestone(Base):
-    __tablename__ = 'milestone'
-
-    milestone_id = Column(Integer, primary_key=True)
-    name = Column(String)
-    category = Column(String)
-
-
-class ProductMilestone(Product):
-    __tablename__ = 'productmilestone'
-
-    link_id = Column(Integer, primary_key=True) 
-    milestone_id = Column(Integer, ForeignKey('milestone.milestone_id'))
-    product_id = Column(Integer, ForeignKey('product.product_id'))
-
-
-class TrialMilestone(Trial):
-    __tablename__ = 'trialmilestone'
-
-    link_id = Column(Integer, primary_key=True) 
-    milestone_id = Column(Integer, ForeignKey('milestone.milestone_id'))
-    trial_id = Column(String, ForeignKey('trial.trial_id'))
-"""
+    @property
+    def json(self):
+        return to_dict(self, self.__class__)

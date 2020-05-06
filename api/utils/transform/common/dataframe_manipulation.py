@@ -75,3 +75,11 @@ def dates_to_string(df:pd.DataFrame)->pd.DataFrame:
     for column in date_columns:
         temp_data[column] = temp_data[column].astype('object')
     return temp_data
+
+
+def null_transform(data: pd.DataFrame):
+    return data
+
+
+def make_column_filter(model):
+    return partial(filter_columns, model=model)
