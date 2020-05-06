@@ -18,24 +18,24 @@ def get_product_names(context=True):
     return [x[0] for x in prod_names]
 
 
-def get_sponsors():
+def get_sponsors(context=True):
     """ Get all sponsors currently in DB """
-    with get_session() as session:
+    with get_session(context) as session:
         sponsors = session.query(
             Sponsor.sponsor_id, Sponsor.sponsor_name).all()
     return pd.DataFrame(sponsors, columns=['sponsor_id', 'sponsor_name'])
 
 
-def get_product_sponsors():
-    with get_session() as session:
+def get_product_sponsors(context=True):
+    with get_session(context) as session:
         sponsors_info = session.query(
             ProductSponsor.product_id, Sponsor.sponsor_id, Sponsor.sponsor_name).join(ProductSponsor).all()
     return sponsors_info
 
 
-def get_product_milestones():
+def get_product_milestones(context=True):
     """ Get all product_milestones currently in DB"""
-    with get_session() as session:
+    with get_session(context) as session:
         milesone_info = session.query(
             ProductMilestone.link_id,
             ProductMilestone.product_id, ProductMilestone.milestone_id, ProductMilestone.date, ProductMilestone.status,
@@ -43,12 +43,12 @@ def get_product_milestones():
     return pd.DataFrame(milesone_info, columns=['link_id', 'product_id', 'milestone_id', 'date', 'status', 'milestone_name', 'category'])
 
 
-def get_site_locations():
+def get_site_locations(context=True):
     with get_session() as session:
         return session.query(SiteLocation).all()
 
-def get_product_locations():
-    with get_session() as session:
+def get_product_locations(context=True):
+    with get_session(context) as session:
         location_info = session.query(
             ProductSiteLocation.link_id,
             ProductSiteLocation.product_id, ProductSiteLocation.site_location_id,
