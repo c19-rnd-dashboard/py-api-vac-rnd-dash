@@ -2,6 +2,7 @@ import unittest
 import pandas as pd
 from pandas._testing import assert_frame_equal
 from utils.geolocation_pure import Geolocation, _map_geocode_to_site_location
+from utils.tools import generate_hash
 
 raw_locations = "kaiser permanente washington health research institute - seattle - washington,emory children's center - decatur - georgia"
 
@@ -116,6 +117,16 @@ class LocationsTest(unittest.TestCase):
 
     def test_geolocation_transform(self):
         expected_frame = pd.DataFrame({
+            'site_location_id': [
+                generate_hash(
+                    "kaiser permanente washington health research institute - seattle - washington"+str(1)),
+                generate_hash(
+                    "emory children's center - decatur - georgia"+str(1)),
+                generate_hash(
+                    "kaiser permanente washington health research institute - seattle - washington"+str(2)),
+                generate_hash(
+                    "emory children's center - decatur - georgia"+str(2)),
+            ],
             'product_id': [
                 1,
                 1,
@@ -142,8 +153,9 @@ class LocationsTest(unittest.TestCase):
             ],
             'country': ['US', 'US', 'US', 'US'],
             'lat': [47.6169397, 47.6169397, 47.6169397, 47.6169397, ],
-            'lng': [-122.329572, -122.329572, -122.329572, -122.329572, ]
-        }, columns=['product_id', 'name', 'city', 'state', 'country', 'lat', 'lng'])
+            'lng': [-122.329572, -122.329572, -122.329572, -122.329572, ],
+
+        }, columns=['site_location_id', 'product_id',  'name', 'city', 'state', 'country', 'lat', 'lng'])
         geolocation = Geolocation(lambda _: gmap_location)
         resulting_frame = geolocation.transform(df_sitelocations)
         assert_frame_equal(expected_frame, resulting_frame)

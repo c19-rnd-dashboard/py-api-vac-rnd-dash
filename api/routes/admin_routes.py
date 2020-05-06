@@ -104,10 +104,10 @@ def run_database_update():
          'https://raw.githubusercontent.com/c19-rnd-dashboard/py-api-vac-rnd-dash/master/data/vaccines/vaccineworkfile2.csv',
          {'loader': "unfiltered_csv"}
          ),
-        ('trial',
-         'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-04-07.csv',
-         {}
-         ),
+        # ('trial',
+        #  'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-04-07.csv',
+        #  {}
+        #  ),
     ]
     for job in jobs:
         run_ingest(category=job[0], source=job[1], **job[2])
@@ -132,7 +132,9 @@ def update_db():
             return "Verification Failed.  Database not updated."
 
 
+@admin_routes.route('/test', methods=['GET'])
 def test_func():
+    run_ingest(category='product', source='https://raw.githubusercontent.com/c19-rnd-dashboard/py-api-vac-rnd-dash/master/data/vaccines/vaccineworkfile2.csv', **{})
     return 'Test Success!!'
 
 

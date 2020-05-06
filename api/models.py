@@ -88,7 +88,6 @@ class ProductRaw(Base):
     product_type = Column(String)
     trial_id = Column(String)
     num_sites = Column(String)
-    site_locations = Column(Text)
     sources = Column(String)
 
     @property
@@ -147,6 +146,7 @@ class TrialRaw(Base):
             "results_link": self.results_link,
             "phase_num": self.get_phase_num(self.phase),
             "phase": self.phase,
+            "site_locations": self.get_site_locations(),
         }
 
     def get_phase_num(self, phase):
@@ -218,7 +218,8 @@ class SiteLocation(Base):
     __tablename__ = 'sitelocation'
     _class_name = 'SiteLocation'
 
-    site_location_id = Column(Integer, primary_key=True, autoincrement=True)
+    site_location_id = Column(String, primary_key=True)
+    product_id = Column(Integer)
     name = Column(String, nullable=False)
     city = Column(String)
     state = Column(String)
@@ -226,22 +227,11 @@ class SiteLocation(Base):
     lat = Column(Float, nullable=False)
     lng = Column(Float, nullable=False)
 
-    productsitelocation = relationship(
-        'ProductSiteLocation', back_populates='sitelocation'
-    )
+    def to_dict(self):
+        return to_dict(self, self.__class__)
 
-
-class ProductSiteLocation(Base):
-    __tablename__ = "productsitelocation"
-    _class_name = 'ProductSiteLocation'
-
-    link_id = Column(Integer, primary_key=True)
-    site_location_id = Column(Integer, ForeignKey(
-        "sitelocation.site_location_id"))
-    product_id = Column(Integer, nullable=False)
-
-    sitelocation = relationship(
-        'SiteLocation', back_populates='productsitelocation')
+    def to_json(self):
+        return json.dumps(self.to_dict())
 
 
 #######################

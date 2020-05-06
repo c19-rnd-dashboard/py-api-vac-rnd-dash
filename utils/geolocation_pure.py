@@ -1,8 +1,9 @@
-from .tools import find, compose, assign_prop, flatten
+from .tools import find, compose, assign_prop, flatten, generate_hash
 import pandas as pd
 
 
 data_frame_columns = [
+    'site_location_id',
     'product_id',
     'name',
     'city',
@@ -40,15 +41,27 @@ def _map_geocode_to_site_location(gmaps_geocode):
     }
 
 
+def _get_addresses(raw):
+    buffer = raw.split(',')
+    new_buffer = [x.split(';') for x in buffer if x is not None]
+    return flatten(new_buffer)
+
+
 def _map_record_to_locations(get_location):
     def actual_map(record):
         _, product_id, addresses_raw = record
         if addresses_raw != '':
-            addresses = addresses_raw.split(",")
-            site_locations = map(get_location, addresses)
-            result = map(lambda x: assign_prop(
-                'product_id', product_id, x), site_locations)
-            return list(result)
+            addresses = _get_addresses(addresses_raw)
+            geolocation = [get_location(address) for address in addresses]
+            site_locations = [
+                address for address in geolocation if address is not None]
+            result = [assign_prop('product_id', product_id, address)
+                      for address in site_locations]
+            for index in range(len(result)):
+                print(addresses[index]+str(product_id))
+                result[index]['site_location_id'] = generate_hash(
+                    addresses[index]+str(product_id))
+            return result
     return actual_map
 
 
@@ -60,7 +73,8 @@ class Geolocation:
         return _map_geocode_to_site_location(self.geocode(address))
 
     def transform(self, data: pd.DataFrame):
-        records = list(data.to_records())
+        records_raw = list(data.to_records())
+        records = [r for r in records_raw if r[2] != '']
         site_locations = flatten(
             list(map(_map_record_to_locations(self.get), records)))
         buffer = {}
@@ -69,5 +83,4 @@ class Geolocation:
         for location in site_locations:
             for column in data_frame_columns:
                 buffer[column].append(location[column])
-
         return pd.DataFrame.from_dict(buffer)

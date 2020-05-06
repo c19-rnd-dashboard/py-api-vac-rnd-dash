@@ -1,5 +1,6 @@
 import functools
 import time
+import hashlib
 
 
 def compose(*functions):
@@ -18,15 +19,18 @@ def find(f):
 
 
 def retry(fun, max_tries=10, time_between_retries=0.3, logger=print):
-    for i in range(max_tries):
-        try:
-            fun()
-            break
-        except Exception as e:
-            time.sleep(time_between_retries)
-            logger("Retry #{retry_count},Max Tries: {max_tries},Time in between retries: {time_between_retries}, Exception: {e}").format(
-                {'retry_count': i, 'e': e, 'time_between_retries': time_between_retries, 'max_tries': max_tries})
-            continue
+    def _retry(param):
+        for i in range(max_tries):
+            try:
+                result = fun(param)
+                if result != None:
+                    return result
+            except Exception as e:
+                time.sleep(time_between_retries)
+                logger("Retry #{},Max Tries: {},Time in between retries: {}, Exception: {}".format(
+                    i, max_tries, time_between_retries, e))
+                continue
+    return _retry
 
 
 def assign_prop(prop_name, value, obj):
@@ -35,3 +39,7 @@ def assign_prop(prop_name, value, obj):
 
 
 def flatten(l): return [item for sublist in l for item in sublist]
+
+
+def generate_hash(input: str) -> str:
+    return hashlib.sha1(input.encode('utf-8')).hexdigest()
