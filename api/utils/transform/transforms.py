@@ -74,12 +74,8 @@ def clean_product_raw(data: pd.DataFrame):
     temp_data = temp_data.rename(columns=product_schema)
 
     # Clean Sources and append to data rows
-<< << << < HEAD
     def get_unique_sources(row_list: list) -> dict:
         tlogg.info('Getting unique sources.')
-== == == =
-    def get_unique_sources(row_list: list) -> dict:
->>>>>> > f2cc1cc... transform site_locations str to geolocation data.
         url_list = []
         for item in row_list:
             if ('http' in item):
@@ -92,12 +88,8 @@ def clean_product_raw(data: pd.DataFrame):
             'sources': urls,
         }
 
-<< << << < HEAD
     def clean_valid_sources(df: pd.DataFrame):
         tlogg.info('Cleaning valid sources.')
-== == == =
-    def clean_valid_sources(df: pd.DataFrame):
->>>>>> > f2cc1cc... transform site_locations str to geolocation data.
         data_rows = df.query("source == 'No'")
         source_rows = df.query("source == 'Yes'")
 
@@ -114,8 +106,9 @@ def clean_product_raw(data: pd.DataFrame):
     temp_data = clean_valid_sources(temp_data)
 
     # Infer preferred_name from other names
-    def build_missing_preferred_names(df:pd.DataFrame)->pd.DataFrame:
+    def build_missing_preferred_names(df: pd.DataFrame) -> pd.DataFrame:
         tlogg.info('Build missing preferred names')
+
         def clean_(item):
             teststr = item
             return teststr.translate(str.maketrans('', '', string.punctuation)).replace(' ', '_')
@@ -309,8 +302,10 @@ def prep_product_sponsors(data: pd.DataFrame) -> pd.DataFrame:
 
 def prep_sponsors(data: pd.DataFrame) -> pd.DataFrame:
     tlogg.info("Starting prep_sponsors")
-    tlogg.info(f"Transforming frame of shape {data.shape} and columns {data.columns}")
-    def filter_raw(df: pd.DataFrame)->np.array:
+    tlogg.info(
+        f"Transforming frame of shape {data.shape} and columns {data.columns}")
+
+    def filter_raw(df: pd.DataFrame) -> np.array:
         data_rows = df[df['Source?'] == 'No']
         return data_rows.Sponsor.to_list()
 
