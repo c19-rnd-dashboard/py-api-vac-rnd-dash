@@ -56,5 +56,5 @@ def get_product_locations():
             SiteLocation.lat, SiteLocation.lng
         ).join(ProductSiteLocation).all()
     return pd.DataFrame(location_info, columns=[
-        'link_id', 'product_id', 'site_location_id', 'name', 'city', 'state', 'country', 'lat', 'lng',
+        'link_id', 'product_id', 'site_location_id', 'location_name', 'city', 'state', 'country', 'lat', 'lng',
     ])

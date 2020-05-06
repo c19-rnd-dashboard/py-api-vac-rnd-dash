@@ -5,7 +5,8 @@ from api.utils.serializer import DictionarySerializer
 from api.utils.transform import (
     fetch_value,
     get_product_sponsors, condense_sponsors,
-    get_product_milestones, condense_milestones
+    get_product_milestones, condense_milestones,
+    get_product_locations, condense_locations,
 )
 from api.cache import cache
 from sqlalchemy import or_, and_
@@ -82,7 +83,7 @@ def assets():
     # Get related data
     sponsors = condense_sponsors(get_product_sponsors())
     milestones = condense_milestones(get_product_milestones())
-    sitelocations = condense_locations(get_product_locations)
+    sitelocations = condense_locations(get_product_locations())
 
     for asset in serialized_assets:
         asset['sponsors'] = fetch_value(sponsors, asset['productId'])
