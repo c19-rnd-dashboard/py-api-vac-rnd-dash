@@ -1,6 +1,6 @@
 # Ignoring pipfile.lock
 Pipefile.lock
-
+.DS_Store
 
 # Ignore GSheets API Credentials
 credentials.json

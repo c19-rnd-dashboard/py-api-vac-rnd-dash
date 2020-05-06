@@ -24,31 +24,32 @@ writelogger = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
 
 class Write(Query):
-    def __init__(self, data:pd.DataFrame, model, **params):
+    def __init__(self, data: pd.DataFrame, model, **params):
         super().__init__(data=data, model=model)
         self.execute(**params)
 
     def execute(self, **params):
-        writelogger.info(f'Starting write execution. Processing stack of: {len(self.data)}')
+        writelogger.info(
+            f'Starting write execution. Processing stack of: {len(self.data)}')
         with get_session(context=False) as session:
             for record in self.dataframe_to_dict(self.data):
                 self.make_or_update(
-                    model=self.model, 
+                    model=self.model,
                     record=record,
                     session=session,
                     primary_key=self._primary_keys,
-                    )
+                )
             session.commit()
             writelogger.info('Stack comitted.')
 
 
 ### Make Function ###
 
-def run_write(data:pd.DataFrame, model, **kwargs):
+def run_write(data: pd.DataFrame, model, **kwargs):
     Write(
-        data = data,
-        model = model,
-        params = kwargs
+        data=data,
+        model=model,
+        params=kwargs
     )
 
 
@@ -107,3 +108,8 @@ def write_productmilestone(data: pd.DataFrame):
     """
     writelogger.info('Building ProductMilestone writer.')
     run_write(data=data, model=ProductMilestone)
+
+
+def write_sitelocation(data: pd.DataFrame):
+    writelogger.info('Building SiteLocation writer.')
+    run_write(data=data, model=SiteLocation)

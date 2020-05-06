@@ -8,11 +8,7 @@ On relationship with Base/Inheritance
 https://docs.sqlalchemy.org/en/13/orm/inheritance.html#joined-table-inheritance
 """
 
-from sqlalchemy.ext.declarative import declarative_base
-import json
-
-Base = declarative_base()
-
+from sqlalchemy.orm import relationship
 from sqlalchemy import (
     Column,
     Integer,
@@ -25,7 +21,10 @@ from sqlalchemy import (
     UniqueConstraint,
     ForeignKeyConstraint,
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base
+import json
+
+Base = declarative_base()
 
 
 ### Helper Functions ##
@@ -35,7 +34,7 @@ def to_dict(inst, cls):
     Convert the sql alchemy query result to a clean python dictionary.
     """
     convert = dict()
-    # add your coversions for things like datetime's 
+    # add your coversions for things like datetime's
     # and what-not that aren't serializable.
     d = dict()
     for c in cls.__table__.columns:
@@ -44,7 +43,8 @@ def to_dict(inst, cls):
             try:
                 d[c.name] = convert[c.type](v)
             except:
-                d[c.name] = "Error:  Failed to covert using ", str(convert[c.type])
+                d[c.name] = "Error:  Failed to covert using ", str(
+                    convert[c.type])
         elif v is None:
             d[c.name] = str()
         else:
@@ -91,11 +91,9 @@ class ProductRaw(Base):
     site_locations = Column(Text)
     sources = Column(String)
 
-
     @property
     def json(self):
         return to_dict(self, self.__class__)
-
 
 
 class TrialRaw(Base):
@@ -108,7 +106,8 @@ class TrialRaw(Base):
         # print(new_id)  # DEBUG
         return new_id
 
-    trial_id = Column(String, primary_key=True, nullable=False, default=id_default)
+    trial_id = Column(String, primary_key=True,
+                      nullable=False, default=id_default)
     preferred_name = Column(String)
     title = Column(String)
     registry = Column(String)
@@ -169,7 +168,9 @@ class Milestone(Base):
     name = Column(String, nullable=False)
     category = Column(String)
 
-    productmilestones = relationship('ProductMilestone', back_populates='milestone')
+    productmilestones = relationship(
+        'ProductMilestone', back_populates='milestone')
+
 
 class ProductMilestone(Base):
     __tablename__ = "productmilestone"
@@ -192,11 +193,10 @@ class Sponsor(Base):
     sponsor_name = Column(String)
 
     products = relationship('ProductSponsor', back_populates='sponsor')
-    
+
     @property
     def json(self):
         return to_dict(self, self.__class__)
-
 
 
 class ProductSponsor(Base):
@@ -214,10 +214,39 @@ class ProductSponsor(Base):
         return to_dict(self, self.__class__)
 
 
+class SiteLocation(Base):
+    __tablename__ = 'sitelocation'
+    _class_name = 'SiteLocation'
+
+    site_location_id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
+    city = Column(String)
+    state = Column(String)
+    country = Column(String)
+    lat = Column(Float, nullable=False)
+    lng = Column(Float, nullable=False)
+
+    productsitelocation = relationship(
+        'ProductSiteLocation', back_populates='sitelocation'
+    )
+
+
+class ProductSiteLocation(Base):
+    __tablename__ = "productsitelocation"
+    _class_name = 'ProductSiteLocation'
+
+    link_id = Column(Integer, primary_key=True)
+    site_location_id = Column(Integer, ForeignKey(
+        "sitelocation.site_location_id"))
+    product_id = Column(Integer, nullable=False)
+
+    sitelocation = relationship(
+        'SiteLocation', back_populates='productsitelocation')
+
+
 #######################
 ### Adv Data Models ###
 #######################
-
 """
 class Product(Base):
     __tablename__ = "product"
