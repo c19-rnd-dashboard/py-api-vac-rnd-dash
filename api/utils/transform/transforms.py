@@ -160,7 +160,7 @@ def infer_trial_products(data: pd.DataFrame):
     # Build search string
     df["search_string"] = df["title"] + " " + df["intervention"]
     # Dump product names from database
-    product_names = get_product_names()
+    product_names = get_product_names(context=False)
 
     def get_name(val, product_names):
         list_vals = val.split()
