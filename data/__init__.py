@@ -1,1 +1,2 @@
-from .factory_ref import reference_tables
+from .factory_ref.reference_countries import countries as factory_countries
+from .factory_ref.reference_milestones import milestones as factory_milestones, get_milestone_renaming_schema

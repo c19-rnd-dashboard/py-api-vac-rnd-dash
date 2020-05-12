@@ -1,6 +1,6 @@
 # Ignoring pipfile.lock
 Pipefile.lock
-
+.DS_Store
 
 # Ignore GSheets API Credentials
 credentials.json
@@ -76,6 +76,7 @@ db.sqlite3-journal
 instance/
 .webassets-cache
 *.sqlite3
+*.rdb
 
 # Scrapy stuff:
 .scrapy

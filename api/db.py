@@ -6,6 +6,7 @@ Database
 
 
 from sqlalchemy import create_engine
+from sqlalchemy.pool import NullPool
 from sqlalchemy.orm import sessionmaker, scoped_session
 import sys
 from decouple import config
@@ -27,18 +28,11 @@ def get_db(context=True):
     Modifty g.db = *connect to match intended database connection.
     """
 
-    def check_context():
-        try:
-            current_app()
-            return True
-        except:
-            return False
-
-    if context and check_context():
+    if context == True:
         if 'db' not in g:
             db_logger.info('DB connection not found. Attempting connection to {}.'.format(current_app.config['DATABASE_URI']))
             try:
-                g.engine = create_engine(current_app.config['DATABASE_URI'])
+                g.engine = create_engine(current_app.config['DATABASE_URI'], poolclass=NullPool)
                 g.db = g.engine.connect()
             except:
                 db_logger.error('Could not establish connection.  Aborting.')
@@ -47,16 +41,17 @@ def get_db(context=True):
 
     else:
         db_logger.info("Creating new database connection without app context.")
-        engine = create_engine(config('DATABASE_URI'))
+        db_logger.info('DB connection not found. Attempting connection to {}.'.format(config('DATABASE_URI')))
+        engine = create_engine(config('DATABASE_URI'), poolclass=NullPool)
         return engine.connect()
 
 
 @contextmanager
-def get_session():
+def get_session(context=True):
     # Setup session with thread engine.
     #   Allows for usage: with get_session() as session: session...
-    engine = get_db()
-    session = scoped_session(sessionmaker(bind=engine))
+    db = get_db(context)
+    session = scoped_session(sessionmaker(bind=db))
     try:
         yield session
     finally:

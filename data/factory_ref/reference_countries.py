@@ -1,47 +1,6 @@
 """
 Factory tables for loading database with ground truth or set categorical data.
 """
-
-milestones = (
-    {
-        'name': 'discovery_started',
-        'category': 'pre-clinical',
-    },
-    {
-        'name': 'pre-clinical',
-        'category': 'pre-clinical',
-    },
-    {
-        'name': 'lead_selection',
-        'category': 'pre-clinical'
-    },
-    {
-        'name': 'clinical_batch',
-        'category': 'manufacturing',
-    },
-    {
-        'name': 'ind',
-        'category': 'regulatory',
-    },
-    {
-        'name': 'phase_1',
-        'category': 'clinical_development',
-    },
-    {
-        'name': 'phase_2',
-        'category': 'clinical_development',
-    },
-    {
-        'name': 'phase_3',
-        'category': 'clinical_development',
-    },
-    {
-        'name': 'nda',
-        'category': 'regulatory',
-    }
-)
-
-
 ## Adapted from https://gist.github.com/Keeguon/2310008
 ## Special thanks to: Félix Bellanger keeguon
 

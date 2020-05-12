@@ -4,7 +4,7 @@ from api.routes.mock_routes import mock_routes
 from api.routes.admin_routes import admin_routes
 from api.routes.covid_dash import covid_dash
 from flask_cors import CORS
-from flask_caching import Cache
+from api.cache import cache
 from decouple import config
 import os
 
@@ -15,9 +15,11 @@ import logging
 ###Setup###
 ###########
 # Local Environment Testing Only.
-#   Un-comment to build environment script in config.py
-# from instance import setup
-# setup.setup_env(testing='TRUE')
+#   Un-comment to build environment script in config.py or run setup files
+if os.path.isfile(os.path.join(os.getcwd(), 'instance/setup.py')):
+    print('Instance setup.py found at: ', os.path.join(os.getcwd(), 'instance/setup.py'))
+    from instance import setup
+    setup.setup_env(testing=True, local_dev=True)
 
 
 def create_app(test_config=None):
@@ -44,7 +46,7 @@ def create_app(test_config=None):
     CORS(app)
 
     # Enable caching
-    cache = Cache(app)
+    cache.init_app(app)
 
     ##############
     ### Routes ###
