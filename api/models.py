@@ -146,7 +146,6 @@ class TrialRaw(Base):
             "results_link": self.results_link,
             "phase_num": self.get_phase_num(self.phase),
             "phase": self.phase,
-            "site_locations": self.get_site_locations(),
         }
 
     def get_phase_num(self, phase):
