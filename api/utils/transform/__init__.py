@@ -17,3 +17,5 @@ from .milestones import milestone_transformer, get_milestone_renaming_schema
 from .endpoint import *
 
 from .common import *
+
+from .products import *

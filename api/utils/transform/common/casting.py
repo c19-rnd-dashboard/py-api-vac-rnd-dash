@@ -13,7 +13,7 @@ def convert_to_datetime(time_string):
         return None
 
 
-def cast_to_int(series: pd.Series)->pd.Series:
+def cast_to_int(series: pd.Series, replace=True)->pd.Series:
     for i, item in enumerate(series):
         try:
             if item is not None and item is not np.nan:
