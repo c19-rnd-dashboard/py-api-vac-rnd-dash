@@ -85,7 +85,6 @@ class ProductRaw(Base):
     current_status = Column(String)
     phase = Column(String)
     condition_or_disease = Column(String)
-    product_type = Column(String)
     trial_id = Column(String)
     num_sites = Column(String)
     sources = Column(String)
