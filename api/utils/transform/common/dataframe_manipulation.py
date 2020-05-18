@@ -63,7 +63,7 @@ def clean_null(data: pd.DataFrame):
 
 def drop_unnamed_columns(df:pd.DataFrame)->pd.DataFrame:
     tlogg.info('drop_unnamed_columns')
-    keep_columns = [col for col in df.columns if len(col)>0]
+    keep_columns = [col for col in df.columns if len(str(col))>0]
     return df[keep_columns].copy()
 
 
