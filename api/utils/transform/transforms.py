@@ -76,16 +76,19 @@ def clean_product_raw(data: pd.DataFrame):
     # Clean Sources and append to data rows
     def get_unique_sources(row_list: list) -> dict:
         url_list = []
-        for item in row_list:
-            if ('http' in item):
-                if item not in url_list:
-                    url_list.append(item)
-        urls = ','.join(url_list)
-        product_id = row_list[0]
-        return {
-            'product_id': product_id,
-            'sources': urls,
-        }
+        try:
+            for item in row_list:
+                if ('http' in item):
+                    if item not in url_list:
+                        url_list.append(item)
+            urls = ','.join(url_list)
+            product_id = row_list[0]
+            return {
+                'product_id': product_id,
+                'sources': urls,
+            }
+        except:
+            return {'product_id': row_list[0], 'sources':None}
 
     def clean_valid_sources(df: pd.DataFrame):
         data_rows = df.query("source == 'No'")
@@ -102,33 +105,42 @@ def clean_product_raw(data: pd.DataFrame):
         return clean_frame
 
     temp_data = clean_valid_sources(temp_data)
-
+    tlogg.info('Cleaned asset sources.')
     # Infer preferred_name from other names
     def build_missing_preferred_names(df: pd.DataFrame) -> pd.DataFrame:
 
         def clean_(item):
-            teststr = item
+            teststr = str(item)
             return teststr.translate(str.maketrans('', '', string.punctuation)).replace(' ', '_')
 
+        tlogg.info('Inferring rule-based preferred names.')
         df1 = df.copy()
+        preferred_names = []
         for i in range(len(df)):
             row = df1.iloc[i]
             if len(row.preferred_name) < 2:
                 if len(row.chemical_name) > 0:
-                    df1.iloc[i].preferred_name = clean_(row.chemical_name)
+                    preferred_name = clean_(row.chemical_name)
                 elif len(row.brand_name) > 0:
-                    df1.iloc[i].preferred_name = clean_(row.brand_name)
+                    preferred_name = clean_(row.brand_name)
                 elif (len(row.sponsors) > 0):
-                    df1.iloc[i].preferred_name = '-'.join(
+                    preferred_name = '-'.join(
                         [
                             clean_(row.sponsors.split(',')[0]),
-                            row.product_id
+                            str(row.product_id)
                         ])
+                else:
+                    preferred_name = None
+            else:
+                preferred_name = row.preferred_name
+            preferred_names.append(preferred_name)
 
+        tlogg.info('rebuilding preferred name series')
+        df1.preferred_name = np.array(preferred_names)
         return df1[df1.preferred_name.str.len() > 0]
 
     temp_data = build_missing_preferred_names(temp_data)
-
+    tlogg.info('Preferred names filled where possible.')
     # Generate country code lists
     temp_data["country_codes"] = temp_data["countries"].apply(clean_country)
 
@@ -237,10 +249,6 @@ def trial_cleaner(data: pd.DataFrame):
 ### Sponsor Transform ###
 #########################
 
-# TODO: SponsorTransform
-# Expand any lists found.
-# Clean sponsor names of all punctuation.
-# Capitalize names.
 
 def prep_product_sponsors(data: pd.DataFrame) -> pd.DataFrame:
     tlogg.info("Starting prep_product_sponsors")
