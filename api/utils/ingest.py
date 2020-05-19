@@ -155,13 +155,18 @@ def assign_product_transforms(**kwargs):
     transform_list = [
         null_transform,
         renumber_id,
-        make_subset_ingest(model=Sponsor, columns=['Sponsor', 'Source?']),
-        make_subset_ingest(model=ProductSponsor, columns=[
-                           'ID', 'Sponsor', 'Source?']),
-        make_subset_ingest(model=ProductMilestone, columns=list(
-            get_milestone_renaming_schema().keys())),
-        make_subset_ingest(model=SiteLocation, columns=[
-            'ID', 'Sites Locations', 'Source?']),
+        make_subset_ingest(
+            model=Sponsor, 
+            columns=['Sponsor', 'Source?']),
+        make_subset_ingest(
+            model=ProductSponsor,
+            columns=['ID', 'Sponsor', 'Source?']),
+        make_subset_ingest(
+            model=ProductMilestone,
+            columns=list(get_milestone_renaming_schema().keys())),
+        make_subset_ingest(
+            model=SiteLocation,
+            columns=['ID', 'Sites Locations', 'Source?']),
         clean_product_raw,
         make_column_filter(ProductRaw),
         cast_dates,

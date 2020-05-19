@@ -2,6 +2,10 @@
 Milestone Cleaning, Transformations
 """
 
+import logging 
+
+logger = logging.getLogger(__name__)
+
 ## NOTE: Parent table Milestone is fed by reference dataset in data/.  This is only for ProductMilestones or TrialMilestones
 
 import pandas as pd
@@ -47,6 +51,7 @@ def compare_max_completed(row, lookup):
     
 def clean_rename_data(dataframe: pd.DataFrame, renaming_schema:dict):
     temp = dataframe.rename(columns=renaming_schema)
+    logger.info(f'milestone clean/rename {temp.columns}')
     temp = temp.query("source == 'No'").copy()
     temp = fill_product_id(temp)
     return temp[renaming_schema.values()]

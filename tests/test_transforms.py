@@ -27,7 +27,7 @@ class LocalDatabaseTest(LiveServerTestCase):
         return app
 
     def setUp(self):
-        self.test_frame = pd.read_csv('/home/vbrandon/Bin/py-api-vac-rnd-dash/data/vaccines/vaccineworkfile3.csv')
+        self.test_frame = pd.read_csv('/home/vbrandon/Bin/py-api-vac-rnd-dash/data/vaccines/vaccineworkfile2.csv')
 
     def test_get_product_names(self):
         self.assertIsNotNone(get_product_names())
@@ -38,7 +38,7 @@ class LocalDatabaseTest(LiveServerTestCase):
         output = load(
             file_or_buffer=file_url,
             loader=loader,
-            # max_len=371,
+            max_len=371,
         )
         self.assertIsNotNone(output)
 
