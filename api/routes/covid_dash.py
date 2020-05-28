@@ -91,6 +91,6 @@ def assets():
         asset['siteLocations'] = fetch_value(sitelocations, asset['productId'])
         asset['sources'] = asset['sources'].split(',')
         asset['countries'] = asset['countries'].split(',')
-        asset['country_codes'] = asset['country_codes'].split(',')
+        asset['countryCodes'] = asset['countryCodes'].split(',')
 
     return jsonify(serialized_assets)
