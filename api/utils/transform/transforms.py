@@ -144,18 +144,7 @@ def clean_product_raw(data: pd.DataFrame):
     # Generate country code lists
     temp_data["country_codes"] = temp_data["countries"].apply(clean_country)
 
-    # Lowercase the dataset
-    def lower(x):
-        """
-        Lowers capitalization of all observations in a given str type column.
-        """
-        try:
-            return x.lower()
-        except:
-            return x
-
     for col in temp_data.columns[temp_data.dtypes == object]:
-        temp_data[col] = temp_data[col].apply(lower)
         temp_data[col] = temp_data[col].apply(clean_lists)
 
     # Finally, return the prepared dataframe
@@ -194,12 +183,6 @@ def trial_cleaner(data: pd.DataFrame):
     df = data.copy()
     tlogg.info("Starting trial_cleaner.")
 
-    def lower(x):
-        """
-        Lowers capitalization of all observations in a given str type column.
-        """
-        return x.lower()
-
     def clean_lists(x):
         if "," in x:
             temp_list = x.split(",")
@@ -235,7 +218,6 @@ def trial_cleaner(data: pd.DataFrame):
     # Apply function
     df = rename_cols(df)
     for col in df.columns[df.dtypes == object]:
-        df[col] = df[col].apply(lower)
         df[col] = df[col].apply(clean_lists)
 
     df["country_codes"] = df["countries"].apply(clean_country)

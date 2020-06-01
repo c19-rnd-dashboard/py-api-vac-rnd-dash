@@ -42,6 +42,6 @@ class LocalDatabaseTest(LiveServerTestCase):
         )
         self.assertIsNotNone(output)
 
-    def test_milestone_transformer(self):
-        output = milestone_transformer(self.test_frame)
-        self.assertIn('link_id', output.columns)
+    # def test_milestone_transformer(self):
+    #     output = milestone_transformer(self.test_frame)
+    #     self.assertIn('link_id', output.columns)
