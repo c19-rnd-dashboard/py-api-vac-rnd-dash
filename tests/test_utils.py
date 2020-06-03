@@ -17,7 +17,7 @@ class IngestTest(LiveServerTestCase):
         return app
 
     def setUp(self):
-        self.test_trial_url = 'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-03-25.csv'
+        self.test_trial_url = 'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-05-26.csv'
         self.test_product_url = 'https://raw.githubusercontent.com/c19-rnd-dashboard/py-api-vac-rnd-dash/master/data/vaccines/vaccineworkfile3.csv'
         self.test_factory_milestones = factory_milestones
         self.test_factory_countries = factory_countries
