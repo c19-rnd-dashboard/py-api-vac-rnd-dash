@@ -18,7 +18,7 @@ def clean_country(country_names: str) -> str:
     return ",".join(result)
 
 
-def clean_lists(x):
+def clean_lists(x:str) -> str:
     if x is None:
         return None 
 
@@ -37,3 +37,13 @@ def clean_lists(x):
         return temp_item
 
     return ",".join([clean_list_item(item) for item in temp_list])
+
+
+def lower(x):
+    """
+    Lowers capitalization of all observations in a given str type column.
+    """
+    try:
+        return x.lower()
+    except:
+        return x

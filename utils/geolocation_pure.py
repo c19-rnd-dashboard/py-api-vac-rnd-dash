@@ -24,7 +24,7 @@ def _getAddressComponent(component): return compose(
 
 
 def _map_geocode_to_site_location(gmaps_geocode):
-    if len(gmaps_geocode) == 0:
+    if (gmaps_geocode is None) or len(gmaps_geocode) == 0:
         return None
     g_address = gmaps_geocode[0]  # TODO this can be emtpy
     address_types = ['locality', 'administrative_area_level_1', 'country', ]
@@ -57,6 +57,7 @@ def _map_record_to_locations(get_location):
                 address for address in geolocation if address is not None]
             result = [assign_prop('product_id', product_id, address)
                       for address in site_locations]
+            if result is None: return result
             for index in range(len(result)):
                 result[index]['site_location_id'] = generate_hash(
                     addresses[index]+str(product_id))

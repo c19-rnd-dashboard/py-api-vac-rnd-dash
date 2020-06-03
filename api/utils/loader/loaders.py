@@ -154,7 +154,7 @@ def load_unfiltered_csv(file_or_url: str, **kwargs):
             'line_counts': np.array(list(map(count_value, raw_file)))
         }
 
-    def infer_head_tail(line_counts:np.array)->dict:
+    def infer_head_tail(line_counts:np.array, **kwargs)->dict:
         max_val = max(line_counts)
         
         def get_first_max(line_counts:np.array, max_val:int)->int:
@@ -163,7 +163,7 @@ def load_unfiltered_csv(file_or_url: str, **kwargs):
                     return index
         head = get_first_max(line_counts, max_val)
         
-        def get_approximate_tail(line_counts:np.array, sensitivity=3):
+        def get_approximate_tail(line_counts:np.array, sensitivity=3, **kwargs):
             lower_bound_val = min(np.quantile(line_counts, [0.95, 0.75, 0.5, 0.25, 0.125]))
             end_region = []
             for index in range(len(line_counts)-1, -1, -1):
@@ -171,25 +171,30 @@ def load_unfiltered_csv(file_or_url: str, **kwargs):
                     end_region.append(index)
                     if len(end_region) >= sensitivity:
                         break
-            return max(end_region) # Control interp here
+            if 'max_len' in kwargs:
+                loadlogger.info(f"Max Length given as: {kwargs['max_len']}")
+                max_len = kwargs['max_len']
+            else:
+                max_len = max(end_region)
+            return min(max_len, max(end_region)) # Control interp here
                 
-        tail_region = get_approximate_tail(line_counts)
+        tail_region = get_approximate_tail(line_counts, **kwargs)
         
         return {
             'head': head, 
-            'tail': tail_region,
+            'tail': tail_region
         }
 
-    def profile_csv(raw_file:np.array)->dict:
+    def profile_csv(raw_file:np.array, **kwargs)->dict:
         profile = {}
         profile.update(get_line_counts(raw_file))
-        profile.update(infer_head_tail(profile['line_counts']))
+        profile.update(infer_head_tail(profile['line_counts'], **kwargs))
         return profile
 
     # Get raw .csv loaded as array
     raw_import = ingest_csv(file_or_url)
     # Profile the .csv file
-    profile = profile_csv(raw_import)
+    profile = profile_csv(raw_import, **kwargs)
     # Build dataframe from inferred attributes
     df = pd.DataFrame(
         raw_import[profile['head']+1:profile['tail']+1],
@@ -247,6 +252,8 @@ def infer_filetype(filename):
 
     if extension in valid_filetypes:
         return extension
+
+
 
 
 if __name__ == "__main__":

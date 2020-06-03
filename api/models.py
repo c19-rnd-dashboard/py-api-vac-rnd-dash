@@ -85,7 +85,6 @@ class ProductRaw(Base):
     current_status = Column(String)
     phase = Column(String)
     condition_or_disease = Column(String)
-    product_type = Column(String)
     trial_id = Column(String)
     num_sites = Column(String)
     sources = Column(String)
@@ -146,7 +145,6 @@ class TrialRaw(Base):
             "results_link": self.results_link,
             "phase_num": self.get_phase_num(self.phase),
             "phase": self.phase,
-            "site_locations": self.get_site_locations(),
         }
 
     def get_phase_num(self, phase):
