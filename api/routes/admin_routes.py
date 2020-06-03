@@ -101,7 +101,7 @@ def run_database_update():
          {}
          ),
         ('product',
-         'https://raw.githubusercontent.com/c19-rnd-dashboard/py-api-vac-rnd-dash/master/data/vaccines/vaccineworkfile3.csv',
+         'https://raw.githubusercontent.com/c19-rnd-dashboard/py-api-vac-rnd-dash/master/data/vaccines/vaccineworkfile4.csv',
          {'loader': "unfiltered_csv"}
          ),
         ('trial',
