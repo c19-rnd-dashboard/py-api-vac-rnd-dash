@@ -154,7 +154,6 @@ def assign_product_transforms(**kwargs):
     """Assemble trial data transforms for clean write"""
     transform_list = [
         null_transform,
-        renumber_id,
         make_subset_ingest(
             model=Sponsor, 
             columns=['Sponsor', 'Source?']),
