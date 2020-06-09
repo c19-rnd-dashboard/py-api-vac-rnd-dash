@@ -12,17 +12,19 @@ import pandas as pd
 import numpy as np
 
 from data import factory_milestones, get_milestone_renaming_schema
-from .common import convert_to_datetime
+from api.utils.transform.common import convert_to_datetime
 
 # Define data preparation and filtering
 def fill_product_id(dataframe: pd.DataFrame):
     if 'product_id' in dataframe.columns: 
-        return dataframe
+        pass
     else: 
-        dataframe['product_id'] = list(
-            dataframe.reindex(range(len(dataframe))).index
-            )
-        return dataframe
+        try:
+            dataframe['product_id'] = dataframe['ID'].astype('int')
+        except Exception as e:
+            logger.error(f'Could not cast ID. {e}') 
+            raise(e)
+    return dataframe
 
     
 def remove_value(dictionary:dict, values:list):
@@ -100,6 +102,13 @@ def drop_unavailable_milestones(dataframe: pd.DataFrame) -> pd.DataFrame:
     temp = dataframe[dataframe.status.notna()]
     return temp
 
+
+def clean_frame(dataframe: pd.DataFrame) -> pd.DataFrame:
+    # Re-Cast product_id to integer type
+    dataframe.product_id = dataframe.product_id.astype('int')
+    return dataframe
+
+
 def milestone_transformer(dataframe: pd.DataFrame) -> pd.DataFrame:
     clean_data = clean_rename_data(dataframe, get_milestone_renaming_schema())
     formatted_data = melt_join_milestones(
@@ -109,4 +118,6 @@ def milestone_transformer(dataframe: pd.DataFrame) -> pd.DataFrame:
     )
     build_status(formatted_data)
     build_link_id(formatted_data)
-    return drop_unavailable_milestones(formatted_data)
+    return clean_frame(
+        drop_unavailable_milestones(formatted_data)
+        )

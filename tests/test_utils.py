@@ -22,10 +22,10 @@ class IngestTest(LiveServerTestCase):
         self.test_factory_milestones = factory_milestones
         self.test_factory_countries = factory_countries
 
-    def test_trial_ingest(self):
-        category = 'trial'
-        error = run_ingest(source=self.test_trial_url, category=category)
-        self.assertIsNone(error)
+    # def test_trial_ingest(self):
+    #     category = 'trial'
+    #     error = run_ingest(source=self.test_trial_url, category=category)
+    #     self.assertIsNone(error)
 
     def test_explicit_ingest(self):
         category = 'product'
