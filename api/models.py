@@ -82,7 +82,7 @@ class ProductRaw(Base):
     other_partners = Column(Text)
     notes = Column(Text)
     status = Column(String)
-    current_status = Column(String)
+    current_stage = Column(String)
     phase = Column(String)
     accepts_healthy_subjects = Column(String)
     condition_or_disease = Column(String)

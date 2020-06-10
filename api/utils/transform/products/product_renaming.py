@@ -14,7 +14,7 @@ product_schema = {
     'Notes': 'notes',
     'Funding/Manufacturing/Research/Other Partners': 'other_partners',
     'Country': 'countries',
-    'Current Status': 'current_status',
+    'Current Stage': 'current_stage',
     'Pre-Clinical Studies Started': 'pre_clinical_studies_started_date',
     'Lead Selection Finalized': 'lead_selection_finalized_date',
     'Clinical Batch Finalized': 'clinical_batch_finalized_date',
