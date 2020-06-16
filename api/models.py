@@ -61,7 +61,8 @@ class Country(Base):
     _class_name = 'Country'
 
     name = Column(String, primary_key=True)
-    code = Column(String)
+    alpha2 = Column(String)
+    alpha3 = Column(String)
 
 
 class ProductRaw(Base):
