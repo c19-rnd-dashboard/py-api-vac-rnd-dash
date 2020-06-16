@@ -27,10 +27,10 @@ class IngestTest(LiveServerTestCase):
     #     error = run_ingest(source=self.test_trial_url, category=category)
     #     self.assertIsNone(error)
 
-    def test_explicit_ingest(self):
-        category = 'product'
-        loader = "unfiltered_csv"
-        error = run_ingest(source=self.test_product_url, category=category, loader=loader, max_len=1137)
+    # def test_explicit_ingest(self):
+    #     category = 'product'
+    #     loader = "unfiltered_csv"
+    #     error = run_ingest(source=self.test_product_url, category=category, loader=loader, max_len=1137)
         self.assertIsNone(error)
 
     def test_object_ingest_countries(self):
