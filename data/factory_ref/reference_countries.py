@@ -250,3 +250,40 @@ countries = (
   {'name': 'Zambia', 'alpha2': 'ZM', 'alpha3': 'ZMB'}, 
   {'name': 'Zimbabwe', 'alpha2': 'ZW', 'alpha3': 'ZWE'},
 )
+
+
+
+### Helper Indices ###
+
+def build_name_index(countries:dict) -> dict:
+    country_by_name = {}
+    [country_by_name.update({country['name']:{'alpha2':country['alpha2'], 'alpha3':country['alpha3']}}) \
+        for country in countries]
+    return country_by_name
+
+def build_alpha2_index(countries:dict) -> dict:
+    country_by_alpha2 = {}
+    [country_by_alpha2.update({country['alpha2']:{'name':country['name'], 'alpha3':country['alpha3']}}) \
+        for country in countries]
+    return country_by_alpha2
+
+
+country_by_name = build_name_index(countries)
+country_by_alpha2 = build_alpha2_index(countries)
+
+### Helper Functions ###
+
+
+def _fetch_value(dictionary, key):
+    if key in dictionary:
+        return dictionary[key]
+    return None
+
+
+def lookup_alpha3_countrycode(alpha2=None, **kwargs): 
+    if alpha2 is not None:
+        return _fetch_value(country_by_alpha2, kwargs['alpha2'])
+
+    if 'name' in kwargs:
+        return _fetch_value(country_by_name, kwargs['name'])
+
