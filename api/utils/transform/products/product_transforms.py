@@ -3,6 +3,9 @@ import numpy as np
 import string
 
 from api.utils.transform.common import *
+
+from api.utils.tools import coalesce
+
 from .product_renaming import product_schema
 import logging
 
@@ -82,12 +85,12 @@ def clean_product_raw(data: pd.DataFrame):
         preferred_names = []
         for i in range(len(df)):
             row = df1.iloc[i]
-            if len(row.preferred_name) < 2:
-                if len(row.chemical_name) > 0:
+            if len(str(row.preferred_name)) < 2:
+                if len(str(row.chemical_name)) > 0:
                     preferred_name = clean_(row.chemical_name)
-                elif len(row.brand_name) > 0:
+                elif len(str(row.brand_name)) > 0:
                     preferred_name = clean_(row.brand_name)
-                elif (len(row.sponsors) > 0):
+                elif (len(str(row.sponsors)) > 0):
                     preferred_name = '-'.join(
                         [
                             clean_(row.sponsors.split(',')[0]),
@@ -105,9 +108,20 @@ def clean_product_raw(data: pd.DataFrame):
 
     temp_data = build_missing_preferred_names(temp_data)
     logger.info('Preferred names filled where possible.')
-    # Generate country code lists
-    temp_data["country_codes"] = temp_data["countries"].apply(clean_country)
+    
+    # Generate country code lists and clean names
+    logger.info("Cleaning Product Countries.")
+    cdata = temp_data["countries"].apply(clean_country)
 
+    alpha3 = [coalesce(country['alpha3'], '')
+                for country in cdata]
+    names = [coalesce(country['name'], '')
+                for country in cdata]
+
+    temp_data["country_codes"] = alpha3
+    temp_data["countries"] = names
+
+    logger.info("Cleaning lists in object fields.")
     for col in temp_data.columns[temp_data.dtypes == object]:
         temp_data[col] = temp_data[col].apply(clean_lists)
 

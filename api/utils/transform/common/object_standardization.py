@@ -6,7 +6,7 @@ tlogg = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
 
 def _split_country_string(s):
-    countries_a = s.split(',')
+    countries_a = str(s).split(',')
     countries_b = []
     
     for country in countries_a:
@@ -22,7 +22,8 @@ def _remove_null_names(s):
     return [name for name in s if name.strip().lower() not in default_names]
 
 def clean_country(country_names: str) -> str:
-    result = []
+    alpha3 = []
+    names = []
 
     countries = _split_country_string(country_names)
 
@@ -34,18 +35,24 @@ def clean_country(country_names: str) -> str:
                 pass
             else:
                 curr_country = pycountry.countries.search_fuzzy(country.strip())
-                result.append(curr_country[0].alpha_3)
+                alpha3.append(curr_country[0].alpha_3)
+                names.append(curr_country[0].name)
+
         except LookupError:
             pass
         except Exception as e:
             tlogg.error(f"Error in country standardization {e}")
-    if len(result) == 0:
-        return None
-    return ",".join(result)
+    if len(alpha3) == 0:
+        return {'name': None, 'alpha3': None}
+
+    alpha3_string = ",".join(alpha3)
+    name_string = ",".join(names)
+
+    return {'name': name_string, 'alpha3': alpha3_string}
 
 
 def clean_lists(x:str) -> str:
-    if x is None:
+    if x is None or type(x) != str:
         return None 
 
     if "," in x:
