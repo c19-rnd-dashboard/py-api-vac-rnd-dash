@@ -1,2 +1,8 @@
-from .factory_ref.reference_countries import countries as factory_countries
-from .factory_ref.reference_milestones import milestones as factory_milestones, get_milestone_renaming_schema
+from .factory_ref import (
+    milestones as factory_milestones, 
+    countries as factory_countries,
+    get_milestone_renaming_schema,
+    build_name_index,
+    build_alpha2_index,
+    lookup_alpha3_countrycode
+)
