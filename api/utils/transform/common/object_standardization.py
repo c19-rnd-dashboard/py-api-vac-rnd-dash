@@ -3,10 +3,26 @@ import pycountry
 
 tlogg = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
+
+
+def _split_country_string(s):
+    countries_a = s.split(',')
+    countries_b = []
+    
+    for country in countries_a:
+        # Business Rule: city - country
+        if country is not None:
+            countries_b.append(country.split('-')[-1])
+    
+    return countries_b
+
+
 def clean_country(country_names: str) -> str:
     result = []
-    for country in country_names.split(","):
-        print('looking up country', country.strip())
+
+    countries = _split_country_string(country_names)
+
+    for country in countries:
         try:
             if country is None or len(country) < 2:
                 pass
