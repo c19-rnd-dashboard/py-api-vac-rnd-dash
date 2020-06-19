@@ -6,9 +6,13 @@ tlogg = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 def clean_country(country_names: str) -> str:
     result = []
     for country in country_names.split(","):
+        print('looking up country', country.strip())
         try:
-            curr_country = pycountry.countries.search_fuzzy(country)
-            result.append(curr_country[0].alpha_3)
+            if country is None or len(country) < 2:
+                pass
+            else:
+                curr_country = pycountry.countries.search_fuzzy(country.strip())
+                result.append(curr_country[0].alpha_3)
         except LookupError:
             pass
         except Exception as e:
