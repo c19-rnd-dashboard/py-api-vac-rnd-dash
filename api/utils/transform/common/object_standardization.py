@@ -3,12 +3,38 @@ import pycountry
 
 tlogg = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 
+
+
+def _split_country_string(s):
+    countries_a = s.split(',')
+    countries_b = []
+    
+    for country in countries_a:
+        # Business Rule: city - country
+        if country is not None:
+            countries_b.append(country.split('-')[-1])
+    
+    return countries_b
+
+
+def _remove_null_names(s):
+    default_names = ['na', 'n/a', '']
+    return [name for name in s if name.strip().lower() not in default_names]
+
 def clean_country(country_names: str) -> str:
     result = []
-    for country in country_names.split(","):
+
+    countries = _split_country_string(country_names)
+
+    countries = _remove_null_names(countries)
+
+    for country in countries:
         try:
-            curr_country = pycountry.countries.search_fuzzy(country)
-            result.append(curr_country[0].alpha_3)
+            if country is None or len(country) < 2:
+                pass
+            else:
+                curr_country = pycountry.countries.search_fuzzy(country.strip())
+                result.append(curr_country[0].alpha_3)
         except LookupError:
             pass
         except Exception as e:

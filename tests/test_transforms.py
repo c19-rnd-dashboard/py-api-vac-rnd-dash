@@ -20,6 +20,8 @@ from api.utils.transform import get_product_names, milestone_transformer
 from api.utils.loader import load
 
 
+from api.utils.transform import clean_country
+
 
 class LocalDatabaseTest(LiveServerTestCase):
     def create_app(self):
@@ -41,3 +43,15 @@ class LocalDatabaseTest(LiveServerTestCase):
             max_len=371,
         )
         self.assertIsNotNone(output)
+
+
+class CommonObjectStandardizationTest(unittest.TestCase):
+
+    def setUp(self):
+        self.set_countries_null = ''
+        self.set_countries_null_multiple = ','
+        self.set_countries_full = 'Japan, japn, Korea, north korea, amsterdam, Amstrdam'
+
+    def test_null_countries(self):
+        self.assertIsNone(clean_country(self.set_countries_null))
+        self.assertIsNone(clean_country(self.set_countries_null_multiple))
