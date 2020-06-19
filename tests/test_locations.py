@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
 from pandas._testing import assert_frame_equal
-from api.utils.geolocation import Geolocation, _map_geocode_to_site_location
+from api.utils.geolocation.geolocation_pure import Geolocation, _map_geocode_to_site_location
 from api.utils.geolocation import generate_hash
 
 raw_locations = "kaiser permanente washington health research institute - seattle - washington,emory children's center - decatur - georgia"
