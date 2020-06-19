@@ -113,10 +113,16 @@ def clean_product_raw(data: pd.DataFrame):
     logger.info("Cleaning Product Countries.")
     cdata = temp_data["countries"].apply(clean_country)
 
+
+    print('cdata', len(cdata))
+
     alpha3 = [coalesce(country['alpha3'], '')
-                for country in cdata if country is not None]
+                for country in cdata]
     names = [coalesce(country['name'], '')
-                for country in cdata if country is not None]
+                for country in cdata]
+
+
+    print('alpha3', len(alpha3))
 
     temp_data["country_codes"] = alpha3
     temp_data["countries"] = names

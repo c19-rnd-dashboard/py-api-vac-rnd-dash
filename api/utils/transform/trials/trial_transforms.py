@@ -5,6 +5,7 @@ from functools import partial
 from fuzzywuzzy import fuzz 
 
 from api.utils.transform.common import *
+from api.utils.tools import coalesce
 
 import logging 
 
@@ -83,9 +84,10 @@ def trial_cleaner(data: pd.DataFrame):
     # Generate country code lists and clean names
     cdata = df["countries"].apply(clean_country)
 
-    alpha3 = [country['alpha3'] for country in cdata if country is not None]
-    names = [country['name'] for country in cdata if country is not None]
-
+    alpha3 = [coalesce(country['alpha3'], '')
+                for country in cdata]
+    names = [coalesce(country['name'], '')
+                for country in cdata]
     df["country_codes"] = alpha3
     df["countries"] = names
     

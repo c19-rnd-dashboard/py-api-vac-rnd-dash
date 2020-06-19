@@ -43,7 +43,7 @@ def clean_country(country_names: str) -> str:
         except Exception as e:
             tlogg.error(f"Error in country standardization {e}")
     if len(alpha3) == 0:
-        return None
+        return {'name': None, 'alpha3': None}
 
     alpha3_string = ",".join(alpha3)
     name_string = ",".join(names)
