@@ -282,8 +282,8 @@ def _fetch_value(dictionary, key):
 
 def lookup_alpha3_countrycode(alpha2=None, **kwargs): 
     if alpha2 is not None:
-        return _fetch_value(country_by_alpha2, kwargs['alpha2'])
+        return _fetch_value(country_by_alpha2, alpha2)['alpha3']
 
     if 'name' in kwargs:
-        return _fetch_value(country_by_name, kwargs['name'])
+        return _fetch_value(country_by_name, kwargs['name'])['alpha3']
 

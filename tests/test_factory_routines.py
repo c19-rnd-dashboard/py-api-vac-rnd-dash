@@ -3,7 +3,7 @@ Test methods packaged with factory reference data
 """
 
 import unittest
-from data import build_alpha2_index, build_name_index
+from data import build_alpha2_index, build_name_index, lookup_alpha3_countrycode
 
 
 
@@ -35,3 +35,8 @@ class CountryReferenceTest(unittest.TestCase):
     def test_alpha2_index_construction(self):
         alpha2_index = build_alpha2_index(self.test_data)
         self.assertEqual('LKA', alpha2_index['LK']['alpha3'])
+
+
+    def test_lookup_alpha3(self):
+        result = lookup_alpha3_countrycode('ES')
+        self.assertEqual('ESP', result)

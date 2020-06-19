@@ -33,5 +33,4 @@ def prep_product_sitelocation(data: pd.DataFrame):
     
     # Cleaning/Standardization
     ndata['country'] = ndata['country'].apply(lookup_alpha3_countrycode)
-    ndata.to_csv('site_locations_test.csv') ## DEBUG
     return ndata
