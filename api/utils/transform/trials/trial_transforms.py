@@ -80,6 +80,15 @@ def trial_cleaner(data: pd.DataFrame):
         df[col] = df[col].apply(clean_lists)
 
     df["country_codes"] = df["countries"].apply(clean_country)
+    # Generate country code lists and clean names
+    cdata = df["countries"].apply(clean_country)
+
+    alpha3 = [country['alpha3'] for country in cdata if country is not None]
+    names = [country['name'] for country in cdata if country is not None]
+
+    df["country_codes"] = alpha3
+    df["countries"] = names
+    
     tlogg.info(f'Trial Columns: {df.columns}')
     if 'target_enrollment' in df.columns:
         df["target_enrollment"] = cast_to_int(df.target_enrollment)

@@ -32,10 +32,10 @@ class CommonObjectStandardizationTest(unittest.TestCase):
 
     def test_country_lookup_multi_delimiter(self):
         testset = self.set_countries_with_hypen
-        self.assertEqual(len(testset.split(',')), len(clean_country(testset).split(',')))
+        self.assertEqual(len(testset.split(',')), len(clean_country(testset)['alpha3'].split(',')))
 
     def test_country_lookup_null_placeholder(self):
         testset = self.set_default_null_name
         print(clean_country(testset))
-        self.assertEqual(1, len(clean_country(testset).split(',')))
+        self.assertEqual(1, len(clean_country(testset)['alpha3'].split(',')))
         
