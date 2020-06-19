@@ -52,7 +52,7 @@ def clean_country(country_names: str) -> str:
 
 
 def clean_lists(x:str) -> str:
-    if x is None:
+    if x is None or type(x) != str:
         return None 
 
     if "," in x:
