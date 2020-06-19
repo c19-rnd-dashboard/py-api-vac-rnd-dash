@@ -19,8 +19,8 @@ class CommonObjectStandardizationTest(unittest.TestCase):
         self.set_default_null_name = 'Japan, NA, N/A'
 
     def test_null_countries(self):
-        self.assertIsNone(clean_country(self.set_countries_null))
-        self.assertIsNone(clean_country(self.set_countries_null_multiple))
+        self.assertIsNone(clean_country(self.set_countries_null)['alpha3'])
+        self.assertIsNone(clean_country(self.set_countries_null_multiple)['alpha3'])
 
     def test_country_lookup(self):
         print(clean_country(self.set_countries_simple))
