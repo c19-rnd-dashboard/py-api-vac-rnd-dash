@@ -17,10 +17,16 @@ def _split_country_string(s):
     return countries_b
 
 
+def _remove_null_names(s):
+    default_names = ['NA']
+    return [name for name in s if name not in default_names]
+
 def clean_country(country_names: str) -> str:
     result = []
 
     countries = _split_country_string(country_names)
+
+    countries = _remove_null_names(countries)
 
     for country in countries:
         try:
