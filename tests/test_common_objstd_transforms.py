@@ -16,6 +16,7 @@ class CommonObjectStandardizationTest(unittest.TestCase):
         self.set_countries_with_null = 'Australia,, United States'
         self.set_countries_full = 'Japan, japn, Korea, north korea, netherlands'
         self.set_countries_with_hypen = 'United State, Rome-Italy'
+        self.set_default_null_name = 'Japan, NA, N/A'
 
     def test_null_countries(self):
         self.assertIsNone(clean_country(self.set_countries_null))
@@ -32,3 +33,9 @@ class CommonObjectStandardizationTest(unittest.TestCase):
     def test_country_lookup_multi_delimiter(self):
         testset = self.set_countries_with_hypen
         self.assertEqual(len(testset.split(',')), len(clean_country(testset).split(',')))
+
+    def test_country_lookup_null_placeholder(self):
+        testset = self.set_default_null_name
+        print(clean_country(testset))
+        self.assertEqual(1, len(clean_country(testset).split(',')))
+        

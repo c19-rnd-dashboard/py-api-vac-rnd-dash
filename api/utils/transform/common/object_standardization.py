@@ -18,8 +18,8 @@ def _split_country_string(s):
 
 
 def _remove_null_names(s):
-    default_names = ['NA']
-    return [name for name in s if name not in default_names]
+    default_names = ['na', 'n/a', '']
+    return [name for name in s if name.strip().lower() not in default_names]
 
 def clean_country(country_names: str) -> str:
     result = []
