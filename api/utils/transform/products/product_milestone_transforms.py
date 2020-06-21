@@ -46,8 +46,10 @@ def infer_status(value):
 
 
 def compare_max_completed(row, lookup):
-    if row.milestone_id <= lookup[row.product_id]:
+    if row.milestone_id < lookup[row.product_id]:
         return 'COMPLETED'
+    elif row.milestone_id == lookup[row.product_id]:
+        return 'ONGOING'
     return None
 
     
@@ -87,8 +89,7 @@ def build_status(dataframe: pd.DataFrame):
             else:
                 fill_status.append(dataframe.iloc[i].status)
         dataframe['status'] = fill_status
-        return dataframe
-        
+        return dataframe        
         
     dataframe['status'] = dataframe.date.apply(infer_status)
     fill_completed(dataframe, get_max_completed(dataframe))
