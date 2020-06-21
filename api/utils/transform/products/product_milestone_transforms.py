@@ -48,10 +48,13 @@ def infer_status(value):
 def compare_max_completed(row, lookup):
     if row.milestone_id < lookup[row.product_id]:
         return 'COMPLETED'
-    elif row.milestone_id == lookup[row.product_id]:
-        return 'ONGOING'
     return None
 
+
+def set_max_completed_to_ongoing(row, lookup):
+    if row.milestone_id == lookup[row.product_id]:
+        return 'ONGOING'
+    return row.status
     
 def clean_rename_data(dataframe: pd.DataFrame, renaming_schema:dict):
     temp = dataframe.rename(columns=renaming_schema)
@@ -87,7 +90,9 @@ def build_status(dataframe: pd.DataFrame):
                     compare_max_completed(row=dataframe.iloc[i], lookup=max_completed)
                 )
             else:
-                fill_status.append(dataframe.iloc[i].status)
+                fill_status.append(
+                    set_max_completed_to_ongoing(row=dataframe.iloc[i], lookup=max_completed)
+                )
         dataframe['status'] = fill_status
         return dataframe        
         
