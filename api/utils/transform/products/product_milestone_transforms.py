@@ -14,6 +14,9 @@ import numpy as np
 from data import factory_milestones, get_milestone_renaming_schema
 from api.utils.transform.common import convert_to_datetime
 
+
+# pd.options.mode.chained_assignment = 'raise'
+
 # Define data preparation and filtering
 def fill_product_id(dataframe: pd.DataFrame):
     if 'product_id' in dataframe.columns: 
@@ -111,8 +114,10 @@ def drop_unavailable_milestones(dataframe: pd.DataFrame) -> pd.DataFrame:
 
 def clean_frame(dataframe: pd.DataFrame) -> pd.DataFrame:
     # Re-Cast product_id to integer type
-    dataframe.product_id = dataframe.product_id.astype('int')
-    return dataframe
+    tempframe = dataframe.copy()
+    tempframe.loc[:, 'product_id'] = tempframe.loc[:, 'product_id'].astype('int')
+    tempframe = tempframe.drop_duplicates(subset=['product_id', 'milestone_id'], keep='first').copy()
+    return tempframe
 
 
 def milestone_transformer(dataframe: pd.DataFrame) -> pd.DataFrame:
