@@ -3,14 +3,21 @@ import pandas as pd
 import numpy as np
 
 
+
+
+def _validate_date(d):
+    return d
+
+
 def convert_to_datetime(time_string):
     try:
         date_val = parse(time_string)
         if pd.isnull(date_val):
             return None
-        return date_val
     except:
         return None
+
+    return _validate_date(date_val)
 
 
 def cast_to_int(series: pd.Series, replace=True)->pd.Series:
