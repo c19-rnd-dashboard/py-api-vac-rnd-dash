@@ -90,6 +90,9 @@ class ProductRaw(Base):
     trial_id = Column(String)
     num_sites = Column(String)
     sources = Column(String)
+    study_start_date = Column(DateTime, nullable=True)
+    primary_completion_date = Column(DateTime, nullable=True)
+    study_completion_date = Column(DateTime, nullable=True)
 
     @property
     def json(self):
