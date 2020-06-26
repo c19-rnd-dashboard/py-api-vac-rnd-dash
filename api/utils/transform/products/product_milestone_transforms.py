@@ -12,17 +12,22 @@ import pandas as pd
 import numpy as np
 
 from data import factory_milestones, get_milestone_renaming_schema
-from .common import convert_to_datetime
+from api.utils.transform.common import convert_to_datetime
+
+
+# pd.options.mode.chained_assignment = 'raise'
 
 # Define data preparation and filtering
 def fill_product_id(dataframe: pd.DataFrame):
     if 'product_id' in dataframe.columns: 
-        return dataframe
+        pass
     else: 
-        dataframe['product_id'] = list(
-            dataframe.reindex(range(len(dataframe))).index
-            )
-        return dataframe
+        try:
+            dataframe['product_id'] = dataframe['ID'].astype('int')
+        except Exception as e:
+            logger.error(f'Could not cast ID. {e}') 
+            raise(e)
+    return dataframe
 
     
 def remove_value(dictionary:dict, values:list):
@@ -44,10 +49,15 @@ def infer_status(value):
 
 
 def compare_max_completed(row, lookup):
-    if row.milestone_id <= lookup[row.product_id]:
+    if row.milestone_id < lookup[row.product_id]:
         return 'COMPLETED'
     return None
 
+
+def set_max_completed_to_ongoing(row, lookup):
+    if row.milestone_id == lookup[row.product_id]:
+        return 'ONGOING'
+    return row.status
     
 def clean_rename_data(dataframe: pd.DataFrame, renaming_schema:dict):
     temp = dataframe.rename(columns=renaming_schema)
@@ -83,10 +93,11 @@ def build_status(dataframe: pd.DataFrame):
                     compare_max_completed(row=dataframe.iloc[i], lookup=max_completed)
                 )
             else:
-                fill_status.append(dataframe.iloc[i].status)
+                fill_status.append(
+                    set_max_completed_to_ongoing(row=dataframe.iloc[i], lookup=max_completed)
+                )
         dataframe['status'] = fill_status
-        return dataframe
-        
+        return dataframe        
         
     dataframe['status'] = dataframe.date.apply(infer_status)
     fill_completed(dataframe, get_max_completed(dataframe))
@@ -100,6 +111,15 @@ def drop_unavailable_milestones(dataframe: pd.DataFrame) -> pd.DataFrame:
     temp = dataframe[dataframe.status.notna()]
     return temp
 
+
+def clean_frame(dataframe: pd.DataFrame) -> pd.DataFrame:
+    # Re-Cast product_id to integer type
+    tempframe = dataframe.copy()
+    tempframe.loc[:, 'product_id'] = tempframe.loc[:, 'product_id'].astype('int')
+    tempframe = tempframe.drop_duplicates(subset=['product_id', 'milestone_id'], keep='first').copy()
+    return tempframe
+
+
 def milestone_transformer(dataframe: pd.DataFrame) -> pd.DataFrame:
     clean_data = clean_rename_data(dataframe, get_milestone_renaming_schema())
     formatted_data = melt_join_milestones(
@@ -109,4 +129,6 @@ def milestone_transformer(dataframe: pd.DataFrame) -> pd.DataFrame:
     )
     build_status(formatted_data)
     build_link_id(formatted_data)
-    return drop_unavailable_milestones(formatted_data)
+    return clean_frame(
+        drop_unavailable_milestones(formatted_data)
+        )

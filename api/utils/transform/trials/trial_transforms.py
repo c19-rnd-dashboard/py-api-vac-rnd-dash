@@ -5,6 +5,7 @@ from functools import partial
 from fuzzywuzzy import fuzz 
 
 from api.utils.transform.common import *
+from api.utils.tools import coalesce
 
 import logging 
 
@@ -80,6 +81,16 @@ def trial_cleaner(data: pd.DataFrame):
         df[col] = df[col].apply(clean_lists)
 
     df["country_codes"] = df["countries"].apply(clean_country)
+    # Generate country code lists and clean names
+    cdata = df["countries"].apply(clean_country)
+
+    alpha3 = [coalesce(country['alpha3'], '')
+                for country in cdata]
+    names = [coalesce(country['name'], '')
+                for country in cdata]
+    df["country_codes"] = alpha3
+    df["countries"] = names
+    
     tlogg.info(f'Trial Columns: {df.columns}')
     if 'target_enrollment' in df.columns:
         df["target_enrollment"] = cast_to_int(df.target_enrollment)
