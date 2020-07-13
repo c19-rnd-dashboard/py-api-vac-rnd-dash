@@ -26,7 +26,9 @@ class LoaderTest(unittest.TestCase):
 
     def test_gsheet_download_with_key(self):
         tlog.info('Running Gsheet Download Test')
-        print(load_gsheet(key=self.gsheet_key, sheet=self.sheet_id))
+        data = load_gsheet(key=self.gsheet_key, sheet=self.sheet_id)
+        self.assertEqual(type(data), pd.DataFrame)
+
 
     
     # def test_explicit_loader(self):

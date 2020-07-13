@@ -1,5 +1,10 @@
 # ghseetloader.py
+from .unfilteredcsv import load_unfiltered_csv
+
 import pandas as pd
+import logging
+
+tlog = logging.getLogger(__name__)
 
 
 class DataSourceProtocol():
@@ -32,7 +37,10 @@ class DataSourceProtocol():
 
 
 def load_gsheet(url:str=None, dtype='csv', key=None, sheet=None) -> pd.DataFrame:
+    tlog.info('Creating Gsheets protocol URL and sending to unfiltered csv.')
     gs = DataSourceProtocol()
     url = gs.gen_url(dtype=dtype, key=key, sheet=sheet)
+    return load_unfiltered_csv(url)
+
 
 
