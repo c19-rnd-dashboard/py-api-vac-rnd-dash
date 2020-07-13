@@ -101,8 +101,8 @@ def run_database_update():
          {}
          ),
         ('product',
-         'https://raw.githubusercontent.com/c19-rnd-dashboard/py-api-vac-rnd-dash/master/data/vaccines/vaccineworkfile4.csv',
-         {'loader': "unfiltered_csv"}
+         'https://docs.google.com/spreadsheets/d/11FlafRMeQ2D6doEX_CMHyW4OqnXkp1FfrkLdsxhd0do/edit#gid=1988095192',
+         {'loader': "gsheet"}
          ),
         ('trial',
          'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-05-26.csv',
