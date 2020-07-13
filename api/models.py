@@ -258,10 +258,12 @@ class ProductContact(Base):
     __tablename__ = 'productcontact'
     _class_name = 'ProductContact'
 
-    product_id = Column(Integer)
+    product_id = Column(Integer, primary_key=True)
     contact_name = Column(String)
     contact_phone = Column(String)
     contact_email = Column(String)
+    contact_website = Column(String)
+    contact_notes = Column(Text)
 
     @property
     def json(self):
