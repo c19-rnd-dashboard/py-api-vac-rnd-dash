@@ -24,22 +24,22 @@ class LoaderTest(unittest.TestCase):
         ds = DataSourceProtocol()
         assert 'https://' in ds.gen_url(dtype='csv', key=self.gsheet_key, sheet=self.sheet_id)
 
+    
     def test_gsheet_download_with_key(self):
         tlog.info('Running Gsheet Download Test')
         data = load_gsheet(key=self.gsheet_key, sheet=self.sheet_id)
         self.assertEqual(type(data), pd.DataFrame)
-
-
     
-    # def test_explicit_loader(self):
+    def test_explicit_loader(self):
 
-    #     output = load(
-    #         file_or_buffer=file_url,
-    #         loader=loader,
-    #         max_len=371,
-    #     )
-    #     self.assertIsNotNone(output)
+
+        output = load(
+            file_or_buffer=self.gsheet_url,
+            loader=self.loader,
+        )
+
+        self.assertIsNotNone(output)
         
-    #     if self.save_result:
-    #         filename = '_'.join([category, loader])
-    #         output.to_csv(filename)
+        if self.save_result:
+            filename = '_'.join([self.loader])
+            output.to_csv(filename)

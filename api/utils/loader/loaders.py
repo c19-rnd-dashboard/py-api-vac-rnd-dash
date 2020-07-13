@@ -75,7 +75,7 @@ class FileLoader(Loader):
 
 
 class ObjectLoader(Loader):
-    def __init__(self, buffer_var):
+    def __init__(self, buffer_var, **kwargs):
         super().__init__()
         self.buffer_var = buffer_var
         self.data_ = None
@@ -129,8 +129,10 @@ def is_file(file_or_buffer):
     tests = [
         # Test for local file
         os.path.isfile(file_or_buffer),
+        # Test filepath type requirement
+        infer_filetype(file_or_buffer) is not None,
         # Test remote URL
-        validate_url(file_or_buffer) and infer_filetype(file_or_buffer) is not None
+        validate_url(file_or_buffer),
     ]
 
     logmsg = f"IsFile tests: run: {'-'.join([str(x) for x in tests])}"

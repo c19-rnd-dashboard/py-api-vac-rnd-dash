@@ -2,6 +2,7 @@
 from .unfilteredcsv import load_unfiltered_csv
 
 import pandas as pd
+import re
 import logging
 
 tlog = logging.getLogger(__name__)
@@ -35,12 +36,30 @@ class DataSourceProtocol():
         
 
 
+def _parse_url(url):
+# https://docs.google.com/spreadsheets/d/11FlafRMeQ2D6doEX_CMHyW4OqnXkp1FfrkLdsxhd0do/edit#gid=1988095192
+    assert 'edit' in url, 'Edit URL not sent.  Is this preformatted?'
+    pat = r'^.*\/d\/(.*)\/edit.*$'
+    match = re.search(pat, url)
+    return {
+        'key':match.group(1),
+        'sheet_id':url.split('=')[-1],
+    }
+    
 
-def load_gsheet(url:str=None, dtype='csv', key=None, sheet=None) -> pd.DataFrame:
+
+def load_gsheet(url:str=None, dtype='csv', key=None, sheet=None, **kwargs) -> pd.DataFrame:
     tlog.info('Creating Gsheets protocol URL and sending to unfiltered csv.')
     gs = DataSourceProtocol()
-    url = gs.gen_url(dtype=dtype, key=key, sheet=sheet)
-    return load_unfiltered_csv(url)
+
+    if url is not None:
+        uparse = _parse_url(url)
+        key = uparse['key']
+        sheet = uparse['sheet_id']
+
+    protocol_url =  gs.gen_url(dtype=dtype, key=key, sheet=sheet)
+
+    return load_unfiltered_csv(protocol_url)
 
 
 
