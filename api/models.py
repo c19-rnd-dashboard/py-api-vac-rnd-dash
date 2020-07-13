@@ -89,6 +89,7 @@ class ProductRaw(Base):
     condition_or_disease = Column(String)
     trial_id = Column(String)
     num_sites = Column(String)
+    registry_link = Column(String)
     sources = Column(String)
     study_start_date = Column(DateTime, nullable=True)
     primary_completion_date = Column(DateTime, nullable=True)
