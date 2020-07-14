@@ -7,6 +7,7 @@ from api.utils.transform import (
     get_product_sponsors, condense_sponsors,
     get_product_milestones, condense_milestones,
     get_product_locations, condense_locations,
+    get_product_contacts, condense_contacts,
 )
 from api.cache import cache
 from sqlalchemy import or_, and_
@@ -84,6 +85,7 @@ def assets():
     sponsors = condense_sponsors(get_product_sponsors())
     milestones = condense_milestones(get_product_milestones())
     sitelocations = condense_locations(get_product_locations())
+    contacts = condense_contacts(get_product_contacts())
 
     for asset in serialized_assets:
         asset['sponsors'] = fetch_value(sponsors, asset['productId'])
@@ -92,5 +94,6 @@ def assets():
         asset['sources'] = asset['sources'].split(',')
         asset['countries'] = asset['countries'].split(',')
         asset['countryCodes'] = asset['countryCodes'].split(',')
+        asset['contact'] = fetch_value(contacts, asset['productId'])
 
     return jsonify(serialized_assets)
