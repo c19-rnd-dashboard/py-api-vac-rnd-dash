@@ -120,3 +120,8 @@ def write_sitelocation(data: pd.DataFrame):
     run_write(data=location_filter(data), model=SiteLocation)
     writelogger.info('Building ProductSiteLocation writer.')
     run_write(data=product_location_filter(data), model=ProductSiteLocation)
+
+
+def write_productcontact(data: pd.DataFrame):
+    writelogger.info('Building ProductContact writer')
+    run_write(data=data, model=ProductContact)

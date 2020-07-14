@@ -51,6 +51,7 @@ def to_dict(inst, cls):
             d[c.name] = v
     return d
 
+
 #######################
 ### New Data Models ###
 #######################
@@ -247,6 +248,22 @@ class ProductSiteLocation(Base):
     product_id = Column(Integer)
 
     sitelocation = relationship('SiteLocation', back_populates='products')
+
+    @property
+    def json(self):
+        return to_dict(self, self.__class__)
+
+
+class ProductContact(Base):
+    __tablename__ = 'productcontact'
+    _class_name = 'ProductContact'
+
+    product_id = Column(Integer, primary_key=True)
+    contact_name = Column(String)
+    contact_phone = Column(String)
+    contact_email = Column(String)
+    contact_website = Column(String)
+    contact_notes = Column(Text)
 
     @property
     def json(self):

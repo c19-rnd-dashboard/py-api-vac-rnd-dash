@@ -83,3 +83,7 @@ def null_transform(data: pd.DataFrame):
 
 def make_column_filter(model):
     return partial(filter_columns, model=model)
+
+
+def rename_columns(frame, schema):
+    return frame.rename(columns=schema)

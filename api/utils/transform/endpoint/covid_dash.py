@@ -67,3 +67,19 @@ def condense_locations(location_results: pd.DataFrame) -> dict:
         }
         location_dict[result.product_id] = location_dict[result.product_id] + [location_info]
     return location_dict
+
+
+def condense_contacts(contact_results: pd.DataFrame) -> dict:
+    unique_ids = contact_results.product_id.unique()
+    contact_dict = _seed_dictionary(unique_ids)
+    for i in range(len(contact_results)):
+        contact = contact_results.iloc[i]
+        contact_info = {
+            'name': contact.contact_name,
+            'phone': contact.contact_phone,
+            'email': contact.contact_email,
+            'website': contact.contact_website,
+            'notes': contact.contact_notes,
+        }
+        contact_dict[contact.product_id] = contact_dict[contact.product_id] + [contact_info]
+    return contact_dict

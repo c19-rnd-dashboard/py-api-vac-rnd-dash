@@ -36,7 +36,7 @@ product_schema = {
     'Discovery Started': 'discovery_started_date',
     'CTG Identifier': 'trial_id',
     'Registry Link': 'registry_link',
-    'Contact Phone': 'contact_phone',
+    'Contact Phone Number': 'contact_phone',
     'Contact Email': 'contact_email',
     'Contact Website': 'contact_website',
     'Contact Notes': 'contact_notes',
