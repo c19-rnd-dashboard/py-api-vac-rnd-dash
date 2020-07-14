@@ -113,8 +113,13 @@ def make_subset_ingest(model, columns: list = None):
     ingestlogger.info(f"Beginning subset ingest of: {model._class_name}")
 
     def ingest_subset(data: pd.DataFrame, **kwargs):
+        if columns is None:
+            df = data.copy()
+        else:
+            df = data[columns].copy()
+
         run_ingest(
-            source=data[columns].copy(),
+            source=df,
             category=kwargs['model'].__tablename__,
         )
         ingestlogger.info(f"Returning data of shape {data.shape}")
@@ -166,6 +171,9 @@ def assign_product_transforms(**kwargs):
         make_subset_ingest(
             model=SiteLocation,
             columns=['ID', 'Sites Locations', 'Source?']),
+        make_subset_ingest(
+            model=ProductContact,
+            columns=None),
         clean_product_raw,
         make_column_filter(ProductRaw),
         cast_dates,
@@ -191,7 +199,6 @@ def assign_sponsor_transforms(**kwargs):
         make_column_filter(Sponsor),
     ]
 
-
 listRegistry.register(assign_sponsor_transforms)
 
 ## Product Sponsors ##
@@ -203,7 +210,6 @@ def assign_productsponsor_transforms(**kwargs):
         make_column_filter(ProductSponsor),
     ]
 
-
 listRegistry.register(assign_productsponsor_transforms)
 
 ## Product Site Locations ##
@@ -213,7 +219,6 @@ def assign_sitelocation_transforms(**kwargs):
     return [
         prep_product_sitelocation,
     ]
-
 
 listRegistry.register(assign_sitelocation_transforms)
 
@@ -231,7 +236,6 @@ def assign_productmilestone_transforms(**kwargs):
         make_column_filter(ProductMilestone)
     ]
 
-
 listRegistry.register(assign_productmilestone_transforms)
 
 ######################
@@ -244,7 +248,6 @@ def assign_milestone_transforms(**kwargs):
         null_transform,
     ]
 
-
 listRegistry.register(assign_milestone_transforms)
 
 
@@ -253,5 +256,18 @@ def assign_country_transforms(**kwargs):
         null_transform,
     ]
 
-
 listRegistry.register(assign_country_transforms)
+
+
+###################################
+### Product Contact Information ###
+###################################
+
+def assign_productcontact_transforms(**kwargs):
+    return [
+        null_transform,
+        product_contact_transformer,
+        make_column_filter(ProductContact)
+    ]
+
+listRegistry.register(assign_productcontact_transforms)

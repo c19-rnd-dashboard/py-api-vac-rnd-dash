@@ -40,12 +40,24 @@ def get_product_milestones(context=True):
             ProductMilestone.link_id,
             ProductMilestone.product_id, ProductMilestone.milestone_id, ProductMilestone.date, ProductMilestone.status,
             Milestone.name, Milestone.category).join(ProductMilestone).all()
-    return pd.DataFrame(milesone_info, columns=['link_id', 'product_id', 'milestone_id', 'date', 'status', 'milestone_name', 'category'])
+    return pd.DataFrame(
+        milesone_info, 
+        columns=[
+            'link_id', 
+            'product_id', 
+            'milestone_id', 
+            'date', 
+            'status', 
+            'milestone_name', 
+            'category'
+        ]
+    )
 
 
 def get_site_locations(context=True):
     with get_session() as session:
         return session.query(SiteLocation).all()
+
 
 def get_product_locations(context=True):
     with get_session(context) as session:
@@ -55,6 +67,38 @@ def get_product_locations(context=True):
             SiteLocation.name, SiteLocation.city, SiteLocation.state, SiteLocation.country,
             SiteLocation.lat, SiteLocation.lng
         ).join(ProductSiteLocation).all()
-    return pd.DataFrame(location_info, columns=[
-        'link_id', 'product_id', 'site_location_id', 'location_name', 'city', 'state', 'country', 'lat', 'lng',
-    ])
+    return pd.DataFrame(
+        location_info, 
+        columns=[
+            'link_id', 
+            'product_id', 
+            'site_location_id', 
+            'location_name', 
+            'city', 
+            'state', 
+            'country', 
+            'lat', 
+            'lng',
+        ]
+    )
+
+
+def get_product_contacts(context=True):
+    with get_session() as session:
+        contact_info = session.query(
+            ProductContact.product_id,
+            ProductContact.contact_name, ProductContact.contact_phone,
+            ProductContact.contact_email, ProductContact.contact_website, 
+            ProductContact.contact_notes
+        ).all()
+    return pd.DataFrame(
+        contact_info, 
+        columns=[
+            'product_id', 
+            'contact_name', 
+            'contact_phone', 
+            'contact_email', 
+            'contact_website',
+            'contact_notes'
+        ]
+    )
