@@ -82,5 +82,6 @@ def get_milestone_renaming_schema(columns=None):
             'Phase 3 Started': 'phase_3',
             'NDA or equivalent Approval Finalized': 'nda',
             'Discovery Started': 'discovery',
+            'Current Stage': 'current_stage',
         }
     return milestone_col_name_schema
