@@ -104,7 +104,7 @@ def build_status(dataframe: pd.DataFrame):
     return dataframe
     
 def build_link_id(dataframe: pd.DataFrame) -> pd.DataFrame:
-    dataframe['link_id'] = dataframe.index.tolist()
+    dataframe['link_id'] = dataframe['product_id'].astype(str) + '99' + dataframe['milestone_id'].astype(str)
     return dataframe
 
 def drop_unavailable_milestones(dataframe: pd.DataFrame) -> pd.DataFrame:
