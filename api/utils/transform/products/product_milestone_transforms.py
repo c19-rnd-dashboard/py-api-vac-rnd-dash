@@ -72,8 +72,7 @@ def fill_current_stage(dataframe: pd.DataFrame):
     def _rename_phase(x):
         pass
     return dataframe  # Bypass change until clarification
-    dataframe['current_stage'] = dataframe['current_stage'].apply(_rename_phase)
-
+    
 
 def melt_join_milestones(dataframe: pd.DataFrame, id_vars:list, value_vars:list):
     pivot_data = pd.melt(dataframe, id_vars=id_vars, value_vars=value_vars)
@@ -132,7 +131,6 @@ def clean_frame(dataframe: pd.DataFrame) -> pd.DataFrame:
 
 def milestone_transformer(dataframe: pd.DataFrame) -> pd.DataFrame:
     clean_data = clean_rename_data(dataframe, get_milestone_renaming_schema())
-    clean_data = fill_current_stage(dataframe)
     formatted_data = melt_join_milestones(
         dataframe=clean_data, 
         id_vars=['product_id'], 
