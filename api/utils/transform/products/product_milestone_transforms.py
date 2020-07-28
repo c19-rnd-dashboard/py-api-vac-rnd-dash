@@ -111,10 +111,19 @@ def build_status(dataframe: pd.DataFrame):
     return dataframe
 
     
+def _clean_link_id(x):
+    # Check against improper .
+    temp = str(x).split('.')[0]
+    try:
+        return str(int(temp))
+    except Exception as e:
+        return None
+
+
 def build_link_id(dataframe: pd.DataFrame) -> pd.DataFrame:
     dataframe['link_id'] = dataframe['product_id'].astype(str) + '99' + dataframe['milestone_id'].astype(str)
+    dataframe['link_id'] = dataframe['link_id'].apply(_clean_link_id)
     return dataframe
-
 
 def drop_unavailable_milestones(dataframe: pd.DataFrame) -> pd.DataFrame:
     temp = dataframe[dataframe.status.notna()]
