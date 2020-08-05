@@ -62,8 +62,6 @@ def _map_record_to_locations(get_location):
             for index in range(len(result)):
                 result[index]['site_location_id'] = generate_hash(
                     addresses[index]+str(product_id))
-                print(f'Raw Name: {addresses[index]}')
-                print(f'\n Name Found: {parse_site_name(addresses[index])} \n')
                 result[index]['name'] = parse_site_name(addresses[index])
             return result
     return actual_map

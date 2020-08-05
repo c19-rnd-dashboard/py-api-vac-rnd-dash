@@ -51,7 +51,6 @@ def parse_site_name(raw: str) -> str:
         return ' '.join([w.capitalize() for w in name.split()])
 
     def _test_hyphen(raw):
-        print('looking at: ', raw)
         if raw is None:
             return None
         name = raw.split('-')[0]
