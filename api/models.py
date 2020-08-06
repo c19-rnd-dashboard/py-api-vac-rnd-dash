@@ -224,7 +224,8 @@ class SiteLocation(Base):
     _class_name = 'SiteLocation'
 
     site_location_id = Column(String, primary_key=True)
-    name = Column(String, nullable=False)
+    address = Column(String)
+    name = Column(String)
     city = Column(String)
     state = Column(String)
     country = Column(String)

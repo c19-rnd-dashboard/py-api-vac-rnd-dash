@@ -13,12 +13,15 @@ tlogg = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 #############################
 
 
+def _parse_names(df:pd.DataFrame):
+    pass
+
+
 def _add_index_as_col(dataframe:pd.DataFrame, col_name) -> pd.DataFrame:
     tlogg.info(f'Adding Column {col_name} to dataframe')
     temp = dataframe.copy()
     temp[col_name] = np.array(temp.index.values)
     return temp
-
 
 
 def prep_product_sitelocation(data: pd.DataFrame):
