@@ -12,7 +12,7 @@ from urllib3 import PoolManager
 
 from .unfilteredcsv import load_unfiltered_csv
 from .gsheetloader import load_gsheet
-
+from .sourcecache import read_cache, cache_source
 
 
 # Logger
@@ -37,10 +37,28 @@ class Loader():
             return data # Null transform returns data
     
     def fetch_transform(self, **kwargs):
-        return self.transform(
-                data = self.fetch(**kwargs),
-                **kwargs
-            )
+
+        if self._check_cache(**kwargs):
+            return self._read_cache(**kwargs)
+        else:
+            return self.transform(
+                    data = self.fetch(**kwargs),
+                    **kwargs
+                )
+
+    def _check_cache(self, *args, **kwargs):
+        ## TODO Complete with imported helper function to infer cache hit details from kwargs
+        read_cache(self, **kwargs)
+        return False
+
+
+    def _read_cache(self, *args, **kwargs):
+        ## TODO Complete with imported helper function to read data from cache (requires conversion to DataFrame)
+        pass
+
+
+
+
 
 
 ### Derived Classes ###
