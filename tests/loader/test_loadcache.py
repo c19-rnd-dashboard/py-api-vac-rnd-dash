@@ -12,6 +12,11 @@ import pandas as pd
 
 import os
 
+import logging 
+import json
+
+tlog = logging.getLogger(__name__)
+
 
 class LoadCacheTest(unittest.TestCase):
 
@@ -19,8 +24,12 @@ class LoadCacheTest(unittest.TestCase):
         self.loader = "gsheet"
         self.gsheet_url = 'https://docs.google.com/spreadsheets/d/11FlafRMeQ2D6doEX_CMHyW4OqnXkp1FfrkLdsxhd0do/edit#gid=1988095192'
 
-        self.save = False
+        self.save = True
+        self.savereadpath = 'CacheRead.txt'
 
+
+    def tearDown(self):
+        clear_cache()
 
     def test_cache_source(self):
         loader = FileLoader(
@@ -29,15 +38,22 @@ class LoadCacheTest(unittest.TestCase):
             cache=False,
         )
         data = loader.fetch_transform()
-        cache_source(name=self.gsheet_url, data=data)
-        self.assertEqual(True, clear_cache())  #  Currently eliminates entire cache (not specific to file)
-
-
-    def test_clear_cache(self):
-        pass
-
+        cache_source(loader)
 
 
     def test_cache_read(self):
-        pass
-    
+        loader = FileLoader(
+            filename=self.gsheet_url,
+            loader=self.loader,
+            cache=False,
+        )
+        data = loader.fetch_transform()
+        cache_source(loader)
+
+        read = read_cache(loader)
+        self.assertIsNotNone(read)
+        # tlog.info(f'CacheRead: {read}')  
+
+        if self.save:
+            with open(self.savereadpath, 'w+') as f:
+                f.write(json.dumps(read))

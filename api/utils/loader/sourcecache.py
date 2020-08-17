@@ -45,7 +45,7 @@ def _recent_cache(filename):
         cachelogger.info(f'Cache found. Age: {age}')
         cachelogger.info(f'Testing age against threshold {cache_time}')
         cachelogger.info(f'Is {age} < {cache_time}: {age < cache_time}')
-        return age > cache_time
+        return age < cache_time
 
 
 def check_cache(*args, **kwargs):
@@ -62,21 +62,25 @@ def read_cache(*args, **kwargs):
         cachelogger.info(f'Filename found in Loader.  Checking cache for recent load.')
         if _recent_cache(loader.filename):
             cachelogger.info(f'Valid cache identified.  Loading data from cache.')
-            return True 
+            with get_session(context=False) as session:
+                data = session.query(SourceCache.data).filter(SourceCache.uri==loader.filename).all()
+                return data
     return False
 
 
-def cache_source(name, data):
+def cache_source(*args, **kwargs):
     def _prep_data(data):
         temp = drop_unnamed_columns(data)
         return temp.to_json(orient='records')
 
-    with get_session(context=False) as session:
+    loader = args[0]
+    name = loader.filename
 
+    with get_session(context=False) as session:
         record = SourceCache(
             source_id=hash(name),
             uri=name,
-            data=_prep_data(data),
+            data=_prep_data(loader.fetch_transform()),
             last_update=datetime.datetime.now(),
             )
         session.add(record)
