@@ -12,7 +12,7 @@ from urllib3 import PoolManager
 
 from .unfilteredcsv import load_unfiltered_csv
 from .gsheetloader import load_gsheet
-from .sourcecache import read_cache, cache_source
+from .sourcecache import check_cache, read_cache, cache_source
 
 
 # Logger
@@ -22,8 +22,8 @@ loadlogger = logging.getLogger('.'.join(['api.app', __name__.strip('api.')]))
 ### Base Class ###
 
 class Loader():
-    def __init__(self):
-        pass
+    def __init__(self, cache=True):
+        self.cache=cache
     
     def fetch(self):
         NotImplemented
@@ -37,19 +37,17 @@ class Loader():
             return data # Null transform returns data
     
     def fetch_transform(self, **kwargs):
+        if self.cache:
+            if self._check_cache(**kwargs):
+                return self._read_cache(**kwargs)
 
-        if self._check_cache(**kwargs):
-            return self._read_cache(**kwargs)
-        else:
-            return self.transform(
-                    data = self.fetch(**kwargs),
-                    **kwargs
-                )
+        return self.transform(
+                data = self.fetch(**kwargs),
+                **kwargs
+            )
 
     def _check_cache(self, *args, **kwargs):
-        ## TODO Complete with imported helper function to infer cache hit details from kwargs
-        read_cache(self, **kwargs)
-        return False
+        return check_cache(self, **kwargs)
 
 
     def _read_cache(self, *args, **kwargs):
@@ -64,10 +62,14 @@ class Loader():
 ### Derived Classes ###
 
 class FileLoader(Loader):
-    def __init__(self, filename, **kwargs):
-        super().__init__()
+    def __init__(self, filename, cache=True, **kwargs):
+        super().__init__(cache)
         self.filename = filename
         self.data_ = None
+        
+        self.loader = None
+        if 'loader' in kwargs:
+            self.loader = kwargs['loader']
 
     def fetch(self, **kwargs):
         # Get filetype to assign loading function
@@ -87,8 +89,8 @@ class FileLoader(Loader):
             'unfiltered_csv': load_unfiltered_csv,
         }
         # Look for explicit loader type
-        if 'loader' in kwargs:
-            return lookup[kwargs['loader']]
+        if self.loader is not None:
+            return lookup[self.loader]
         return lookup[filetype]
 
 
@@ -115,10 +117,10 @@ class ObjectLoader(Loader):
 ### Control Functions ###
 #########################
 
-def load(file_or_buffer=None, **kwargs):
+def load(file_or_buffer=None, cache=True, **kwargs):
     # print('file_or_buffer: ', file_or_buffer)  # DEBUG
     if type(file_or_buffer) == str and is_file(file_or_buffer):
-        loader = FileLoader(filename=file_or_buffer, **kwargs)
+        loader = FileLoader(filename=file_or_buffer, cache=cache, **kwargs)
         return loader.fetch_transform(**kwargs)
     else:
         loader = ObjectLoader(buffer_var=file_or_buffer, **kwargs)
