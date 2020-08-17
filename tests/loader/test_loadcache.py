@@ -24,12 +24,13 @@ class LoadCacheTest(unittest.TestCase):
         self.loader = "gsheet"
         self.gsheet_url = 'https://docs.google.com/spreadsheets/d/11FlafRMeQ2D6doEX_CMHyW4OqnXkp1FfrkLdsxhd0do/edit#gid=1988095192'
 
-        self.save = True
+        self.save = False
         self.savereadpath = 'CacheRead.txt'
 
 
     def tearDown(self):
         clear_cache()
+
 
     def test_cache_source(self):
         loader = FileLoader(
@@ -52,8 +53,11 @@ class LoadCacheTest(unittest.TestCase):
 
         read = read_cache(loader)
         self.assertIsNotNone(read)
+
         # tlog.info(f'CacheRead: {read}')  
+        # tlog.info(f'Read Type: {type(read)}')
+        # tlog.info(f'Dir read: {dir(read)}')
 
         if self.save:
-            with open(self.savereadpath, 'w+') as f:
-                f.write(json.dumps(read))
+            with open(self.savereadpath, 'w') as f:
+                f.write(read.to_csv())

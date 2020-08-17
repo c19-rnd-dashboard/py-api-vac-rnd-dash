@@ -3,10 +3,10 @@
 
 from api.models import SourceCache
 from api.db import get_session
-import datetime
-
 from api.utils.transform import drop_unnamed_columns
 
+import datetime
+import pickle
 
 import logging
 
@@ -58,20 +58,24 @@ def check_cache(*args, **kwargs):
 
 def read_cache(*args, **kwargs):
     loader = args[0]
+
+    def _unpickle(data):
+        return pickle.loads(data)
+
     if _check_filename(loader):
         cachelogger.info(f'Filename found in Loader.  Checking cache for recent load.')
         if _recent_cache(loader.filename):
             cachelogger.info(f'Valid cache identified.  Loading data from cache.')
             with get_session(context=False) as session:
-                data = session.query(SourceCache.data).filter(SourceCache.uri==loader.filename).all()
-                return data
+                result = session.query(SourceCache).filter(SourceCache.uri==loader.filename).all()
+                return _unpickle(result[0].data)
     return False
 
 
 def cache_source(*args, **kwargs):
     def _prep_data(data):
         temp = drop_unnamed_columns(data)
-        return temp.to_json(orient='records')
+        return pickle.dumps(temp, pickle.HIGHEST_PROTOCOL)
 
     loader = args[0]
     name = loader.filename

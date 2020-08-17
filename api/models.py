@@ -18,6 +18,7 @@ from sqlalchemy import (
     Float,
     Text,
     Boolean,
+    Binary,
     UniqueConstraint,
     ForeignKeyConstraint,
 )
@@ -276,5 +277,5 @@ class  SourceCache(Base):
 
     source_id = Column(String, primary_key=True)
     uri = Column(String, nullable=False)
-    data = Column(String, nullable=False)
+    data = Column(Binary, nullable=False)
     last_update = Column(DateTime, nullable=False)
