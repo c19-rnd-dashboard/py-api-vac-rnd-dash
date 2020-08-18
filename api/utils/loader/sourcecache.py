@@ -67,12 +67,10 @@ def read_cache(*args, **kwargs):
         return pickle.loads(data)
 
     if _check_filename(loader):
-        cachelogger.info(f'Filename found in Loader.  Checking cache for recent load.')
-        if _recent_cache(loader.filename):
-            cachelogger.info(f'Valid cache identified.  Loading data from cache.')
-            with get_session(context=False) as session:
-                result = session.query(SourceCache).filter(SourceCache.uri==loader.filename).all()
-                return _unpickle(result[0].data)
+        cachelogger.info('Retrieving data from database cache.')
+        with get_session(context=False) as session:
+            result = session.query(SourceCache).filter(SourceCache.uri==loader.filename).all()
+            return _unpickle(result[0].data)
     return False
 
 

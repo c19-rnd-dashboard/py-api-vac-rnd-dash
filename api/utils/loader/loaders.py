@@ -5,6 +5,7 @@ Loaders
 
 import os
 import pandas as pd
+import random
 import logging
 
 from urllib3.util import parse_url
@@ -38,22 +39,29 @@ class Loader():
     
     def fetch_transform(self, **kwargs):
         #  If cache is available, read regardless of cache flag
-        loadlogger.info(f'Checking cache for {self.filename}')
-        if check_cache(self, **kwargs):
-            loadlogger.info(f'Returning cached data.')
-            return self.read_cache(self, **kwargs)
-        else:
-            loadlogger.info(f'Generating result for {self.filename}')
-            result = self.transform(
-                        data = self.fetch(**kwargs),
-                        **kwargs
-                    )
+        if self.cache:
+            loadlogger.info(f'Checking cache for {self.filename}')
+            if check_cache(self, **kwargs):
+                loadlogger.info(f'Returning cached data.')
+                return read_cache(self, **kwargs)
+            else:
+                loadlogger.info(f'Generating result for {self.filename}')
+                result = self.transform(
+                            data = self.fetch(**kwargs),
+                            **kwargs
+                        )
 
-            loadlogger.info(f'Checking cache settings: {self.cache}')
-            if self.cache:
+                loadlogger.info(f'Checking cache settings: {self.cache}')
+                
                 cache_source(name=self.filename, data=result)
 
-            return result
+                return result
+        else:
+            return self.transform(
+                            data = self.fetch(**kwargs),
+                            **kwargs
+                        )
+
 
 
 
@@ -96,10 +104,13 @@ class FileLoader(Loader):
 
 
 class ObjectLoader(Loader):
-    def __init__(self, buffer_var, **kwargs):
-        super().__init__()
+    def __init__(self, buffer_var, cache=False, **kwargs):
+        super().__init__(cache)
         self.buffer_var = buffer_var
         self.data_ = None
+        if 'name' in kwargs:
+            self.filename = kwargs['name']
+
 
     def fetch(self, **kwargs):
         print(type(self.buffer_var), self.buffer_var)
