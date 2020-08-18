@@ -33,23 +33,25 @@ class LoadCacheTest(unittest.TestCase):
 
 
     def test_cache_source(self):
+        tlog.info('test_cache_source starting:')
         loader = FileLoader(
             filename=self.gsheet_url,
             loader=self.loader,
             cache=False,
         )
         data = loader.fetch_transform()
-        cache_source(loader)
+        cache_source(name=loader.filename, data=data)
 
 
     def test_cache_read(self):
+        tlog.info('test_cache_read starting:')
         loader = FileLoader(
             filename=self.gsheet_url,
             loader=self.loader,
             cache=False,
         )
         data = loader.fetch_transform()
-        cache_source(loader)
+        cache_source(name=loader.filename, data=data)
 
         read = read_cache(loader)
         self.assertIsNotNone(read)
@@ -61,3 +63,15 @@ class LoadCacheTest(unittest.TestCase):
         if self.save:
             with open(self.savereadpath, 'w') as f:
                 f.write(read.to_csv())
+
+
+    def test_cache_on_load(self):
+        tlog.info('test_cache_on_load starting:')
+        loader = FileLoader(
+            filename=self.gsheet_url,
+            loader=self.loader,
+            cache=True,
+        )
+        data = loader.fetch_transform()
+        self.assertTrue(check_cache(loader))
+        self.assertIsNotNone(data)

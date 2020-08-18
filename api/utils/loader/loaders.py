@@ -37,24 +37,23 @@ class Loader():
             return data # Null transform returns data
     
     def fetch_transform(self, **kwargs):
-        if self.cache:
-            if self._check_cache(**kwargs):
-                return self._read_cache(**kwargs)
+        #  If cache is available, read regardless of cache flag
+        loadlogger.info(f'Checking cache for {self.filename}')
+        if check_cache(self, **kwargs):
+            loadlogger.info(f'Returning cached data.')
+            return self.read_cache(self, **kwargs)
+        else:
+            loadlogger.info(f'Generating result for {self.filename}')
+            result = self.transform(
+                        data = self.fetch(**kwargs),
+                        **kwargs
+                    )
 
-        return self.transform(
-                data = self.fetch(**kwargs),
-                **kwargs
-            )
+            loadlogger.info(f'Checking cache settings: {self.cache}')
+            if self.cache:
+                cache_source(name=self.filename, data=result)
 
-    def _check_cache(self, *args, **kwargs):
-        return check_cache(self, **kwargs)
-
-
-    def _read_cache(self, *args, **kwargs):
-        ## TODO Complete with imported helper function to read data from cache (requires conversion to DataFrame)
-        pass
-
-
+            return result
 
 
 
@@ -92,6 +91,8 @@ class FileLoader(Loader):
         if self.loader is not None:
             return lookup[self.loader]
         return lookup[filetype]
+
+
 
 
 class ObjectLoader(Loader):
