@@ -104,10 +104,6 @@ def run_database_update():
          'https://docs.google.com/spreadsheets/d/11FlafRMeQ2D6doEX_CMHyW4OqnXkp1FfrkLdsxhd0do/edit#gid=1988095192',
          {'loader': "gsheet"}
          ),
-        ('trial',
-         'https://raw.githubusercontent.com/ebmdatalab/covid_trials_tracker-covid/master/notebooks/processed_data_sets/trial_list_2020-05-26.csv',
-         {}
-         ),
     ]
     for job in jobs:
         run_ingest(category=job[0], source=job[1], **job[2])
@@ -122,7 +118,7 @@ def update_db():
             routelogger.info('Verified. Updating Database.')
             q = get_q()
             job = q.enqueue_call(
-                func=run_database_update, args=(), result_ttl=5000, timeout=1800,
+                func=run_database_update, args=(), result_ttl=5000, timeout=5400,
             )
             return {
                 'message': 'Database Update Started.',

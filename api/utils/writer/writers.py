@@ -125,3 +125,8 @@ def write_sitelocation(data: pd.DataFrame):
 def write_productcontact(data: pd.DataFrame):
     writelogger.info('Building ProductContact writer')
     run_write(data=data, model=ProductContact)
+
+
+def write_sourcecache(data: pd.DataFrame):
+    writelogger('Building SourceCache writer.')
+    run_write(data=data, model=SourceCache)

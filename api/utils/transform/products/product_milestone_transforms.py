@@ -59,6 +59,7 @@ def set_max_completed_to_ongoing(row, lookup):
         return 'ONGOING'
     return row.status
     
+
 def clean_rename_data(dataframe: pd.DataFrame, renaming_schema:dict):
     temp = dataframe.rename(columns=renaming_schema)
     logger.info(f'milestone clean/rename {temp.columns}')
@@ -66,6 +67,12 @@ def clean_rename_data(dataframe: pd.DataFrame, renaming_schema:dict):
     temp = fill_product_id(temp)
     return temp[renaming_schema.values()]
 
+
+def fill_current_stage(dataframe: pd.DataFrame):
+    def _rename_phase(x):
+        pass
+    return dataframe  # Bypass change until clarification
+    
 
 def melt_join_milestones(dataframe: pd.DataFrame, id_vars:list, value_vars:list):
     pivot_data = pd.melt(dataframe, id_vars=id_vars, value_vars=value_vars)
@@ -102,9 +109,20 @@ def build_status(dataframe: pd.DataFrame):
     dataframe['status'] = dataframe.date.apply(infer_status)
     fill_completed(dataframe, get_max_completed(dataframe))
     return dataframe
+
     
+def _clean_link_id(x):
+    # Check against improper .
+    temp = str(x).split('.')[0]
+    try:
+        return str(int(temp))
+    except Exception as e:
+        return None
+
+
 def build_link_id(dataframe: pd.DataFrame) -> pd.DataFrame:
-    dataframe['link_id'] = dataframe.index.tolist()
+    dataframe['link_id'] = dataframe['product_id'].astype(str) + '99' + dataframe['milestone_id'].astype(str)
+    dataframe['link_id'] = dataframe['link_id'].apply(_clean_link_id)
     return dataframe
 
 def drop_unavailable_milestones(dataframe: pd.DataFrame) -> pd.DataFrame:
