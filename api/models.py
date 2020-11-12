@@ -18,6 +18,7 @@ from sqlalchemy import (
     Float,
     Text,
     Boolean,
+    Binary,
     UniqueConstraint,
     ForeignKeyConstraint,
 )
@@ -224,7 +225,8 @@ class SiteLocation(Base):
     _class_name = 'SiteLocation'
 
     site_location_id = Column(String, primary_key=True)
-    name = Column(String, nullable=False)
+    address = Column(String)
+    name = Column(String)
     city = Column(String)
     state = Column(String)
     country = Column(String)
@@ -268,3 +270,13 @@ class ProductContact(Base):
     @property
     def json(self):
         return to_dict(self, self.__class__)
+
+
+class  SourceCache(Base):
+    __tablename__ = 'sourcecache'
+    _class_name = 'SourceCache'
+
+    source_id = Column(String, primary_key=True)
+    uri = Column(String, nullable=False)
+    data = Column(Binary, nullable=False)
+    last_update = Column(DateTime, nullable=False)

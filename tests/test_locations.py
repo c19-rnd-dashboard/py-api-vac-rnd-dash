@@ -95,8 +95,8 @@ secondlocation = [{'access_points': [],
 
 class LocationsTest(unittest.TestCase):
 
-    expected = {
-        'name': '1730 Minor Ave, Seattle, WA 98101, USA',
+    expected = {  # Missing name, site_location_id which won't be generated in first test
+        'address': '1730 Minor Ave, Seattle, WA 98101, USA',
         'lat': 47.6169397,
         'lng': -122.329572,
         'country': 'US',
@@ -116,7 +116,7 @@ class LocationsTest(unittest.TestCase):
         self.assertEqual(result, self.expected)
 
     def test_geolocation_transform(self):
-        expected_frame = pd.DataFrame({
+        expected_frame = pd.DataFrame.from_dict({
             'site_location_id': [
                 generate_hash(
                     "kaiser permanente washington health research institute - seattle - washington"+str(1)),
@@ -134,6 +134,12 @@ class LocationsTest(unittest.TestCase):
                 2
             ],
             'name': [
+                'Kaiser Permanente Washington Health Research Institute',
+                "Emory Children's Center",
+                'Kaiser Permanente Washington Health Research Institute',
+                "Emory Children's Center",
+            ],
+            'address': [
                 '1730 Minor Ave, Seattle, WA 98101, USA',
                 '1730 Minor Ave, Seattle, WA 98101, USA',
                 '1730 Minor Ave, Seattle, WA 98101, USA',
@@ -155,9 +161,11 @@ class LocationsTest(unittest.TestCase):
             'lat': [47.6169397, 47.6169397, 47.6169397, 47.6169397, ],
             'lng': [-122.329572, -122.329572, -122.329572, -122.329572, ],
 
-        }, columns=['site_location_id', 'product_id',  'name', 'city', 'state', 'country', 'lat', 'lng'])
+        })
         geolocation = Geolocation(lambda _: gmap_location)
         resulting_frame = geolocation.transform(df_sitelocations)
+        expected_frame.to_csv('expected_test.csv')
+        resulting_frame.to_csv('resulting_test.csv')        
         assert_frame_equal(expected_frame, resulting_frame)
 
 

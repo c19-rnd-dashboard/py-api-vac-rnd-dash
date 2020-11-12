@@ -1,4 +1,4 @@
-from .tools import find, compose, assign_prop, flatten, generate_hash
+from .tools import find, compose, assign_prop, flatten, generate_hash, parse_site_name
 import pandas as pd
 
 
@@ -6,6 +6,7 @@ data_frame_columns = [
     'site_location_id',
     'product_id',
     'name',
+    'address',
     'city',
     'state',
     'country',
@@ -32,7 +33,7 @@ def _map_geocode_to_site_location(gmaps_geocode):
     city, state, country = (_getAddressComponent(address_type)(
         address_components) for address_type in address_types)  # can return null
     return {
-        "name": g_address["formatted_address"],
+        "address": g_address["formatted_address"], 
         "lat": g_address["geometry"]["location"]["lat"],
         "lng": g_address["geometry"]["location"]["lng"],
         "city": city,
@@ -61,8 +62,10 @@ def _map_record_to_locations(get_location):
             for index in range(len(result)):
                 result[index]['site_location_id'] = generate_hash(
                     addresses[index]+str(product_id))
+                result[index]['name'] = parse_site_name(addresses[index])
             return result
     return actual_map
+
 
 
 class Geolocation:

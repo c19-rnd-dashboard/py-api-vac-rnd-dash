@@ -1,6 +1,7 @@
 import functools
 import time
 import hashlib
+import pandas as pd
 
 
 def compose(*functions):
@@ -18,7 +19,7 @@ def find(f):
     return excecution
 
 
-def retry(fun, max_tries=10, time_between_retries=0.3, logger=print):
+def retry(fun, max_tries=2, time_between_retries=0.3, logger=print):
     def _retry(param):
         for i in range(max_tries):
             try:
@@ -43,3 +44,22 @@ def flatten(l): return [item for sublist in l for item in sublist]
 
 def generate_hash(input: str) -> str:
     return hashlib.sha1(input.encode('utf-8')).hexdigest()
+
+
+def parse_site_name(raw: str) -> str:
+    def _capitalize(name):
+        return ' '.join([w.capitalize() for w in name.split()])
+
+    def _test_hyphen(raw):
+        if raw is None:
+            return None
+        name = raw.split('-')[0]
+        if len(name) > 1:
+            return _capitalize(name)
+
+    def _test_semicolon(raw):
+        if ';' in raw:
+            return None
+        return raw
+        
+    return _test_hyphen(_test_semicolon(raw))
