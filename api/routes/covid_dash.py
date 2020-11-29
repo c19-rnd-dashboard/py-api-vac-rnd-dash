@@ -82,6 +82,7 @@ def products():
         asset['countries'] = asset['countries'].split(',')
         asset['countryCodes'] = asset['countryCodes'].split(',')
         asset['contact'] = fetch_value(contacts, asset['productId'])
+        asset['registryLink'] = asset['registryLink'].split(' ')
 
     return jsonify(serialized_assets)
 
