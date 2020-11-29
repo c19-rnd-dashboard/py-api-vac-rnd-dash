@@ -8,6 +8,7 @@ from api.utils.transform import (
     get_product_milestones, condense_milestones,
     get_product_locations, condense_locations,
     get_product_contacts, condense_contacts,
+    split_field,
 )
 from api.cache import cache
 from sqlalchemy import or_, and_
@@ -82,6 +83,7 @@ def products():
         asset['countries'] = asset['countries'].split(',')
         asset['countryCodes'] = asset['countryCodes'].split(',')
         asset['contact'] = fetch_value(contacts, asset['productId'])
+        asset['registryLink'] = split_field(asset['registryLink'], ' ')
 
     return jsonify(serialized_assets)
 
@@ -110,5 +112,6 @@ def assets():
         asset['countries'] = asset['countries'].split(',')
         asset['countryCodes'] = asset['countryCodes'].split(',')
         asset['contact'] = fetch_value(contacts, asset['productId'])
+        asset['registryLink'] = split_field(asset['registryLink'], ' ')
 
     return jsonify(serialized_assets)

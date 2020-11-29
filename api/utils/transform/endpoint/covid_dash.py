@@ -83,3 +83,28 @@ def condense_contacts(contact_results: pd.DataFrame) -> dict:
         }
         contact_dict[contact.product_id] = contact_dict[contact.product_id] + [contact_info]
     return contact_dict
+
+
+def split_field(results:str, delimiter:str, req_arr=False) -> list:
+    """
+        split_field
+            Split a string on delimiter and format the output.
+        Params:
+        :resuts: (str) string to split
+        :delimiter: (str) delimiter to split on
+        :req_arr: (bool) 
+    """
+    def _check_valid_arr(arr:list):
+        if len(arr) > 1:
+            return arr
+        else:
+            try:
+                return arr[0]
+            except:
+                return None
+
+    if req_arr:
+        return [x for x in results.split(delimiter) if len(x) > 1]
+    else:
+        return _check_valid_arr([x for x in results.split(delimiter) if len(x) > 1])
+    
